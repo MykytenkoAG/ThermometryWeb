@@ -154,6 +154,9 @@
 
                 <script type="text/javascript" src="node_modules/chart.js/dist/chart.js"></script>
                 <script src="node_modules/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.js"></script>
+
+                <script type="text/javascript" src="js/ui.js"></script>
+
                 <script src="visualisation/visu_report.js"></script>
                 
               </div>

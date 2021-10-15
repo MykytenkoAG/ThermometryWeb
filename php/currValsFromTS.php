@@ -2,7 +2,7 @@
 //	Скрипт для вычитывания текущих значений температур, скоростей их изменения, уровней и текущей даты из TermoServer'а по протоколу http
 //	Используется AJAX'ом каждые 10 секунд и скриптом dbWriteParameters для записи полученных значений температур в базу данных 1 раз в 30 минут в фоновом режиме
 require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/php/configFromINI.php');
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/debug/debugScript.php');
+require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/php/debugScript.php');
 
 $inputValsArr		 = getInputArray ( getInputString($IPAddr, $port) );	//	[температуры][скорости][уровни][дата]
 $arrayOfTemperatures = getArrayOfValues3d($inputValsArr[0]);

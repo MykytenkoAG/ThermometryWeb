@@ -1,5 +1,3 @@
-let project_conf_array = [];
-
 let pr_f_silo_name;
 let pr_f_podv_num;
 let pr_f_layer_num;
@@ -80,21 +78,7 @@ function prfChbCurrDate(element_id){
     return;
 }
 
-//  Функция для установки аттрибутов option элемента select
-function setSelectOptions(dom_element, options_arr){
-    while (dom_element.options.length) {
-        dom_element.remove(0);
-    }
-    options_arr.forEach(element => {
-        if(element==="all"){
-            dom_element.add(new Option("все","all"));
-        } else{
-            dom_element.add(new Option(element,element));
-        }   
-    });
-    return;
-}
-
+//  Установка значений для элементов выбора подвески и датчика (Печатные формы)
 function prFormChangedSilo(){
 
     const selectedSiloName = pr_f_silo_name.options[pr_f_silo_name.selectedIndex].value;
@@ -117,7 +101,7 @@ function prFormChangedSilo(){
 
     return;
 }
-
+//  Установка значений для элемента выбора датчика (Печатные формы)
 function prFormChangedPodv(){
     
     const selectedSiloName = pr_f_silo_name.options[pr_f_silo_name.selectedIndex].value;
@@ -138,7 +122,7 @@ function prFormChangedPodv(){
     return;
 }
 
-
+//  Установка значений для элементов выбора подвески и датчика (Печатные формы)
 function chartChangedSilo(){
 
     const selects = document.getElementById("sensor-temperatures-table").getElementsByTagName('select');
@@ -153,7 +137,7 @@ function chartChangedSilo(){
 
     return;
 }
-
+//  Установка значений для элемента выбора датчика (График температуры)
 function chartChangedPodv(){
 
     const selects = document.getElementById("sensor-temperatures-table").getElementsByTagName('select');
@@ -168,7 +152,7 @@ function chartChangedPodv(){
     return;
 }
 
-
+//  Добавление кривой на график
 function addNewLineOnChart(){
 
     //  Получаем доступ ко всем полям
@@ -222,7 +206,7 @@ function addNewLineOnChart(){
     
     addNewTableRow();
 }
-
+//  Добавление строки в таблицу
 function addNewTableRow(){
 
     //  Отключаем элементы на последней строке
@@ -325,5 +309,3 @@ const config = {
 };    
 //  render / init block
 let myChart = new Chart(document.getElementById('myChart'), config);
-
-

@@ -348,6 +348,7 @@ function createTemperaturesTable($siloNum){
         
         $outStr .= "<tr style=\"height: 15px; \">";
 
+        //  Отображение уровня
         if($i==($rows_number-1)){
             $outStr .= "<td rowspan=\"".($rows_number)."\">
                     <input type=\"range\" id=\"\" name=\"\" 
@@ -370,11 +371,20 @@ function createTemperaturesTable($siloNum){
                 }
                 
                 $curr_ind += $i;  
-//  DROPDOWN!!
-                $outStr .= "<div class=\"dropdown\">
-                        <div id=\"sensor-t-$siloNum-$j-$i\" role=\"button\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\"
-                        style=\"width: 40px; text-align: center; font-weight: bold; background-color: ".$main_array[$curr_ind]['curr_t_colour'].";\">"
-                        .$main_array[$curr_ind]['curr_t_text']."</div></div>";
+                
+                //  DROPDOWN!!
+                $outStr .= "
+                    <div class=\"dropdown\">
+                        <button class=\"\" type=\"button\" id=\"sensor-t-$siloNum-$j-$i\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\"
+                        style=\"width: 40px; height: 30px; text-align: center; font-weight: bold; background-color: ".$main_array[$curr_ind]['curr_t_colour'].";\"
+                        >"
+                            .$main_array[$curr_ind]['curr_t_text'].
+                        "</button>
+                        <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu2\">
+                        <li><button class=\"dropdown-item\" type=\"button\">Отключить выбранный датчик</button></li>
+                        <li><button class=\"dropdown-item\" type=\button\">Отключить выбранную подвеску</button></li>
+                        </ul>
+                    </div>";
 
             }
 

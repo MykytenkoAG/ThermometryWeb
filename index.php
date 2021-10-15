@@ -79,9 +79,7 @@
                     <?php
                       echo getCurrentAlarms();
                     ?>
-
                   </div>
-                
 
                   <div class="col-sm p-1">
                     <button type="button" class="btn btn-light" style="width: 100%;">
