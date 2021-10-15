@@ -26,6 +26,7 @@ window.onload = function(){
     getProjectConfArr();
 }
 
+//  Получение главного конфигурационного ассоциативного массива
 function getProjectConfArr(){
 
     $.ajax({
@@ -48,14 +49,35 @@ function getProjectConfArr(){
 
 }
 
-function prf_chb(){
+//  Функции управления чекбоксами
+function prfChbAllDates(){
+    const value = document.getElementById("prfchballdates").checked;
     let checkboxes = document.getElementsByTagName("input");
 
     for(let i=0; i<checkboxes.length; i++){
-            console.log(checkboxes[i].id + " " +checkboxes[i].checked)
+            if(checkboxes[i].id.split("_")[0]==="prfchball" || checkboxes[i].id.split("_")[0]==="prfchb"){
+                checkboxes[i].checked = value;
+            }
     }
 
+    return;
+}
 
+function prfChbCurrDate(element_id){
+    
+    const date = element_id.split("_")[1];
+    const prfChbDate = document.getElementById(element_id);
+    const value = prfChbDate.checked;
+
+    let checkboxes = document.getElementsByTagName("input");
+
+    for(let i=0; i<checkboxes.length; i++){
+            if(checkboxes[i].id.split("_")[0]==="prfchb" && checkboxes[i].id.split("_")[1]===date){
+                checkboxes[i].checked = value;
+            }
+    }
+
+    return;
 }
 
 //  Функция для установки аттрибутов option элемента select

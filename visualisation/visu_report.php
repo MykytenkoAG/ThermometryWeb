@@ -54,7 +54,7 @@ function createMeasurementCheckboxes($measurementArray){
     if(count($measurementArray)>1){
         $outStr.= "
         <div class=\"form-check mt-2 mb-2\">
-            <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchballdates\" onchange=\"prf_chb()\">
+            <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchballdates\" onchange=\"prfChbAllDates()\">
             <label class=\"form-check-label\">
                 Все
             </label>
@@ -65,15 +65,15 @@ function createMeasurementCheckboxes($measurementArray){
 
         $outStr.= " <p>
                         <button class=\"btn btn-secondary\" type=\"button\" data-bs-toggle=\"collapse\"
-                                data-bs-target=\".prfchbmc-$date\" aria-expanded=\"false\">
+                                data-bs-target=\".prfchbmc_$date\" aria-expanded=\"false\">
                             $date
                         </button>
                     </p>";
 
         if(count($measurementArray[$date])>1){
             $outStr.= "
-            <div class=\"form-check mt-2 mb-2 collapse multi-collapse prfchbmc-$date\">
-                <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchball-$date\" onchange=\"prf_chb()\">
+            <div class=\"form-check mt-2 mb-2 collapse multi-collapse prfchbmc_$date\">
+                <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchball_$date\" onchange=\"prfChbCurrDate('prfchball_$date')\">
                 <label class=\"form-check-label\">
                     Все
                 </label>
@@ -82,8 +82,8 @@ function createMeasurementCheckboxes($measurementArray){
 
         foreach($time as $measTime){
             $outStr.= "
-                    <div class=\"form-check mt-2 mb-2 collapse multi-collapse prfchbmc-$date\">
-                        <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchb-$date-$measTime\" onchange=\"prf_chb()\">
+                    <div class=\"form-check mt-2 mb-2 collapse multi-collapse prfchbmc_$date\">
+                        <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchb_".$date."_".$measTime."\">
                         <label class=\"form-check-label\">
                             $measTime
                         </label>
