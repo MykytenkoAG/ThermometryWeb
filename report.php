@@ -5,6 +5,9 @@
       $webSiteTitle="Отчет"; require_once "blocks/head.php";      
       require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/visualisation/visu_report.php');
     ?>
+    
+    <script type="text/javascript" src="js/ui.js"></script>
+    
   </head>
   <body>
       <?php require_once "blocks/header.php"; ?>
@@ -66,30 +69,38 @@
                         <h5 style="font-family: Arial, Helvetica, sans-serif; font-size: 16px;">Входные данные</h5>
 
                         <div class="mt-2">
-                          <label for="rprt-pr-f-silo-name" class="form-label">Силос</label>
-                          <select class="form-control" style="width: 70px" id="rprt-pr-f-silo-name" onchange="prFormChangedSilo()">
+                          <label for="rprtprf_silo_1" class="form-label">Силос</label>
+                          <select class="form-control"
+                            id="rprtprf_silo_1"     onchange="redrawSelectsRow(event.target.id)"
+                            style="width: 70px">
                             <option value="all">все</option>
                           </select>
 
                           <div class="row mt-2">
 
                             <div class="col-4 mr-1">
-                              <label for="rprt-pr-f-podv-num" class="form-label">Подвеска</label>
-                              <select class="form-control" style="width: 70px" id="rprt-pr-f-podv-num" onchange="prFormChangedPodv()">
+                              <label for="rprtprf_podv_1" class="form-label">Подвеска</label>
+                              <select class="form-control"
+                                id="rprtprf_podv_1" onchange="redrawSelectsRow(event.target.id)"
+                                style="width: 70px">
                                 <option value="all">все</option>
                               </select>
                             </div>
 
                             <div class="col-4 mr-1">
-                              <label for="rprt-pr-f-layer-num" class="form-label">Слой</label>
-                              <select class="form-control" style="width: 70px" id="rprt-pr-f-layer-num">
+                              <label for="rprtprf_layer_1" class="form-label">Слой</label>
+                              <select class="form-control"
+                                id="rprtprf_layer_1"
+                                style="width: 70px">
                                 <option value="all">все</option>
                               </select>
                             </div>
 
                             <div class="col-4 mr-1">
-                              <label for="rprt-pr-f-sensor-num" class="form-label">Датчик</label>
-                              <select class="form-control" style="width: 70px" id="rprt-pr-f-sensor-num">
+                              <label for="rprtprf_sensor_1" class="form-label">Датчик</label>
+                              <select class="form-control"
+                                id="rprtprf_sensor_1"
+                                style="width: 70px">
                                 <option value="all">все</option>
                               </select>
                             </div>
@@ -127,19 +138,12 @@
                                 CSV
                               </button>
                             </div>
-
                           </div>
-                        
                         </div>
-                        
                       </div>
-
                     </div>
-
                   </div>
-
                 </div>
-
               </div>
             </div>
           </div>
@@ -155,7 +159,6 @@
                 <script type="text/javascript" src="node_modules/chart.js/dist/chart.js"></script>
                 <script src="node_modules/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.js"></script>
 
-                <script type="text/javascript" src="js/ui.js"></script>
 
                 <script src="visualisation/visu_report.js"></script>
                 
@@ -186,21 +189,23 @@
                     <tbody>
                       <tr>
                         <td>
-                          <!--<input type="number" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">-->
-                          <select class="form-control" style="width: 70px" id="rprt-chart-silo-name" onchange="chartChangedSilo()">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                          </select>
-                        </td>
-                        <td>
-                          <!--<input type="number" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">-->
-                          <select class="form-control" style="width: 70px" id="rprt-chart-podv-num" onchange="chartChangedPodv()">
+                          <select class="form-control"
+                            id="rprtchart_silo_1" onchange="redrawSelectsRow(event.target.id)"
+                            style="width: 70px">
                             <option value="1">1</option>
                           </select>
                         </td>
                         <td>
-                          <!--<input type="number" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-sm">-->
-                          <select class="form-control" style="width: 70px" id="rprt-chart-sensor-num">
+                          <select class="form-control"
+                            id="rprtchart_podv_1" onchange="redrawSelectsRow(event.target.id)"
+                            style="width: 70px">
+                            <option value="1">1</option>
+                          </select>
+                        </td>
+                        <td>
+                          <select class="form-control"
+                            id="rprtchart_sensor_1"
+                            style="width: 70px">
                             <option value="1">1</option>
                           </select>
                         </td>

@@ -1,53 +1,23 @@
-let pr_f_silo_name;
-let pr_f_podv_num;
-let pr_f_layer_num;
-let pr_f_sensor_num;
+function report_init(){
 
-let chart_silo_name;
-let chart_podv_num;
-let chart_sensor_num;
-
-window.onload = function(){
-    pr_f_silo_name  = document.getElementById("rprt-pr-f-silo-name");
-    pr_f_podv_num   = document.getElementById("rprt-pr-f-podv-num");
-    pr_f_layer_num  = document.getElementById("rprt-pr-f-layer-num");
-    pr_f_sensor_num = document.getElementById("rprt-pr-f-sensor-num");
-    pr_f_podv_num.disabled = true;
-    pr_f_layer_num.disabled = true;
-    pr_f_sensor_num.disabled = true;
+    setSelectOptions( document.getElementById("rprtprf_silo_1"),    ["all"].concat( Object.keys(project_conf_array) ) );
+    setSelectOptions( document.getElementById("rprtprf_podv_1"),    ["all"].concat( Object.keys(project_conf_array[1]) ) );
+    setSelectOptions( document.getElementById("rprtprf_layer_1"),   ["all"].concat( Object.keys(project_conf_array[1][1]) ) );
+    setSelectOptions( document.getElementById("rprtprf_sensor_1"),  ["all"].concat( Object.keys(project_conf_array[1][1]) ) );
 
     const selects = document.getElementById("sensor-temperatures-table").getElementsByTagName('select');
-    chart_silo_name  = selects.item(selects.length - 4);
-    chart_podv_num   = selects.item(selects.length - 3);
-    chart_sensor_num = selects.item(selects.length - 2);
-    
-    getProjectConfArr();
-}
 
-//  Получение главного конфигурационного ассоциативного массива
-function getProjectConfArr(){
+    let chart_silo_1   = selects.item(selects.length - 4);
+    let chart_podv_1   = selects.item(selects.length - 3);
+    let chart_sensor_1 = selects.item(selects.length - 2);
 
-    $.ajax({
-        url: '/webTermometry/php/configFromINI.php',
-        type: 'POST',
-        cache: false,
-        data: { 'get_project_conf_array': 1 },
-        dataType: 'html',
-        success: function(fromPHP) {
-            
-            project_conf_array = (JSON.parse(fromPHP));
-            setSelectOptions( pr_f_silo_name, ["all"].concat( Object.keys(project_conf_array) ) );
-
-            setSelectOptions( chart_silo_name,  Object.keys(project_conf_array) );
-            setSelectOptions( chart_podv_num,   Object.keys(project_conf_array[1]) );
-            setSelectOptions( chart_sensor_num, Object.keys(project_conf_array[1][1]) );
-            
-        }
-    });
-
+    setSelectOptions( chart_silo_1,   Object.keys(project_conf_array) );
+    setSelectOptions( chart_podv_1,   Object.keys(project_conf_array[1]) );
+    setSelectOptions( chart_sensor_1, Object.keys(project_conf_array[1][1]) );
 }
 
 //  Функции управления чекбоксами
+//  Вкл/Откл все чекбоксы
 function prfChbAllDates(){
     const value = document.getElementById("prfchballdates").checked;
     let checkboxes = document.getElementsByTagName("input");
@@ -60,11 +30,11 @@ function prfChbAllDates(){
 
     return;
 }
-
+//  Вкл/Откл все чекбоксы для определенного дня
 function prfChbCurrDate(element_id){
     
-    const date = element_id.split("_")[1];
     const prfChbDate = document.getElementById(element_id);
+    const date = element_id.split("_")[1];
     const value = prfChbDate.checked;
 
     let checkboxes = document.getElementsByTagName("input");
@@ -118,36 +88,6 @@ function prFormChangedPodv(){
         pr_f_layer_num.disabled = false;
         pr_f_sensor_num.disabled = false;
     }
-
-    return;
-}
-
-//  Установка значений для элементов выбора подвески и датчика (Печатные формы)
-function chartChangedSilo(){
-
-    const selects = document.getElementById("sensor-temperatures-table").getElementsByTagName('select');
-
-    const selected_silo_id = selects.item(selects.length - 4).value;
-
-    let chart_podv_num = selects.item(selects.length - 3);
-    let chart_sensor_num = selects.item(selects.length - 2);
-    
-    setSelectOptions( chart_podv_num,   Object.keys(project_conf_array[selected_silo_id]) );
-    setSelectOptions( chart_sensor_num, Object.keys(project_conf_array[selected_silo_id][1]) );
-
-    return;
-}
-//  Установка значений для элемента выбора датчика (График температуры)
-function chartChangedPodv(){
-
-    const selects = document.getElementById("sensor-temperatures-table").getElementsByTagName('select');
-
-    const selected_silo_id = selects.item(selects.length - 4).value;
-    const selected_podv_id = selects.item(selects.length - 3).value;
-
-    let chart_sensor_num = selects.item(selects.length - 2);
-    
-    setSelectOptions( chart_sensor_num, Object.keys(project_conf_array[selected_silo_id][selected_podv_id]) );
 
     return;
 }
@@ -216,8 +156,10 @@ function addNewTableRow(){
     selects.item(selects.length - 4).disabled = true;
     selects.item(selects.length - 3).disabled = true;
     selects.item(selects.length - 2).disabled = true;
-    inputs.item(inputs.length - 1).disabled = true;
+    inputs.item(inputs.length - 1).disabled   = true;
     selects.item(selects.length - 1).disabled = true;
+
+    row_num = +selects.item(selects.length - 4).id.split("_")[2] + 1;
 
     //  получаем доступ к tbody
     let tbody = document.getElementById("sensor-temperatures-table").getElementsByTagName("tbody")[0];
@@ -226,25 +168,27 @@ function addNewTableRow(){
     //  создаем столбцы
     let td1 = document.createElement("td");
     let input_silo_num = document.createElement("select");
-    input_silo_num.setAttribute("onchange","chartChangedSilo()");
+    input_silo_num.setAttribute("id","rprtchart_silo_"+row_num);
+    input_silo_num.setAttribute("onchange","redrawSelectsRow(event.target.id)");
     input_silo_num.className = "form-control";
     td1.appendChild(input_silo_num);
 
     let td2 = document.createElement("TD");
     let input_podv_num = document.createElement("select");
-    input_podv_num.setAttribute("onchange","chartChangedPodv()");
+    input_podv_num.setAttribute("id","rprtchart_podv_"+row_num);
+    input_podv_num.setAttribute("onchange","redrawSelectsRow(event.target.id)");
     input_podv_num.className = "form-control";
     td2.appendChild(input_podv_num);
 
     let td3 = document.createElement("TD");
     var input_sensor_num = document.createElement("select");
+    input_sensor_num.setAttribute("id","rprtchart_sensor_"+row_num);
     input_sensor_num.className = "form-control";
     td3.appendChild(input_sensor_num);
-
+    //  Новый цвет выбирается случайным образом
     let td4 = document.createElement("TD");
     let input_color = document.createElement("input");
     input_color.type = "color";
-    
     let colour_value="";
     for(let i=0; i<3; i++){
         if(i==0){
@@ -260,7 +204,6 @@ function addNewTableRow(){
             input_color.setAttribute("value",colour_value);
         }
     }
-    
     input_color.className = "form-control form-control-color";
     td4.appendChild(input_color);
 
@@ -278,8 +221,8 @@ function addNewTableRow(){
     row.appendChild(td5);
     tbody.appendChild(row);
 
-    setSelectOptions( input_silo_num, Object.keys(project_conf_array) );
-    setSelectOptions( input_podv_num, Object.keys(project_conf_array[1]) );
+    setSelectOptions( input_silo_num,   Object.keys(project_conf_array) );
+    setSelectOptions( input_podv_num,   Object.keys(project_conf_array[1]) );
     setSelectOptions( input_sensor_num, Object.keys(project_conf_array[1][1]) );
 
     return;

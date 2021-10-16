@@ -150,7 +150,7 @@
                     </td>
                     <td>
                       <select class="form-control"
-                        id="dbg_l_3" onchange="redrawSelectsRow(event.target.id)"
+                        id="dbg_level_3" onchange="redrawSelectsRow(event.target.id)"
                         style="width: 100px;">
                         <option value="1">1</option>
                       </select>

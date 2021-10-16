@@ -56,7 +56,7 @@ function createMeasurementCheckboxes($measurementArray){
         <div class=\"form-check mt-2 mb-2\">
             <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchballdates\" onchange=\"prfChbAllDates()\">
             <label class=\"form-check-label\">
-                Все
+                Все даты
             </label>
         </div>";
     }

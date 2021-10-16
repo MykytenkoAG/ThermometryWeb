@@ -58,7 +58,6 @@ function getArrayOfValues3d($inputArray){
 
 //	Функция для получения массива уровней
 function getLevels($inputArray){
-	//	Получаем массив уровней
 	$arrayOfLevels = preg_split('/:/', $inputArray, -1, PREG_SPLIT_NO_EMPTY);
 	return $arrayOfLevels;
 }
