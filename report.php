@@ -6,7 +6,7 @@
       require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/visualisation/visu_report.php');
     ?>
     
-    <script type="text/javascript" src="js/ui.js"></script>
+    <script type="text/javascript" src="visualisation/ui.js"></script>
     
   </head>
   <body>
@@ -45,20 +45,23 @@
                         <h5 style="font-family: Arial, Helvetica, sans-serif; font-size: 16px;">Печатные данные</h5>
                         
                         <div class="form-check mt-2">
-                          <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked>
-                          <label class="form-check-label" for="exampleRadios1">
+                          <input class="form-check-input" type="radio" name="exampleRadios"
+                                  id="prfrb_avg-t-by-layer" onchange="prfSelectsDisable()" value="avg-t-by-layer" checked>
+                          <label class="form-check-label" for="prfrb_avg-t-by-layer">
                             Средние температуры в слоях
                           </label>
                         </div>
                         <div class="form-check mt-1">
-                          <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2">
-                          <label class="form-check-label" for="exampleRadios2">
+                          <input class="form-check-input" type="radio" name="exampleRadios"
+                                  id="prfrb_t-by-layer" onchange="prfSelectsDisable()" value="t-by-layer">
+                          <label class="form-check-label" for="prfrb_t-by-layer">
                             Температуры каждого датчика в слоях
                           </label>
                         </div>
                         <div class="form-check mt-1">
-                          <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios3" value="option3">
-                          <label class="form-check-label" for="exampleRadios3">
+                          <input class="form-check-input" type="radio" name="exampleRadios"
+                                  id="prfrb_t-by-sensor" onchange="prfSelectsDisable()" value="t-by-sensor">
+                          <label class="form-check-label" for="prfrb_t-by-sensor">
                             Температуры датчика в подвеске
                           </label>
                         </div>

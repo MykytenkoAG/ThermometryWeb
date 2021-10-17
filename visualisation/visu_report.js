@@ -14,6 +14,8 @@ function report_init(){
     setSelectOptions( chart_silo_1,   Object.keys(project_conf_array) );
     setSelectOptions( chart_podv_1,   Object.keys(project_conf_array[1]) );
     setSelectOptions( chart_sensor_1, Object.keys(project_conf_array[1][1]) );
+
+    prfSelectsDisable();
 }
 
 //  Функции управления чекбоксами
@@ -48,45 +50,20 @@ function prfChbCurrDate(element_id){
     return;
 }
 
-//  Установка значений для элементов выбора подвески и датчика (Печатные формы)
-function prFormChangedSilo(){
+//  Включение/Отключение элементов выбора при нажатых радиокнопках
+function prfSelectsDisable(){
+    
+    if( document.getElementById("prfrb_avg-t-by-layer").checked || document.getElementById("prfrb_t-by-layer").checked ){
+        document.getElementById("rprtprf_podv_1").disabled = true;
+        document.getElementById("rprtprf_layer_1").disabled = false;
+        document.getElementById("rprtprf_sensor_1").disabled = true;
 
-    const selectedSiloName = pr_f_silo_name.options[pr_f_silo_name.selectedIndex].value;
-
-    if(selectedSiloName==="all"){
-        setSelectOptions(pr_f_podv_num,     ["all"]);
-        setSelectOptions(pr_f_layer_num,    ["all"]);
-        setSelectOptions(pr_f_sensor_num,   ["all"]);
-        pr_f_podv_num.disabled = true;
-        pr_f_layer_num.disabled = true;
-        pr_f_sensor_num.disabled = true;
-    } else {
-        setSelectOptions(pr_f_podv_num,     ["all"].concat( Object.keys(project_conf_array[selectedSiloName]) ));
-        setSelectOptions(pr_f_layer_num,    ["all"]);
-        setSelectOptions(pr_f_sensor_num,   ["all"]);
-        pr_f_podv_num.disabled = false;
-        pr_f_layer_num.disabled = true;
-        pr_f_sensor_num.disabled = true;
     }
 
-    return;
-}
-//  Установка значений для элемента выбора датчика (Печатные формы)
-function prFormChangedPodv(){
-    
-    const selectedSiloName = pr_f_silo_name.options[pr_f_silo_name.selectedIndex].value;
-    const selectedPodvNum = pr_f_podv_num.options[pr_f_podv_num.selectedIndex].value;
-
-    if(selectedPodvNum==="all"){
-        setSelectOptions(pr_f_layer_num,    ["all"]);
-        setSelectOptions(pr_f_sensor_num,   ["all"]);
-        pr_f_layer_num.disabled = true;
-        pr_f_sensor_num.disabled = true;
-    } else {
-        setSelectOptions(pr_f_layer_num,     ["all"].concat( Object.keys(project_conf_array[selectedSiloName][selectedPodvNum]) ));
-        setSelectOptions(pr_f_sensor_num,     ["all"].concat( Object.keys(project_conf_array[selectedSiloName][selectedPodvNum]) ));
-        pr_f_layer_num.disabled = false;
-        pr_f_sensor_num.disabled = false;
+    if( document.getElementById("prfrb_t-by-sensor").checked ){
+        document.getElementById("rprtprf_podv_1").disabled = false;
+        document.getElementById("rprtprf_layer_1").disabled = true;
+        document.getElementById("rprtprf_sensor_1").disabled = false;
     }
 
     return;
@@ -99,12 +76,11 @@ function addNewLineOnChart(){
     let inputs = document.getElementById("sensor-temperatures-table").getElementsByTagName('input');
     let selects = document.getElementById("sensor-temperatures-table").getElementsByTagName('select');
 
-
-    let silo_id = selects.item(selects.length - 4).value;
-    let podv_id = selects.item(selects.length - 3).value;
-    let sensor_num = selects.item(selects.length - 2).value;
+    let silo_id     = selects.item(selects.length - 4).value;
+    let podv_id     = selects.item(selects.length - 3).value;
+    let sensor_num  = selects.item(selects.length - 2).value;
     let line_colour = inputs.item(inputs.length - 1).value;
-    let period = selects.item(selects.length - 1).value;
+    let period      = selects.item(selects.length - 1).value;
 
     //  !       Передаем параметры в PHP
     $.ajax({
@@ -139,12 +115,12 @@ function addNewLineOnChart(){
                                                     + parseInt(line_colour.slice(5,7),16) + ",1)";
 
             myChart.data.datasets.push(newDataset);
-            myChart.update();    
+            myChart.update();
+
+            addNewTableRow();
 
         }
     });
-    
-    addNewTableRow();
 }
 //  Добавление строки в таблицу
 function addNewTableRow(){
@@ -159,7 +135,7 @@ function addNewTableRow(){
     inputs.item(inputs.length - 1).disabled   = true;
     selects.item(selects.length - 1).disabled = true;
 
-    row_num = +selects.item(selects.length - 4).id.split("_")[2] + 1;
+    row_num = +selects.item(selects.length - 4).id.split("_")[2] + 1;   //  Номер строки. Вычисляем для присваивания нового id элементам
 
     //  получаем доступ к tbody
     let tbody = document.getElementById("sensor-temperatures-table").getElementsByTagName("tbody")[0];
@@ -221,6 +197,7 @@ function addNewTableRow(){
     row.appendChild(td5);
     tbody.appendChild(row);
 
+    //  Производим инициализацию элементов select
     setSelectOptions( input_silo_num,   Object.keys(project_conf_array) );
     setSelectOptions( input_podv_num,   Object.keys(project_conf_array[1]) );
     setSelectOptions( input_sensor_num, Object.keys(project_conf_array[1][1]) );

@@ -6,7 +6,7 @@
       require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/visualisation/visu_report.php');
     ?>
 
-    <script type="text/javascript" src="js/ui.js"></script>
+    <script type="text/javascript" src="visualisation/ui.js"></script>
     <script type="text/javascript" src="visualisation/visu_debug_page.js"></script>
   </head>
 
