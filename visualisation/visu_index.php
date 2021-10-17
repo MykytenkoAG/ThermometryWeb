@@ -1,24 +1,6 @@
 <?php
 
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/php/alarms.php');
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/php/dbCreateTables.php');
-
-/*deleteAllTables();
-createTableUsers();
-createTableErrors();
-createTableDates();
-createTableProdtypes();
-createTableProdtypesbysilo();
-createTableSensors();
-createTableMeasurements();
-initTableUsers();
-initTableErrors();
-initTableDates();
-initTableProdtypes();
-initTableProdbysilo();
-initTableSensors();*/
-
-writeCurrentReadingsToDB();
+require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');
 
 //  OUT = html table < NACK, time, silo_name, podv_num, sensor_num, reason >
 function getCurrentAlarms(){

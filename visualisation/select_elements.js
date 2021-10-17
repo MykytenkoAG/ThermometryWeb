@@ -11,9 +11,9 @@ window.onload = function(){
 /*  Получение главного конфигурационного ассоциативного массива
 */
 function getProjectConfArr(){
-
+    
     $.ajax({
-        url: '/webTermometry/php/configFromINI.php',
+        url: '/webTermometry/scripts/currValsFromTS.php',
         type: 'POST',
         cache: false,
         data: { 'get_project_conf_array': 1 },
@@ -35,7 +35,6 @@ function getProjectConfArr(){
     });
 
 }
-
 /*  Функция для установки аттрибутов option элемента select
 */
 function setSelectOptions(dom_element, options_arr){

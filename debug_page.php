@@ -2,11 +2,9 @@
 <html lang="en">
   <head>
     <?php
-      $webSiteTitle="DEBUG"; require_once "blocks/head.php";      
-      require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/visualisation/visu_report.php');
+      $webSiteTitle="DEBUG"; require_once "blocks/head.php";
     ?>
-
-    <script type="text/javascript" src="visualisation/ui.js"></script>
+    <script type="text/javascript" src="visualisation/select_elements.js"></script>
     <script type="text/javascript" src="visualisation/visu_debug_page.js"></script>
   </head>
 
@@ -55,30 +53,14 @@
                       <input type="number" class="form-control" id="dbg_t_1" name="dbg_1_temperature" value="0" style="width: 100px;">
                     </td>
                     <td>
-                      <button type="button" class="form-control" id="dbg_1_button">Установить</button>
+                      <button type="button" class="form-control" id="dbg_1_button"
+                      
+                      onclick="onClick_dbg_button_1('dbg_silo_1','dbg_t_1')">
+                      
+                      Установить</button>
                     </td>
                     </form>
                   </tr>
-
-                  <script>
-                    $('#dbg_1_button').click(function(){
-
-                      $.ajax({
-                          url: 'debug/debugScript.php',
-                          type: 'POST',
-                          cache: false,
-                          data: { 'dbg_1_silo_num': $('#dbg_1_silo_num').val(), 'dbg_1_temperature': $('#dbg_1_temperature').val() },
-                          dataType: 'html',
-                          success: function(fromPHP) {
-                            alert(fromPHP);
-                            redrawMainDbgTable();
-                          }
-                      });
-
-
-
-                    });
-                  </script>
 
                   <!--  -->
                   <tr>
@@ -104,27 +86,13 @@
                       <input type="number" class="form-control" id="dbg_v_2" name="dbg_2_t_speed" value="0" style="width: 100px;">
                     </td>
                     <td>
-                      <button type="button" class="form-control" id="dbg_2_button">Установить</button>
+                      <button type="button" class="form-control" id="dbg_2_button"
+                      
+                      onclick="onClick_dbg_button_2('dbg_silo_2','dbg_v_2')">
+                      
+                      Установить</button>
                     </td>
                   </tr>
-
-                  <script>
-                    $('#dbg_2_button').click(function(){
-
-                      $.ajax({
-                          url: 'debug/debugScript.php',
-                          type: 'POST',
-                          cache: false,
-                          data: { 'dbg_2_silo_num': $('#dbg_2_silo_num').val(), 'dbg_2_t_speed': $('#dbg_2_t_speed').val() },
-                          dataType: 'html',
-                          success: function(fromPHP) {
-                            alert(fromPHP);
-                            redrawMainDbgTable();
-                          }
-                      });
-
-                    });
-                  </script>
 
                   <!--  -->
                   <tr>
@@ -156,27 +124,13 @@
                       </select>
                     </td>
                     <td>
-                      <button class="form-control" type="button" id="dbg_3_button">Установить</button>
+                      <button class="form-control" type="button" id="dbg_3_button"
+                      
+                      onclick="onClick_dbg_button_3('dbg_silo_3','dbg_level_3')">
+                      
+                      Установить</button>
                     </td>
                   </tr>
-
-                  <script>
-                    $('#dbg_3_button').click(function(){
-
-                      $.ajax({
-                          url: 'debug/debugScript.php',
-                          type: 'POST',
-                          cache: false,
-                          data: { 'dbg_3_silo_num': $('#dbg_3_silo_num').val(), 'dbg_3_grain_level': $('#dbg_3_grain_level').val() },
-                          dataType: 'html',
-                          success: function(fromPHP) {
-                            alert(fromPHP);
-                            redrawMainDbgTable();
-                          }
-                      });
-
-                    });
-                  </script>
 
                   <!--  -->
                   <tr>
@@ -210,33 +164,17 @@
                       Температура
                     </td>
                     <td>
-                      <input type="number" class="form-control" id="dbg_4_temperature" name="dbg_4_temperature" value="0" style="width: 100px;">
+                      <input type="number" class="form-control" id="dbg_t_4" name="dbg_t_4" value="0" style="width: 100px;">
                     </td>
 
                     <td>
-                      <button type="button" class="form-control" id="dbg_4_button">Установить</button>
+                      <button type="button" class="form-control" id="dbg_4_button"
+                      
+                      onclick="onClick_dbg_button_4('dbg_silo_4', 'dbg_podv_4', 'dbg_t_4')">
+                      
+                      Установить</button>
                     </td>
                   </tr>
-
-                  <script>
-                    $('#dbg_4_button').click(function(){
-
-                      $.ajax({
-                          url: 'debug/debugScript.php',
-                          type: 'POST',
-                          cache: false,
-                          data: { 'dbg_4_silo_num': $('#dbg_4_silo_num').val(),
-                                  'dbg_4_podv_num': $('#dbg_4_podv_num').val(),
-                                  'dbg_4_temperature': $('#dbg_4_temperature').val() },
-                          dataType: 'html',
-                          success: function(fromPHP) {
-                            alert(fromPHP);
-                            redrawMainDbgTable();
-                          }
-                      });
-
-                    });
-                  </script>
 
                   <!--  -->
                   <tr>
@@ -269,32 +207,16 @@
                     Скорость
                   </td>
                   <td>
-                    <input type="number" class="form-control" id="dbg_5_t_speed" name="dbg_5_t_speed" value="0" style="width: 100px;">
+                    <input type="number" class="form-control" id="dbg_v_5" name="dbg_5_t_speed" value="0" style="width: 100px;">
                   </td>
                   <td>
-                    <button type="button" class="form-control" id="dbg_5_button">Установить</button>
+                    <button type="button" class="form-control" id="dbg_5_button"
+                    
+                    onclick="onClick_dbg_button_5('dbg_silo_5', 'dbg_podv_5', 'dbg_v_5')">
+                    
+                    Установить</button>
                   </td>
                   </tr>
-
-                  <script>
-                    $('#dbg_5_button').click(function(){
-
-                      $.ajax({
-                          url: 'debug/debugScript.php',
-                          type: 'POST',
-                          cache: false,
-                          data: { 'dbg_5_silo_num': $('#dbg_5_silo_num').val(),
-                                  'dbg_5_podv_num': $('#dbg_5_podv_num').val(),
-                                  'dbg_5_t_speed': $('#dbg_5_t_speed').val() },
-                          dataType: 'html',
-                          success: function(fromPHP) {
-                            alert(fromPHP);
-                            redrawMainDbgTable();
-                          }
-                      });
-
-                    });
-                  </script>
 
                   <!--  -->
                   <tr>
@@ -335,33 +257,16 @@
                     Температура
                   </td>
                   <td>
-                    <input type="number" class="form-control" id="dbg_6_temperature" name="dbg_6_temperature" value="0" style="width: 100px;">
+                    <input type="number" class="form-control" id="dbg_t_6" name="dbg_6_temperature" value="0" style="width: 100px;">
                   </td>
                   <td>
-                    <button type="button" class="form-control" id="dbg_6_button">Установить</button>
+                    <button type="button" class="form-control" id="dbg_6_button"
+                    
+                    onclick="onClick_dbg_button_6('dbg_silo_6', 'dbg_podv_6', 'dbg_sensor_6', 'dbg_t_6')">
+                    
+                    Установить</button>
                   </td>
                   </tr>
-
-                  <script>
-                    $('#dbg_6_button').click(function(){
-
-                      $.ajax({
-                          url: 'debug/debugScript.php',
-                          type: 'POST',
-                          cache: false,
-                          data: { 'dbg_6_silo_num': $('#dbg_6_silo_num').val(),
-                                  'dbg_6_podv_num': $('#dbg_6_podv_num').val(),
-                                  'dbg_6_sensor_num': $('#dbg_6_sensor_num').val(),
-                                  'dbg_6_temperature': $('#dbg_6_temperature').val() },
-                          dataType: 'html',
-                          success: function(fromPHP) {
-                            alert(fromPHP);
-                            redrawMainDbgTable();
-                          }
-                      });
-
-                    });
-                  </script>
 
                   <!--  -->
                   <tr>
@@ -402,45 +307,29 @@
                       Скорость
                     </td>
                     <td>
-                      <input type="number" class="form-control" id="dbg_7_t_speed" name="dbg_7_t_speed" value="0" style="width: 100px;">
+                      <input type="number" class="form-control" id="dbg_v_7" name="dbg_7_t_speed" value="0" style="width: 100px;">
                     </td>
                     <td>
-                      <button type="button" class="form-control" id="dbg_7_button">Установить</button>
+                      <button type="button" class="form-control" id="dbg_7_button"
+                      
+                      onclick="onClick_dbg_button_7('dbg_silo_7', 'dbg_podv_7', 'dbg_sensor_7', 'dbg_v_7')">Установить</button>
+
                     </td>
                   </tr>
-
-                  <script>
-                    $('#dbg_7_button').click(function(){
-
-                      $.ajax({
-                          url: 'debug/debugScript.php',
-                          type: 'POST',
-                          cache: false,
-                          data: { 'dbg_7_silo_num': $('#dbg_7_silo_num').val(),
-                                  'dbg_7_podv_num': $('#dbg_7_podv_num').val(),
-                                  'dbg_7_sensor_num': $('#dbg_7_sensor_num').val(),
-                                  'dbg_7_t_speed': $('#dbg_7_t_speed').val() },
-                          dataType: 'html',
-                          success: function(fromPHP) {
-                            alert(fromPHP);
-                            redrawMainDbgTable();
-                          }
-                      });
-
-                    });
-                  </script>
-
 
                 </table>
 
                 <button type="button" class="form-control"
                         id="dbg_write_measurements_to_db"
-                        style="position: absolute; width: 300px; bottom: 2%;">
+                        style="position: absolute; width: 300px; bottom: 2%;"
+
+                        onclick="onClick_dbg_button_add_measurements()">
+
                     Сохранить текущие показания в БД
                 </button>
                 
                 <?php
-                  require_once "php/currValsFromTS.php";
+                  require_once "scripts/currValsFromTS.php";
 
                   if($simulation_mode){
                     echo "<div style=\"position: absolute; bottom: 2%; right:2%\">ВКЛЮЧЕН РЕЖИМ ОТЛАДКИ</div>";
@@ -451,43 +340,16 @@
             </div>
           </div>
 
-          <script>
-            $('#dbg_write_measurements_to_db').click(function(){
-
-              $.ajax({
-                  url: 'debug/debugScript.php',
-                  type: 'POST',
-                  cache: false,
-                  data: { 'write_measurements_to_db': 1 },
-                  dataType: 'html',
-                  success: function(fromPHP) { alert(fromPHP) }
-              });
-
-            });
-          </script>
-
           <div class="col-md-6 g-1">
             <div class="card rounded-3 shadow-sm">
               <div class="card-header py-3" style="height: 60px;">
                 <h4 class="my-0 fw-normal align-center" id="CurrentSiloName" style="position: absolute; top: auto; left: 40%;">Параметры</h4>
 
-                <button type="button" class="form-control" id="dbg_refresh"
-                  style="position: relative; float: right; top: -5px; width: 100px;">Обновить</button>
-
-                <script>
-                    $('#dbg_refresh').click(function(){
-
-                      redrawMainDbgTable();
-                      
-                    });
-
-                    </script>
-
               </div>  
               <div class="card-body d-flex justify-content-center" style="height:750px; overflow: auto;" id="debug_parameters_table">
 
                 <?php
-                  require_once "php/debugScript.php";
+                  require_once "visualisation/visu_debug_page.php";
                   echo debug_get_debug_table();
                 ?>
               

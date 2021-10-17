@@ -4,7 +4,6 @@
 <title><?= $webSiteTitle ?></title>
 <link rel="icon" href="img/icon.ico">
 
-<link href="node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
 <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
-
+<link href="node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
 <script type="text/javascript" src="node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
