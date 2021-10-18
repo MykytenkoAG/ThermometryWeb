@@ -17,8 +17,6 @@ function clearLog(){
     return;
 }
 
-/*	Функция установки сигнала АПС
-	Вызывается из AJAX (если клиенты не подключены, то и формировать АПС нет необходимости)	*/
 function setNACK(){
 
 	global $dbh; global $serverDate;
@@ -193,8 +191,6 @@ function setNACK(){
 	return;
 }
 
-/*	Функция квитирования сигналов АПС
-	Вызывается при нажатии пользователм кнопки сброса (через AJAX)	*/
 function setACK(){
 
 	global $dbh; global $serverDate;
@@ -362,8 +358,6 @@ function setACK(){
 	return;
 }
 
-/*	Функция сброса сигнала АПС
-	Вызывается на каждом цикле опроса	*/
 function resetACK(){
 
 	global $dbh; global $serverDate;

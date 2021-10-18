@@ -120,6 +120,6 @@
       </main>
       
       <script src="visualisation/visu_silo_config.js"></script>
-
+      <script type="text/javascript" src="periodic.js"></script>
     </body>
 </html>

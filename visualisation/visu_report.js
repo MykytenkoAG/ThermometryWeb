@@ -1,4 +1,4 @@
-function report_init(){
+function init_report(){
 
     setSelectOptions( document.getElementById("rprtprf_silo_1"),    ["all"].concat( Object.keys(project_conf_array) ) );
     setSelectOptions( document.getElementById("rprtprf_podv_1"),    ["all"].concat( Object.keys(project_conf_array[1]) ) );

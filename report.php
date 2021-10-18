@@ -2,12 +2,9 @@
 <html lang="en">
   <head>
     <?php
-      $webSiteTitle="Отчет"; require_once "blocks/head.php";      
+      $webSiteTitle="Отчет"; require_once "blocks/head.php";
       require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/visualisation/visu_report.php');
     ?>
-    
-    <script type="text/javascript" src="visualisation/ui.js"></script>
-    
   </head>
   <body>
       <?php require_once "blocks/header.php"; ?>
@@ -159,12 +156,10 @@
                 </div>
                 <canvas id="myChart"></canvas>
 
-                <script type="text/javascript" src="node_modules/chart.js/dist/chart.js"></script>
-                <script src="node_modules/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.js"></script>
+          <script type="text/javascript" src="node_modules/chart.js/dist/chart.js"></script>
+          <script src="node_modules/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.js"></script>
 
-
-                <script src="visualisation/visu_report.js"></script>
-                
+          <script type="text/javascript" src="visualisation/visu_report.js"></script>
               </div>
             </div>
           </div>

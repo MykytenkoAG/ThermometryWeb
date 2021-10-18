@@ -519,7 +519,7 @@ if(isset($_POST['silo_id_forText']) && !empty($_POST['silo_id_forText'])) {
 }
 
 //  Отрисовка текущих значений параметров силоса
-if(isset($_POST['silo_id_for_silo_parameters']) && !empty($_POST['silo_id_for_silo_parameters'])) {
+if( isset($_POST['silo_id_for_silo_parameters']) ) {
     echo json_encode(getSiloParameters($_POST['silo_id_for_silo_parameters']));
 }
 

@@ -297,4 +297,8 @@ if( isset($_POST['get_project_conf_array']) ) {
     echo json_encode( getProjectConfArr() ) ;
 }
 
+if( isset($_POST['read_vals']) ) {
+    echo "Данные успешно прочитаны" ;
+}
+
 ?>

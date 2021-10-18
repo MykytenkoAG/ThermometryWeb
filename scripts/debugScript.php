@@ -1,7 +1,5 @@
 <?php
 
-//require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/dbSensors.php');
-
 function debug_drop_all_tables(){
 
 	global $dbh;

@@ -1,6 +1,5 @@
 <?php
-//	Включение/Отключение датчиков
-//	Вызов только по команде пользователя
+
 function sensorEnable($silo_id, $podv_id, $sensor_num){
 
 	global $dbh;

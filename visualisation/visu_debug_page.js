@@ -1,4 +1,4 @@
-function debug_page_init(){
+function init_debug_page(){
 
     //  Инициализация элементов select
     for(let i=1; i<=7; i++){

@@ -1,6 +1,6 @@
 <?php
 
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/php/configFromINI.php');
+require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');
 
 //  Получить все даты измерений
 //  out = [дата => массив времен измерений]
@@ -386,7 +386,6 @@ function getSensorTemperaturesByPodv($arrayOfSilos, $arrayOfPodv, $arrayOfSensor
     }
 */
 
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/php/configFromINI.php');
 
 function getTimeTemperatureTable($silo_id, $podv_id, $sens_num, $dateStart, $dateEnd){
 

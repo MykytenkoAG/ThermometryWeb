@@ -4,6 +4,9 @@
 <title><?= $webSiteTitle ?></title>
 <link rel="icon" href="img/icon.ico">
 
-<script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript" src="node_modules/jquery/dist/jquery.js"></script>
+
 <link href="node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
 <script type="text/javascript" src="node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+
+<script type="text/javascript" src="scripts/periodic.js"></script>

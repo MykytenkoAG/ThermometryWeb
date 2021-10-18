@@ -25,11 +25,12 @@
 
 */
 
-window.onload = function(){
+function init_silo_config(){
     buttonDisable("table-prodtypes-btn-save-changes");
     buttonDisable("table-prodtypes-btn-discard-changes");
     buttonDisable("table-prodtypesbysilo-btn-save-changes");
     buttonDisable("table-prodtypesbysilo-btn-discard-changes");
+
 }
 
 function tableInputsDisable(table_id){

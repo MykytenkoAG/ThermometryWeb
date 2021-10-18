@@ -1,48 +1,66 @@
-//  Сохраняем последние значения кнопок выбора параметров
-let lastButtonID = "btn-temperatures";
-let lastSiloID = "silo-0";
+function init_index(){
 
-//  При загрузке страницы
-window.onload = function() {
+    lastParamSelectButtonID = "btn-temperatures";
     document.getElementById("btn-temperatures").className = "btn btn-success";
-    onSiloClicked("silo-0");
+    lastSiloID = "silo-0";
+    onSiloClicked(lastSiloID);
+
+    return;
 }
 
-function onBtnClicked(btn_id) {
-    lastButtonID = btn_id;
-    onSiloClicked(lastSiloID);
-    //  можно оптимизировать при помощи массива
-    document.getElementById("btn-temperatures").className   = "btn btn-light";
-    document.getElementById("btn-speeds").className         = "btn btn-light";
-    document.getElementById(btn_id).className               = "btn btn-success";
-}
+let lastParamSelectButtonID;                //  Кнопка для выбора отображаемых параметров (температуры, скорости)
+let lastSiloID;
 
 //  Произведено нажатие на один из силосов
 function onSiloClicked(silo_id) {
 
-    if (lastButtonID === "btn-temperatures") {
-        //  Отрисовка таблиц температур
-        $.ajax({
-            url: 'visualisation/visu_index.php',
-            type: 'POST',
-            cache: false,
-            data: { 'silo_id_for_temperature_table': silo_id },
-            dataType: 'html',
-            success: function(fromPHP) { document.getElementById("silo-param-table").innerHTML = fromPHP; }
-        });
-    } else if (lastButtonID === "btn-speeds") {
-        //  Отрисовка таблиц скоростей
-        $.ajax({
-            url: 'visualisation/visu_index.php',
-            type: 'POST',
-            cache: false,
-            data: { 'silo_id_for_speeds_table': silo_id },
-            dataType: 'html',
-            success: function(fromPHP) { document.getElementById("silo-param-table").innerHTML = fromPHP; }
-        });
+    if          (lastParamSelectButtonID === "btn-temperatures") {
+        redrawTableTemperatures(silo_id);                           //  таблица температур
+    } else if   (lastParamSelectButtonID === "btn-speeds") {
+        redrawTableTemperatureSpeeds(silo_id);                      //  таблица скоростей
     }
 
-    //  Изменение текста номера силоса
+    redrawSiloNameText(silo_id);                                    //  Название силоса
+    redrawProductParametersTable(silo_id);                          //  Параметры продукта
+
+    lastSiloID = silo_id;
+
+}
+
+function onBtnClicked(btn_id) {
+    onSiloClicked(lastSiloID);
+    document.getElementById("btn-temperatures").className   = "btn btn-light";
+    document.getElementById("btn-speeds").className         = "btn btn-light";
+    document.getElementById(btn_id).className               = "btn btn-success";    //  Подсвечиваем выбранную кнопку
+    lastParamSelectButtonID = btn_id;
+    return;
+}
+
+function redrawTableTemperatures(silo_id){
+    $.ajax({
+        url: 'visualisation/visu_index.php',
+        type: 'POST',
+        cache: false,
+        data: { 'silo_id_for_temperature_table': silo_id },
+        dataType: 'html',
+        success: function(fromPHP) { document.getElementById("silo-param-table").innerHTML = fromPHP; }
+    });
+    return;
+}
+
+function redrawTableTemperatureSpeeds(silo_id){
+    $.ajax({
+        url: 'visualisation/visu_index.php',
+        type: 'POST',
+        cache: false,
+        data: { 'silo_id_for_speeds_table': silo_id },
+        dataType: 'html',
+        success: function(fromPHP) { document.getElementById("silo-param-table").innerHTML = fromPHP; }
+    });
+    return;
+}
+
+function redrawSiloNameText(silo_id){
     $.ajax({
         url: 'visualisation/visu_index.php',
         type: 'POST',
@@ -51,8 +69,10 @@ function onSiloClicked(silo_id) {
         dataType: 'html',
         success: function(fromPHP) { document.getElementById("current-silo-name").innerHTML = fromPHP; }
     });
+    return;
+}
 
-    //  Получение параметров силоса
+function redrawProductParametersTable(silo_id){
     $.ajax({
         url: 'visualisation/visu_index.php',
         type: 'POST',
@@ -76,7 +96,7 @@ function onSiloClicked(silo_id) {
 
         }
     });
-
-    lastSiloID = silo_id;
-
+    return;
 }
+
+

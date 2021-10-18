@@ -5,7 +5,7 @@
       $webSiteTitle="Термометрия"; require_once "blocks/head.php";
       require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/visualisation/visu_index.php');
     ?>
-    <script src="visualisation/visu_index.js"></script>
+    <script type="text/javascript" src="visualisation/visu_index.js"></script>
   </head>
   <body>
       <?php require_once "blocks/header.php"; ?>

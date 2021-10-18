@@ -1,7 +1,6 @@
 <?php
 
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/php/configFromINI.php');
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/php/dbSensors.php');
+require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');
 
 function drawTableProdtypes(){
 
