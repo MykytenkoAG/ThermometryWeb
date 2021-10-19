@@ -2,6 +2,9 @@ function init_index(){
 
 
     console.log("index initialisation");
+
+    redrawSiloStatus();
+
     lastParamSelectButtonID = "btn-temperatures";
     document.getElementById("btn-temperatures").className = "btn btn-success";
     lastSiloID = "silo-0";
@@ -9,9 +12,6 @@ function init_index(){
 
     return;
 }
-
-let lastParamSelectButtonID;                //  Кнопка для выбора отображаемых параметров (температуры, скорости)
-let lastSiloID;
 
 //  Алармы
 function redrawTableCurrentAlarms(){
@@ -23,6 +23,18 @@ function redrawTableCurrentAlarms(){
         dataType: 'html',
         success: function(fromPHP) { document.getElementById("ind-table-alarms").innerHTML = fromPHP; }
     });
+    return;
+}
+
+//  !   TODO
+function disableAllDefectiveSensors(){
+
+    return;
+}
+
+//  !   TODO
+function enableAllSensors(){
+
     return;
 }
 
@@ -86,6 +98,9 @@ function redrawSiloStatus(){
 }
 
 //  Правый сайтбар
+let lastParamSelectButtonID;                //  Кнопка для выбора отображаемых параметров (температуры, скорости)
+let lastSiloID;
+
 function onSiloClicked(silo_id) {
 
     if          (lastParamSelectButtonID === "btn-temperatures") {
@@ -173,3 +188,26 @@ function redrawTableTemperatureSpeeds(silo_id){
     return;
 }
 
+//  !   TODO
+function disableCurrentSensor(silo_id, podv_num, sensor_num){
+
+    return;
+}
+
+//  !   TODO
+function enableCurrentSensor(silo_id, podv_num, sensor_num){
+
+    return;
+}
+
+//  !   TODO
+function disableCurrentPodv(silo_id, podv_num, sensor_num){
+
+    return;
+}
+
+//  !   TODO
+function enableCurrentPodv(silo_id, podv_num, sensor_num){
+
+    return;
+}

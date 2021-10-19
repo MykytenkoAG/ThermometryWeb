@@ -121,6 +121,6 @@ title="Авторизоваться как технолог">
     </script>
 
     
-    <audio id="alarm-sound" src="sound\ES_Submarine Alarm 1 - SFX Producer.mp3"></audio>
+    <audio id="alarm-sound" src="sound/ES_Submarine Alarm 1 - SFX Producer.mp3"></audio>
 
 </header>

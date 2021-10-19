@@ -93,11 +93,11 @@
                     </button>
                   </div>
 
-                  <div class="col-sm p-1">
+                  <!--    <div class="col-sm p-1">
                     <button type="button" class="btn btn-light" style="width: 100%;">
                       Отключить автоопределение уровня на всех силосах
                     </button>
-                  </div>
+                  </div>  -->
 
                 </div>
 
