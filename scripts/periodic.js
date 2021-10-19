@@ -2,10 +2,13 @@ let current_page;
 let project_conf_array=[];
 let timer;
 
-window.onload = function(){
+document.addEventListener("DOMContentLoaded", () => {
     current_page = window.location.pathname.split("/").pop();
     getProjectConfArr();
-}
+    isSoundOn();
+    console.log(current_page);
+});
+
 
 /*  Получение главного конфигурационного ассоциативного массива
 */
@@ -23,7 +26,7 @@ function getProjectConfArr(){
             timer = setInterval( every10s, 10000);
             
             //  Производим инициализацию в зависимости от того, на какой странице находимся
-            if          (current_page === "index.php"){
+            if          (current_page === "index.php" || current_page === ""){
                 init_index();
             } else if   (current_page === "report.php"){
                 init_report();
@@ -106,6 +109,55 @@ function redrawSelectsRow(select_element_id){
     return;
 }
 
+function isSoundOn(){
+
+    $.ajax({
+        url: '/webTermometry/scripts/currValsFromTS.php',
+        type: 'POST',
+        cache: false,
+        data: { 'is_sound_on': 1 },
+        dataType: 'html',
+        success: function(fromPHP) {
+
+            console.log(fromPHP);
+
+            if(fromPHP=="YES"){
+                document.getElementById("alarm-sound").loop = true;
+                document.getElementById("alarm-sound").play();
+            }else {
+                
+                document.getElementById("alarm-sound").pause();
+            }
+
+        }
+    });
+    return;
+}
+
+
+function acknowledgeAlarms(){
+    document.getElementById("alarm-sound").pause();
+
+    $.ajax({
+        url: '/webTermometry/scripts/currValsFromTS.php',
+        type: 'POST',
+        cache: false,
+        data: { 'acknowledge': 1 },
+        dataType: 'html',
+        success: function(fromPHP) {
+            console.log(fromPHP);
+            if(current_page === "index.php"){
+                redrawTableCurrentAlarms();
+
+                redrawSiloStatus();
+
+                onSiloClicked(lastSiloID);
+            }
+        }
+    });
+    return;
+}
+
 function every10s() {
     
     $.ajax({
@@ -115,7 +167,14 @@ function every10s() {
         data: { 'read_vals': 1 },
         dataType: 'html',
         success: function(fromPHP) {
-            if(current_page === "index.php"){
+            console.log(fromPHP);
+            isSoundOn();
+
+            if(current_page === "index.php" || current_page === ""){
+                redrawTableCurrentAlarms();
+
+                redrawSiloStatus();
+
                 onSiloClicked(lastSiloID);
             }
         }

@@ -22,9 +22,9 @@ function replaceForbiddenChars($str){
 }
 //	Чтение главных конфигурационных файлов проекта
 $termoServerINI  =	@parse_ini_string(replaceForbiddenChars(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/webTermometry/settings/TermoServer.ini')), true);
-if( count($termoServerINI)==0){	$error .= "Файл TermoServer.ini отсутствует в каталоге webTermometry/settings;";}
+if( count($termoServerINI)==0 ){	$error .= "Файл TermoServer.ini отсутствует в каталоге webTermometry/settings;";}
 $termoClientINI  =	@parse_ini_string(replaceForbiddenChars(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/webTermometry/settings/TermoClient.ini')), true);
-if( count($termoClientINI)==0){	$error .= "Файл TermoClient.ini отсутствует в каталоге webTermometry/settings;";}
+if( count($termoClientINI)==0 ){	$error .= "Файл TermoClient.ini отсутствует в каталоге webTermometry/settings;";}
 
 function doINIFilesMatchEachOther($termoServerINI,$termoClientINI){
 	$termoServerSiloArray=array();$termoClientSiloArray=array();
@@ -253,7 +253,7 @@ update_lvl($arrayOfLevels);
 
 //	Проверка на алармы
 setNACK();
-resetACK();
+//resetACK();
 
 //	Функция выдачи главного конфигурационного массива проекта
 function getProjectConfArr(){
@@ -297,8 +297,20 @@ if( isset($_POST['get_project_conf_array']) ) {
     echo json_encode( getProjectConfArr() ) ;
 }
 
+
+if( isset($_POST['is_sound_on']) ) {
+    echo isSoundOn();
+	//echo "Данные успешно прочитаны" ;
+}
+
 if( isset($_POST['read_vals']) ) {
-    echo "Данные успешно прочитаны" ;
+    //echo isSoundOn();
+	echo "Данные успешно прочитаны" ;
+}
+
+if( isset($_POST['acknowledge']) ) {
+	setACK();
+    echo "Произведено подтверждение сигналов АПС" ;
 }
 
 ?>

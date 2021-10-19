@@ -26,7 +26,6 @@
         </style>
 
       <main>
-
         <div class="row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-2 row-cols-xxl-3 g-0">
 
           <div class="col-12 col-md-5 col-lg-4 col-xl-4 col-xxl-3 g-1">
@@ -75,10 +74,11 @@
 
                   <div class="col p-1 mx-auto" style="max-height: 650px; width: 430px; overflow: auto; text-align: left; border-style: solid; border-color: gray;
                                                       border-width: 1px;">
-
-                    <?php
-                      echo getCurrentAlarms();
-                    ?>
+                    <div class="" id="ind-table-alarms">
+                      <?php
+                        echo getCurrentAlarms();
+                      ?>
+                    </div>
                   </div>
 
                   <div class="col-sm p-1">

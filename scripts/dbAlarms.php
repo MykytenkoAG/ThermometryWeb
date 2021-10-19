@@ -508,5 +508,25 @@ function resetACK(){
 	return;
 }
 
+function isSoundOn(){
+
+    global $dbh;
+
+    $sql = "SELECT sensor_id FROM sensors WHERE NACK_Tmax=1 OR NACK_Vmax=1 OR NACK_err=1;";
+
+    $sth = $dbh->query($sql);
+
+    if($sth==false){
+        return false;
+    }
+
+	$rows = $sth->fetchAll();
+
+	if(count($rows)>0){
+		return "YES";
+	}
+
+    return "NO";
+}
 
 ?>

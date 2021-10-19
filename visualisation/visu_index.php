@@ -101,6 +101,90 @@ function getCurrentAlarms(){
     return $outStr;
 }
 
+//  Выход - массив, в котором индекс - silo_id, а значение - строка с текущим статусом
+function getSiloCurrentStatus(){
+
+    global $dbh;
+    $outArr = array();    
+    
+    $sql = "SELECT  sensor_id, s.silo_id,
+                    NACK_Tmax, ACK_Tmax, NACK_Vmax, ACK_Vmax, NACK_err, ACK_err,
+                    error_id, pbs.is_square
+            FROM sensors AS s inner join prodtypesbysilo AS pbs ON s.silo_id=pbs.silo_id;";
+
+    $sth = $dbh->query($sql);
+
+    if($sth==false){
+    return false;
+    }
+    $rows = $sth->fetchAll();
+
+    $curr_silo_id=""; $curr_silo_status=""; $curr_silo_type="";
+
+    foreach($rows as $row){
+
+        if($curr_silo_id!=$row['silo_id']){
+            $curr_silo_id = $row['silo_id'];
+            if($curr_silo_status!=""){
+                //array_push($outArr, $curr_silo_type.$curr_silo_status);
+                array_push($outArr, array($curr_silo_type, $curr_silo_status) );
+            }
+            $curr_silo_status=5;
+        }
+
+        if($row['is_square']==1){
+            //$curr_silo_type="S_";                                   //  square
+            $curr_silo_type = 1;
+        } else {
+            //$curr_silo_type="R_";                                   //  round
+            $curr_silo_type = 0;
+        }
+
+        if( $row['error_id']==255 or $row['error_id']==256){
+            //$curr_silo_status="OFF";                            //  OFF
+            $curr_silo_status = 0;
+            continue;
+        }
+
+        if( $row['error_id']==253 or $row['error_id']==254){
+            //$curr_silo_status="CRC";                            //  CRC
+            $curr_silo_status = 1;
+            continue;
+        }
+
+        if( $row['NACK_Tmax']==1 or $row['NACK_Vmax']==1 or $row['NACK_err']==1){
+            //$curr_silo_status="NACK";                           //  NACK
+            $curr_silo_status = 2;
+            continue;
+        }
+
+        if( $curr_silo_status!=3 and
+            ($row['ACK_Tmax']==1 or $row['ACK_Vmax']==1 or $row['ACK_err']==1)){
+            //$curr_silo_status="ACK";                            //  ACK
+            $curr_silo_status = 3;
+            continue;
+        }
+
+        if( $curr_silo_status!=0 and $curr_silo_status!=1 and $curr_silo_status!=2 and $curr_silo_status!=3 and
+            ($row['NACK_Tmax']==0 and $row['NACK_Vmax']==0 and $row['NACK_err']==0 and
+             $row['ACK_Tmax']==0 and $row['ACK_Vmax']==0 and $row['ACK_err']==0)){
+            //$curr_silo_status="OK";                             //  OK
+            $curr_silo_status = 4;
+            continue;
+        }
+
+    }
+
+    //array_push($outArr, $curr_silo_type.$curr_silo_status);
+    array_push($outArr, array($curr_silo_type, $curr_silo_status) );
+
+    return $outArr;
+}
+
+if( isset($_POST['get_silo_current_status']) ) {
+    echo json_encode(getSiloCurrentStatus());
+}
+
 //  Функция отрисовки главного плана расположения силосов
 function createSiloPlan(){ 
 
@@ -356,15 +440,15 @@ function createTemperaturesTable($siloNum){
                 
                 //  DROPDOWN!!
                 $outStr .= "
-                    <div class=\"dropdown\">
+                    <div class=\"dropdown\" style=\"margin:0px; padding:0px;\">
                         <button class=\"\" type=\"button\" id=\"sensor-t-$siloNum-$j-$i\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\"
-                        style=\"width: 40px; height: 30px; text-align: center; font-weight: bold; background-color: ".$main_array[$curr_ind]['curr_t_colour'].";\"
+                        style=\"border: none; width: 40px; height: 25px; padding: 0px 0px 0px 0px; text-align: center; font-weight: bold; background-color: ".$main_array[$curr_ind]['curr_t_colour'].";\"
                         >"
                             .$main_array[$curr_ind]['curr_t_text'].
                         "</button>
                         <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu2\">
                         <li><button class=\"dropdown-item\" type=\"button\">Отключить выбранный датчик</button></li>
-                        <li><button class=\"dropdown-item\" type=\button\">Отключить выбранную подвеску</button></li>
+                        <li><button class=\"dropdown-item\" type=\"button\">Отключить выбранную подвеску</button></li>
                         </ul>
                     </div>";
 
@@ -523,5 +607,9 @@ if( isset($_POST['silo_id_for_silo_parameters']) ) {
     echo json_encode(getSiloParameters($_POST['silo_id_for_silo_parameters']));
 }
 
+//  Получение текущих алармов
+if( isset($_POST['get_current_alarms']) ) {
+    echo getCurrentAlarms();
+}
 
 ?>
