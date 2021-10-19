@@ -262,69 +262,57 @@ function prodtypesbysiloUpdate($silo_id, $grainLevelFromTS, $grain_level, $produ
     return $sql;
 }
 
-/*  AJAX*/
-
-if( isset($_POST['tbl_prodtypes_changes_queue']) ) {
-    print_r( $_POST['tbl_prodtypes_changes_queue'] );
-}
-
 if( isset($_POST['draw_table_prodtypes']) ) {
     echo drawTableProdtypes();
 }
-
-
-if(isset($_POST['table_prodtypes_remove'])) {
-    prodtypesRemove($_POST['table_prodtypes_remove']);
-}
-
-if( isset($_POST['table_prodtypes_insert_product_id']) &&
-    isset($_POST['table_prodtypes_insert_product_name']) &&
-    isset($_POST['table_prodtypes_insert_t_min']) &&
-    isset($_POST['table_prodtypes_insert_t_max']) &&
-    isset($_POST['table_prodtypes_insert_v_min']) &&
-    isset($_POST['table_prodtypes_insert_v_max']) ) {
-
-        echo prodtypesInsert(
-            $_POST['table_prodtypes_insert_product_id'],
-            $_POST['table_prodtypes_insert_product_name'],
-            $_POST['table_prodtypes_insert_t_min'],
-            $_POST['table_prodtypes_insert_t_max'],
-            $_POST['table_prodtypes_insert_v_min'],
-            $_POST['table_prodtypes_insert_v_max']
-        );
-}
-
-if( isset($_POST['table_prodtypes_update_product_id']) &&
-    isset($_POST['table_prodtypes_update_product_name']) &&
-    isset($_POST['table_prodtypes_update_t_min']) &&
-    isset($_POST['table_prodtypes_update_t_max']) &&
-    isset($_POST['table_prodtypes_update_v_min']) &&
-    isset($_POST['table_prodtypes_update_v_max']) ) {
-
-        echo prodtypesUpdate(
-            $_POST['table_prodtypes_update_product_id'],
-            $_POST['table_prodtypes_update_product_name'],
-            $_POST['table_prodtypes_update_t_min'],
-            $_POST['table_prodtypes_update_t_max'],
-            $_POST['table_prodtypes_update_v_min'],
-            $_POST['table_prodtypes_update_v_max']
-        );
-}
-
 
 if( isset($_POST['draw_table_prodtypes_by_silo']) ) {
     echo drawTableProdtypesbysilo();
 }
 
-if( isset($_POST['table_prodtypesbysilo_update_silo_id']) &&
-    isset($_POST['table_prodtypesbysilo_update_grain_level_from_TS']) &&
-    isset($_POST['table_prodtypesbysilo_update_grain_level']) &&
-    isset($_POST['table_prodtypesbysilo_update_product_id']) ) {
+if( isset($_POST['tbl_prodtypes_changes_queue']) ) {
 
-    echo prodtypesbysiloUpdate(  $_POST['table_prodtypesbysilo_update_silo_id'],
-                                 $_POST['table_prodtypesbysilo_update_grain_level_from_TS'],
-                                 $_POST['table_prodtypesbysilo_update_grain_level'],
-                                 $_POST['table_prodtypesbysilo_update_product_id']);
+    $prodTypesChangesQueue = $_POST['tbl_prodtypes_changes_queue'];
+
+    foreach($prodTypesChangesQueue as $currChange){
+
+        if (key($currChange)=="remove_row"){
+            prodtypesRemove( $currChange[key($currChange)]['product_id'] );
+        } elseif(key($currChange)=="update_row"){
+            prodtypesUpdate(    $currChange[key($currChange)]['product_id'],
+                                $currChange[key($currChange)]['product_name'],
+                                $currChange[key($currChange)]['t_min'],
+                                $currChange[key($currChange)]['t_max'],
+                                $currChange[key($currChange)]['v_min'],
+                                $currChange[key($currChange)]['v_max']);
+        } elseif(key($currChange)=="insert_row"){
+            prodtypesInsert(    $currChange[key($currChange)]['product_id'],
+                                $currChange[key($currChange)]['product_name'],
+                                $currChange[key($currChange)]['t_min'],
+                                $currChange[key($currChange)]['t_max'],
+                                $currChange[key($currChange)]['v_min'],
+                                $currChange[key($currChange)]['v_max']);
+        }
+
+    }
+
+    echo "Изменения успешно внесены в Базу Данных";
+}
+
+if( isset($_POST['tbl_prodtypesbysilo_update_list']) ) {
+
+    $prodtypesBySiloUpdateList = $_POST['tbl_prodtypesbysilo_update_list'];
+
+    foreach($prodtypesBySiloUpdateList as $currUpdate){
+
+        prodtypesbysiloUpdate(  $currUpdate['silo_id'],
+                                $currUpdate['grain_level_from_TS'],
+                                $currUpdate['grain_level'],
+                                $currUpdate['product_id']);
+
+    }
+
+    echo "Изменения успешно внесены в Базу Данных";
 
 }
 

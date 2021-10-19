@@ -4,8 +4,6 @@
 
     При наличии активных АПС обе таблицы должны блокироваться
 
-    Добавить функции для отключения кнопок сохранения и отмены изменений
-
     Добавить контроль доступа
         Входить на страницу должен либо оператор, либо технолог
         Оператор имеет право только на изменение таблицы "Загрузка силосов"
@@ -280,14 +278,14 @@ function onClickTblProdtypesSaveChanges(){
         data: { 'tbl_prodtypes_changes_queue': tbl_prodtypes_changes_queue },
         dataType: 'html',
         success: function(fromPHP) {
+            console.log(fromPHP);
+            tbl_prodtypes_changes_queue.length=0;
             alert("Изменения успешно внесены в Базу Данных");
+            //  Перерисовываем таблицу
+            redrawTableProdtypes();
         }
     });
 
-    //  Очщаем очередь
-    tbl_prodtypes_changes_queue.length=0;
-    //  Перерисовываем таблицу
-    redrawTableProdtypes();
     //  Блокируем кнопки "сохранить" и "отменить изменения"
     buttonDisable("table-prodtypes-btn-save-changes");
     buttonDisable("table-prodtypes-btn-discard-changes");
@@ -360,17 +358,20 @@ function onClickTblProdtypesbysiloSaveChanges(){
         data: { 'tbl_prodtypesbysilo_update_list': tbl_prodtypesbysilo_update_list },
         dataType: 'html',
         success: function(fromPHP) {
+            console.log(fromPHP);
+
             alert("Изменения успешно внесены в Базу Данных");
+            tbl_prodtypesbysilo_update_list.length = 0;
+
+            //  Блокируем кнопки "сохранить" и "отменить изменения"
+            buttonDisable("table-prodtypesbysilo-btn-save-changes");
+            buttonDisable("table-prodtypesbysilo-btn-discard-changes");
+            //  Включаем обе таблицы
+            redrawTableProdtypes();
+            redrawTableProdtypesbysilo();   
+
         }
     });
-
-    tbl_prodtypesbysilo_update_list.length = 0;
-    //  Блокируем кнопки "сохранить" и "отменить изменения"
-    buttonDisable("table-prodtypesbysilo-btn-save-changes");
-    buttonDisable("table-prodtypesbysilo-btn-discard-changes");
-    //  Включаем обе таблицы
-    redrawTableProdtypes();
-    redrawTableProdtypesbysilo();    
 
     return;
 }

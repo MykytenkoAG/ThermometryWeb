@@ -55,10 +55,10 @@ if( ! doINIFilesMatchEachOther($termoServerINI,$termoClientINI) ){
 	$initProductsINI =	parse_ini_string(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/webTermometry/settings/init_products.ini'), true);
 	$initUsersINI	 =	parse_ini_string(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/webTermometry/settings/init_users.ini'), true);
 	$settingsINI	 =	parse_ini_string(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/webTermometry/settings/settings.ini'), true);
-//	Параметры подключения к TermoServer
+ //	Параметры подключения к TermoServer
 	$IPAddr		= $settingsINI['TermoServerIPAddr'];
 	$port		= $settingsINI['TermoServerPort'];
-//	Необходимые параметры для подключения к БД
+ //	Необходимые параметры для подключения к БД
 	$servername	= $settingsINI['DBServerIPAddr'];
 	$username	= $settingsINI['DBUserName'];
 	$password	= $settingsINI['DBPassword'];
@@ -235,15 +235,15 @@ if( ! ( count( arrayRecursiveDiff( createTermoServerAssocArray($termoServerINI) 
 	//	Файл TermoServer.ini был обновлен. Необходимо выполнить автоматическую инициализацию всех таблиц в БД
 	echo "Файл TermoServer.ini был обновлен. Выполняем автоматическую инициализацию всех таблиц в БД";
 
-	deleteAllTables();
+	deleteAllTables($dbh);
 
-	createTableUsers();				initTableUsers($initUsersINI);
-	createTableErrors();			initTableErrors($errCodesINI);
-	createTableDates();				initTableDates($serverDate);
-	createTableProdtypes();			initTableProdtypes($initProductsINI);
-	createTableProdtypesbysilo();	initTableProdbysilo($termoClientINI,$termoServerINI);
-	createTableSensors();			initTableSensors($termoServerINI,$serverDate);
-	createTableMeasurements();
+	createTableUsers($dbh);				initTableUsers($dbh, $initUsersINI);
+	createTableErrors($dbh);			initTableErrors($dbh, $errCodesINI);
+	createTableDates($dbh);				initTableDates($dbh, $serverDate);
+	createTableProdtypes($dbh);			initTableProdtypes($dbh, $initProductsINI);
+	createTableProdtypesbysilo($dbh);	initTableProdbysilo($dbh, $termoClientINI,$termoServerINI);
+	createTableSensors($dbh);			initTableSensors($dbh, $termoServerINI,$serverDate);
+	createTableMeasurements($dbh);
 
 }
 
@@ -252,8 +252,8 @@ update_t_v($arrayOfTemperatures,$arrayOfTempSpeeds,$serverDate);
 update_lvl($arrayOfLevels);
 
 //	Проверка на алармы
-setNACK();
-//resetACK();
+setNACK($dbh, $serverDate);
+resetACK($dbh, $serverDate);
 
 //	Функция выдачи главного конфигурационного массива проекта
 function getProjectConfArr(){
@@ -299,7 +299,7 @@ if( isset($_POST['get_project_conf_array']) ) {
 
 
 if( isset($_POST['is_sound_on']) ) {
-    echo isSoundOn();
+    echo isSoundOn($dbh);
 	//echo "Данные успешно прочитаны" ;
 }
 
@@ -309,7 +309,7 @@ if( isset($_POST['read_vals']) ) {
 }
 
 if( isset($_POST['acknowledge']) ) {
-	setACK();
+	setACK($dbh,$serverDate);
     echo "Произведено подтверждение сигналов АПС" ;
 }
 

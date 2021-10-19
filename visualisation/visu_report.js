@@ -1,12 +1,10 @@
 function init_report(){
-    console.log(project_conf_array);
-    console.log(document.getElementById("rprtprf_silo_1"));
-    console.log(document.getElementById("rprtprf_podv_1"));
+    //console.log(project_conf_array);
 
     setSelectOptions( document.getElementById("rprtprf_silo_1"),    ["all"].concat( Object.keys(project_conf_array) ) );
-    setSelectOptions( document.getElementById("rprtprf_podv_1"),    ["all"].concat( Object.keys(project_conf_array[3]) ) );         //  проблема, в случае, если в проекте нет силоса с номером один
-    setSelectOptions( document.getElementById("rprtprf_layer_1"),   ["all"].concat( Object.keys(project_conf_array[3][1]) ) );
-    setSelectOptions( document.getElementById("rprtprf_sensor_1"),  ["all"].concat( Object.keys(project_conf_array[3][1]) ) );
+    setSelectOptions( document.getElementById("rprtprf_podv_1"),    ["all"].concat( Object.keys(project_conf_array[silo_name_with_max_podv_number]) ) );         //  проблема, в случае, если в проекте нет силоса с номером один
+    setSelectOptions( document.getElementById("rprtprf_layer_1"),   ["all"].concat( Object.keys(project_conf_array[silo_name_with_max_podv_number][1]) ) );
+    setSelectOptions( document.getElementById("rprtprf_sensor_1"),  ["all"].concat( Object.keys(project_conf_array[silo_name_with_max_podv_number][1]) ) );
 
     const selects = document.getElementById("sensor-temperatures-table").getElementsByTagName('select');
 
@@ -15,8 +13,8 @@ function init_report(){
     let chart_sensor_1 = selects.item(selects.length - 2);
 
     setSelectOptions( chart_silo_1,   Object.keys(project_conf_array) );
-    setSelectOptions( chart_podv_1,   Object.keys(project_conf_array[3]) );
-    setSelectOptions( chart_sensor_1, Object.keys(project_conf_array[3][1]) );
+    setSelectOptions( chart_podv_1,   Object.keys(project_conf_array[silo_name_with_max_podv_number]) );
+    setSelectOptions( chart_sensor_1, Object.keys(project_conf_array[silo_name_with_max_podv_number][1]) );
 
     prfSelectsDisable();
 }
@@ -93,6 +91,8 @@ function addNewLineOnChart(){
         data: { 'silo_id': silo_id, 'podv_id': podv_id, 'sensor_num': sensor_num, 'period': period },
         dataType: 'html',
         success: function(fromPHP) {
+
+            //console.log(fromPHP);
 
             const newDataset = {
                 label: '',
@@ -202,8 +202,8 @@ function addNewTableRow(){
 
     //  Производим инициализацию элементов select
     setSelectOptions( input_silo_num,   Object.keys(project_conf_array) );
-    setSelectOptions( input_podv_num,   Object.keys(project_conf_array[1]) );
-    setSelectOptions( input_sensor_num, Object.keys(project_conf_array[1][1]) );
+    setSelectOptions( input_podv_num,   Object.keys(project_conf_array[silo_name_with_id_0]) );
+    setSelectOptions( input_sensor_num, Object.keys(project_conf_array[silo_name_with_id_0][1]) );
 
     return;
 }

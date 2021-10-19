@@ -1,19 +1,30 @@
 let current_page;
+let mainTimer;
+let serverDateTime;
 let project_conf_array=[];
-let timer;
+let silo_name_with_id_0;
+let silo_name_with_max_podv_number;
 
 document.addEventListener("DOMContentLoaded", () => {
-    current_page = window.location.pathname.split("/").pop();
-    getProjectConfArr();
-    isSoundOn();
-    console.log(current_page);
-});
 
+    current_page = window.location.pathname.split("/").pop();
+    mainTimer = setInterval( periodicActions, 10000);
+
+    if              (current_page === "index.php" || current_page === ""){
+        init_index();
+    } else if       (current_page === "report.php" || current_page === "debug_page.php"){
+        getProjectConfArr();
+    } else if       (current_page === "silo_config.php"){
+        init_silo_config();
+    }
+
+    isSoundOn();
+    
+});
 
 /*  Получение главного конфигурационного ассоциативного массива
 */
 function getProjectConfArr(){
-    
     $.ajax({
         url: '/webTermometry/scripts/currValsFromTS.php',
         type: 'POST',
@@ -21,24 +32,44 @@ function getProjectConfArr(){
         data: { 'get_project_conf_array': 1 },
         dataType: 'html',
         success: function(fromPHP) {
-            
             project_conf_array = (JSON.parse(fromPHP));
-            timer = setInterval( every10s, 10000);
-            
-            //  Производим инициализацию в зависимости от того, на какой странице находимся
-            if          (current_page === "index.php" || current_page === ""){
-                init_index();
-            } else if   (current_page === "report.php"){
+            getSiloNameWithID0();
+        }
+    });
+}
+
+function getSiloNameWithID0(){
+    $.ajax({
+        url: '/webTermometry/visualisation/visu_report.php',
+        type: 'POST',
+        cache: false,
+        data: { 'get_silo_name_with_id_0': 1 },
+        dataType: 'html',
+        success: function(fromPHP) {
+            silo_name_with_id_0 = (JSON.parse(fromPHP));
+            getSiloNameWithMaxPodvNumber();
+        }
+    });
+    return;
+}
+
+function getSiloNameWithMaxPodvNumber(){
+    $.ajax({
+        url: '/webTermometry/visualisation/visu_report.php',
+        type: 'POST',
+        cache: false,
+        data: { 'get_silo_number_with_max_podv_number': 1 },
+        dataType: 'html',
+        success: function(fromPHP) {
+            silo_name_with_max_podv_number = (JSON.parse(fromPHP));
+            if(current_page === "report.php"){
                 init_report();
-            } else if   (current_page === "silo_config.php"){
-                init_silo_config();
             } else if   (current_page === "debug_page.php"){
                 init_debug_page();
             }
-           
         }
     });
-
+    return;
 }
 
 /*  Функция для установки аттрибутов option элемента select
@@ -72,8 +103,8 @@ function redrawSelectsRow(select_element_id){
     const current_silo  = document.getElementById(page + "_silo_" + row_number);
 
     const opt_0 = current_silo.options[0].value==="all" ? ["all"] : [];
-    const current_silo_selected_ind = current_silo.options[current_silo.selectedIndex].value==="all" ? 1 : current_silo.options[current_silo.selectedIndex].value;
-    
+    const current_silo_selected_ind = current_silo.options[current_silo.selectedIndex].value==="all" ? silo_name_with_max_podv_number : current_silo.options[current_silo.selectedIndex].value;
+
     let element_podv    = document.getElementById(page + "_podv_"  + row_number);
     let element_sensor  = document.getElementById(page + "_sensor_"+ row_number);
     let element_level   = document.getElementById(page + "_level_" + row_number);
@@ -134,7 +165,6 @@ function isSoundOn(){
     return;
 }
 
-
 function acknowledgeAlarms(){
     document.getElementById("alarm-sound").pause();
 
@@ -158,7 +188,7 @@ function acknowledgeAlarms(){
     return;
 }
 
-function every10s() {
+function periodicActions() {
     
     $.ajax({
         url: '/webTermometry/scripts/currValsFromTS.php',

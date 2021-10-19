@@ -95,6 +95,49 @@ function createMeasurementCheckboxes($measurementArray){
     return $outStr;
 }
 
+function getSiloNameWithID0($dbh){
+
+    $sql = "SELECT silo_name
+            FROM prodtypesbysilo
+            WHERE silo_id=0";
+
+    $sth = $dbh->query($sql);
+
+    if($sth==false){
+        return false;
+    }
+
+    $rows = $sth->fetchAll();
+    
+    return $rows[0]['silo_name'];
+}
+
+if( isset( $_POST['get_silo_name_with_id_0']) ) {
+    echo getSiloNameWithID0($dbh);
+}
+
+function getSiloNameWithMaxPodvNumber($dbh){
+
+    $sql = "SELECT s.silo_id, pbs.silo_name, count(distinct (s.podv_id))
+            FROM sensors AS s INNER JOIN prodtypesbysilo AS pbs ON s.silo_id = pbs.silo_id 
+            GROUP BY s.silo_id
+            ORDER BY count(distinct (s.podv_id)) DESC";
+
+    $sth = $dbh->query($sql);
+
+    if($sth==false){
+        return false;
+    }
+
+    $rows = $sth->fetchAll();
+    
+    return $rows[0]['silo_name'];
+}
+
+if( isset( $_POST['get_silo_number_with_max_podv_number']) ) {
+    echo getSiloNameWithMaxPodvNumber($dbh);
+}
+
 //  Средние температуры в слоях
 function getAvgTemperaturesByLayer($arrayOfSilos, $arrayOfLayers, $arrayOfDates){
 
@@ -387,16 +430,13 @@ function getSensorTemperaturesByPodv($arrayOfSilos, $arrayOfPodv, $arrayOfSensor
 */
 
 
-function getTimeTemperatureTable($silo_id, $podv_id, $sens_num, $dateStart, $dateEnd){
-
-    global $dbh; global $serverDate;
+function getTimeTemperatureTable($dbh,$silo_name, $podv_id, $sens_num, $dateStart, $dateEnd){
     
-    $sql = "
-            SELECT d.date, m.temperature
-                FROM sensors AS s INNER JOIN measurements AS m ON s.sensor_id=m.sensor_id
-                INNER JOIN dates AS d ON m.date_id=d.date_id
-                WHERE (s.silo_id = $silo_id AND s.podv_id = $podv_id AND s.sensor_num = $sens_num AND d.date BETWEEN '$dateStart' AND '$dateEnd')
-    ";
+    $sql = "SELECT d.date, m.temperature
+            FROM sensors AS s INNER JOIN measurements AS m ON s.sensor_id=m.sensor_id
+            INNER JOIN dates AS d ON m.date_id=d.date_id
+            WHERE (s.silo_id = (select silo_id from prodtypesbysilo where silo_name=$silo_name) AND s.podv_id = $podv_id AND s.sensor_num = $sens_num AND
+                                d.date BETWEEN '$dateStart' AND '$dateEnd')";
     
     $sth = $dbh->query($sql);
 
@@ -412,11 +452,16 @@ function getTimeTemperatureTable($silo_id, $podv_id, $sens_num, $dateStart, $dat
         $outArr[] = array('date' => $row['date'], 'temperature' => $row['temperature']);
     }
 
-    return $outArr;
+   return $outArr;
 }
 
 if( isset($_POST['silo_id']) && isset($_POST['podv_id']) && isset($_POST['sensor_num']) && isset($_POST['period']) ) {
-    echo json_encode( getTimeTemperatureTable( $_POST['silo_id'], $_POST['podv_id'], $_POST['sensor_num'], "2021-10-07 10:00:00", "2021-10-07 11:00:00" ) );
+
+    $dateEnd = DateTime::createFromFormat('d.m.Y H:i:s', $serverDate);
+    $dateStart = DateTime::createFromFormat('d.m.Y H:i:s', $serverDate);
+    $dateStart->modify("-1 ".$_POST['period']);
+
+    echo json_encode( getTimeTemperatureTable( $dbh, $_POST['silo_id'], $_POST['podv_id'], $_POST['sensor_num'], $dateStart->format('Y-m-d H:i:s'), $dateEnd->format('Y-m-d H:i:s') ) );
 }
 
 /*    if( isset($_POST['get_silo_podv_arr']) ) {

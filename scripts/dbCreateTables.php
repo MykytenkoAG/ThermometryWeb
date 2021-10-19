@@ -9,9 +9,7 @@ function createDBBackup(){
 }
 
 //	Удаление/очистка таблиц
-function deleteAllTables(){
-
-	global $dbh;
+function deleteAllTables($dbh){
 
 	$query = 
 	   "DROP TABLE IF EXISTS zernoib.measurements;
@@ -29,9 +27,7 @@ function deleteAllTables(){
 	return;
 }
 
-function truncateTableMeasurements(){
-
-	global $dbh;
+function truncateTableMeasurements($dbh){
 
 	$query = 
 	   "TRUNCATE zernoib.measurements;";
@@ -44,9 +40,7 @@ function truncateTableMeasurements(){
 }
 
 //	Создание таблиц
-function createTableUsers(){
-
-	global $dbh;
+function createTableUsers($dbh){
 	
 	$query = "CREATE TABLE IF NOT EXISTS zernoib.users
 			 (user_id INT NOT NULL AUTO_INCREMENT,
@@ -62,9 +56,7 @@ function createTableUsers(){
 	return;
 }
 
-function createTableErrors(){
-
-	global $dbh;
+function createTableErrors($dbh){
 	
 	$query = "CREATE TABLE IF NOT EXISTS zernoib.errors
 			 (error_id INT NOT NULL,
@@ -80,9 +72,7 @@ function createTableErrors(){
 	return;
 }
 
-function createTableDates(){
-
-	global $dbh;
+function createTableDates($dbh){
 	
 	$query = "CREATE TABLE IF NOT EXISTS zernoib.dates
 			 (date_id INT NOT NULL AUTO_INCREMENT,
@@ -96,10 +86,8 @@ function createTableDates(){
 	return;
 }
 
-function createTableProdtypes(){
+function createTableProdtypes($dbh){
 
-	global $dbh;
-	
 	$query = "CREATE TABLE IF NOT EXISTS zernoib.prodtypes
 			 (product_id INT NOT NULL AUTO_INCREMENT,
 			  product_name VARCHAR(60) NOT NULL,
@@ -114,9 +102,7 @@ function createTableProdtypes(){
 	return;
 }
 
-function createTableProdtypesbysilo(){
-
-	global $dbh;
+function createTableProdtypesbysilo($dbh){
 	
 	$query = "CREATE TABLE IF NOT EXISTS zernoib.prodtypesbysilo
 			 (silo_id INT NOT NULL,
@@ -139,9 +125,7 @@ function createTableProdtypesbysilo(){
 	return;
 }
 
-function createTableSensors(){
-
-	global $dbh;
+function createTableSensors($dbh){
 	
 	$query = "CREATE TABLE IF NOT EXISTS zernoib.sensors
 			 (sensor_id INT NOT NULL,
@@ -172,9 +156,7 @@ function createTableSensors(){
 	return;
 }
 
-function createTableMeasurements(){
-
-	global $dbh;
+function createTableMeasurements($dbh){
 	
 	$query = "CREATE TABLE IF NOT EXISTS zernoib.measurements
 			 (date_id INT NOT NULL,
@@ -192,10 +174,8 @@ function createTableMeasurements(){
 }
 
 //	Инициализация таблиц
-function initTableUsers($initUsersINI){
+function initTableUsers($dbh, $initUsersINI){
 	
-	global $dbh;
-
 	$query="INSERT INTO users (user_name, password, access_level) VALUES ";
 
 	foreach ($initUsersINI as $key => $value) {
@@ -212,9 +192,7 @@ function initTableUsers($initUsersINI){
 	return;
 }
 
-function initTableErrors($errCodesINI){
-
-	global $dbh;
+function initTableErrors($dbh, $errCodesINI){
 
 	$query="INSERT INTO errors (error_id, error_description, error_desc_short, error_desc_for_visu) VALUES ";
 
@@ -234,9 +212,7 @@ function initTableErrors($errCodesINI){
 	return;
 }
 
-function initTableDates($serverDate){
-
-	global $dbh;
+function initTableDates($dbh, $serverDate){
 
 	$query="INSERT INTO dates (date) VALUES (STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'));";
 	$stmt = $dbh->prepare($query);
@@ -246,9 +222,7 @@ function initTableDates($serverDate){
 	return;
 }
 
-function initTableProdtypes($initProductsINI){
-
-	global $dbh;
+function initTableProdtypes($dbh, $initProductsINI){
 
 	$query="INSERT INTO prodtypes (product_name, t_min, t_max, v_min, v_max) VALUES ";
 
@@ -268,9 +242,7 @@ function initTableProdtypes($initProductsINI){
 	return;
 }
 
-function initTableProdbysilo($termoClientINI,$termoServerINI){
-
-	global $dbh;
+function initTableProdbysilo($dbh, $termoClientINI, $termoServerINI){
 
     $query = "SELECT product_id FROM zernoib.prodtypes ORDER BY product_id ASC LIMIT 1";
     $sth = $dbh->query($query);
@@ -304,9 +276,7 @@ function initTableProdbysilo($termoClientINI,$termoServerINI){
 	return;
 }
 
-function initTableSensors($termoServerINI,$serverDate){
-
-	global $dbh;
+function initTableSensors($dbh, $termoServerINI,$serverDate){
 
 	$query="INSERT INTO sensors (sensor_id, silo_id, podv_id, sensor_num, current_temperature, current_speed, server_date) VALUES ";
 
