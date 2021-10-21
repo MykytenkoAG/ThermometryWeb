@@ -10,6 +10,7 @@
   <body>
     <?php
       require_once "blocks/header.php";
+      require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');
     ?>
     <div class="container-fluid h-100">
       <main>
@@ -42,7 +43,9 @@
                       Температура
                     </td>
                     <td>
-                      <input type="number" class="form-control" id="dbg_t_1" name="dbg_1_temperature" value="0" style="width: 100px;">
+                      <?php
+                        echo "<input type=\"number\" class=\"form-control\" id=\"dbg_t_1\" name=\"dbg_1_temperature\" value=\"0\" style=\"width: 100px;\" $debugPageDisableElements>";
+                      ?>
                     </td>
                     <td>
                       <button type="button" class="form-control" id="dbg_1_button"
@@ -71,7 +74,9 @@
                       Скорость
                     </td>
                     <td>
-                      <input type="number" class="form-control" id="dbg_v_2" name="dbg_2_t_speed" value="0" style="width: 100px;">
+                      <?php
+                        echo "<input type=\"number\" class=\"form-control\" id=\"dbg_v_2\" name=\"dbg_2_t_speed\" value=\"0\" style=\"width: 100px;\" $debugPageDisableElements>";
+                      ?>
                     </td>
                     <td>
                       <button type="button" class="form-control" id="dbg_2_button"
@@ -99,11 +104,14 @@
                       Уровень
                     </td>
                     <td>
-                      <select class="form-control"
-                        id="dbg_level_3" onchange="redrawSelectsRow(event.target.id)"
-                        style="width: 100px;">
-                        <option value="1">1</option>
-                      </select>
+                      <?php
+                        echo "<select class=\"form-control\"
+                        id=\"dbg_level_3\" onchange=\"redrawSelectsRow(event.target.id)\"
+                        style=\"width: 100px;\" $debugPageDisableElements>
+                        <option value=\"1\">1</option>
+                      </select>";
+                      ?>
+                      
                     </td>
                     <td>
                       <button class="form-control" type="button" id="dbg_3_button"
@@ -141,7 +149,9 @@
                       Температура
                     </td>
                     <td>
-                      <input type="number" class="form-control" id="dbg_t_4" name="dbg_t_4" value="0" style="width: 100px;">
+                      <?php
+                        echo "<input type=\"number\" class=\"form-control\" id=\"dbg_t_4\" name=\"dbg_t_4\" value=\"0\" style=\"width: 100px;\" $debugPageDisableElements>";
+                      ?>
                     </td>
                     <td>
                       <button type="button" class="form-control" id="dbg_4_button"
@@ -179,7 +189,9 @@
                     Скорость
                   </td>
                   <td>
-                    <input type="number" class="form-control" id="dbg_v_5" name="dbg_5_t_speed" value="0" style="width: 100px;">
+                    <?php
+                      echo "<input type=\"number\" class=\"form-control\" id=\"dbg_v_5\" name=\"dbg_5_t_speed\" value=\"0\" style=\"width: 100px;\" $debugPageDisableElements>";
+                    ?>
                   </td>
                   <td>
                     <button type="button" class="form-control" id="dbg_5_button"
@@ -225,7 +237,9 @@
                     Температура
                   </td>
                   <td>
-                    <input type="number" class="form-control" id="dbg_t_6" name="dbg_6_temperature" value="0" style="width: 100px;">
+                    <?php
+                      echo "<input type=\"number\" class=\"form-control\" id=\"dbg_t_6\" name=\"dbg_6_temperature\" value=\"0\" style=\"width: 100px;\" $debugPageDisableElements>";
+                    ?>
                   </td>
                   <td>
                     <button type="button" class="form-control" id="dbg_6_button"
@@ -271,7 +285,9 @@
                       Скорость
                     </td>
                     <td>
-                      <input type="number" class="form-control" id="dbg_v_7" name="dbg_7_t_speed" value="0" style="width: 100px;">
+                      <?php
+                        echo "<input type=\"number\" class=\"form-control\" id=\"dbg_v_7\" name=\"dbg_7_t_speed\" value=\"0\" style=\"width: 100px;\" $debugPageDisableElements>";
+                      ?>
                     </td>
                     <td>
                       <button type="button" class="form-control" id="dbg_7_button"
@@ -279,6 +295,10 @@
                     </td>
                   </tr>
                 </table>
+
+                <button type="button" class="form-control mt-5" id="dbg_8_button" style="position: absolute; width: 300px; bottom: 8%;"
+                onclick="onClick_dbg_button_8()">Обнулить все показания</button>
+
                 <button type="button" class="form-control"
                         id="dbg_write_measurements_to_db"
                         style="position: absolute; width: 300px; bottom: 2%;"
@@ -302,7 +322,7 @@
               <div class="card-body d-flex justify-content-center" style="height:750px; overflow: auto;" id="debug_parameters_table">
                 <?php
                   require_once "visualisation/visu_debug_page.php";
-                  echo debug_get_debug_table();
+                  echo debug_get_debug_table($dbh);
                 ?>
               </div>
             </div>

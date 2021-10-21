@@ -3,7 +3,7 @@
 $logFile = $_SERVER['DOCUMENT_ROOT'].'/webTermometry/logs/log.txt';
 
 function writeToLog($loggingString){
-    global $logFile;
+	global $logFile;
     // Write the contents to the file, 
     // using the FILE_APPEND flag to append the content to the end of the file
     // and the LOCK_EX flag to prevent anyone else writing to the file at the same time
@@ -12,7 +12,7 @@ function writeToLog($loggingString){
 }
 
 function clearLog(){
-    global $logFile;
+	global $logFile;
     file_put_contents($logFile, "");
     return;
 }
@@ -197,7 +197,7 @@ function setNACK($dbh, $serverDate){
 
 function setACK($dbh, $serverDate){
 	
-	$sql_joinedTable = "SELECT s.sensor_id, s.current_temperature
+	$sql_joinedTable = "SELECT s.sensor_id, s.current_temperature, s.current_speed
 						FROM sensors AS s
 						JOIN prodtypesbysilo AS pbs
 							ON s.silo_id=pbs.silo_id
@@ -383,7 +383,7 @@ function resetACK($dbh, $serverDate){
 	$cond_RST_tmax="WHERE (s.NACK_Tmax=0 AND s.ACK_Tmax=1 AND
 							(s.is_enabled=0 OR s.sensor_num >= pbs.grain_level OR s.current_temperature < pr.t_max))";	// датчики с превышением температуры
 	$cond_RST_vmax="WHERE (s.NACK_Vmax=0 AND s.ACK_Vmax=1 AND
-							(s.is_enabled=0 OR s.sensor_num >= pbs.grain_level OR s.current_temperature < pr.v_max))";	// датчики с превышением скорости
+							(s.is_enabled=0 OR s.sensor_num >= pbs.grain_level OR s.current_speed < pr.v_max))";	// датчики с превышением скорости
    
 	$sql = $sql_joinedTable.$cond_RST_sens_errors;
 	$sth = $dbh->query($sql);

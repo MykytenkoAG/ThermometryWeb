@@ -10,6 +10,8 @@ function init_index(){
     lastSiloID = "silo-0";
     onSiloClicked(lastSiloID);
 
+    //$('#staticBackdrop').modal('show');
+
     return;
 }
 
@@ -171,7 +173,10 @@ function redrawTableTemperatures(silo_id){
         cache: false,
         data: { 'silo_id_for_temperature_table': silo_id },
         dataType: 'html',
-        success: function(fromPHP) { document.getElementById("silo-param-table").innerHTML = fromPHP; }
+        success: function(fromPHP) {
+            //console.log(fromPHP);
+            document.getElementById("silo-param-table").innerHTML = fromPHP;
+        }
     });
     return;
 }
@@ -189,14 +194,36 @@ function redrawTableTemperatureSpeeds(silo_id){
 }
 
 //  !   TODO
-function disableCurrentSensor(silo_id, podv_num, sensor_num){
+function selectedSensorDisable(silo_id, podv_num, sensor_num){
+    //console.log("Disable: ",silo_id, podv_num, sensor_num);
+    $.ajax({
+        url: 'scripts/dbSensorsEnDis.php',
+        type: 'POST',
+        cache: false,
+        data: { 'sensor_disable_silo_id': silo_id, 'sensor_disable_podv_num': podv_num, 'sensor_disable_sensor_num': sensor_num },
+        dataType: 'html',
+        success: function(fromPHP) { 
+            onSiloClicked(lastSiloID);
 
+        }
+    });
     return;
 }
 
 //  !   TODO
-function enableCurrentSensor(silo_id, podv_num, sensor_num){
+function selectedSensorEnable(silo_id, podv_num, sensor_num){
+    //console.log("Ensable: ",silo_id, podv_num, sensor_num);
+    $.ajax({
+        url: 'scripts/dbSensorsEnDis.php',
+        type: 'POST',
+        cache: false,
+        data: { 'sensor_enable_silo_id': silo_id, 'sensor_enable_podv_num': podv_num, 'sensor_enable_sensor_num': sensor_num },
+        dataType: 'html',
+        success: function(fromPHP) { 
+            onSiloClicked(lastSiloID);
 
+         }
+    });
     return;
 }
 
@@ -209,5 +236,85 @@ function disableCurrentPodv(silo_id, podv_num, sensor_num){
 //  !   TODO
 function enableCurrentPodv(silo_id, podv_num, sensor_num){
 
+    return;
+}
+
+function change_grain_level_from_slider(silo_id){
+
+    let lvl_slider;
+
+    if(document.getElementById("lvl-slider-t-"+silo_id)){
+        lvl_slider = document.getElementById("lvl-slider-t-"+silo_id);
+    } else {
+        lvl_slider = document.getElementById("lvl-slider-v-"+silo_id);
+    }
+
+    $.ajax({
+        url: 'visualisation/visu_index.php',
+        type: 'POST',
+        cache: false,
+        data: { 'change_level_from_slider_silo_id': silo_id, 'change_level_from_slider_grain_level': lvl_slider.value },
+        dataType: 'html',
+        success: function(fromPHP) { 
+            onSiloClicked(lastSiloID);
+         }
+    });
+
+    return;
+}
+
+function disable_all_defective_sensors(){
+    $.ajax({
+        url: 'scripts/dbSensorsEnDis.php',
+        type: 'POST',
+        cache: false,
+        data: { 'disable_all_defective_sensors': 1 },
+        dataType: 'html',
+        success: function(fromPHP) { 
+            onSiloClicked(lastSiloID);
+         }
+    });
+    return;
+}
+
+function enable_all_sensors(){
+    $.ajax({
+        url: 'scripts/dbSensorsEnDis.php',
+        type: 'POST',
+        cache: false,
+        data: { 'enable_all_sensors': 1 },
+        dataType: 'html',
+        success: function(fromPHP) { 
+            onSiloClicked(lastSiloID);
+         }
+    });
+    return;
+}
+
+function change_grain_level_mode(silo_id, lvl_mode){
+    $.ajax({
+        url: 'visualisation/visu_index.php',
+        type: 'POST',
+        cache: false,
+        data: { 'change_level_mode_silo_id': silo_id, 'change_level_mode_level_mode': lvl_mode },
+        dataType: 'html',
+        success: function(fromPHP) { 
+            onSiloClicked(lastSiloID);
+         }
+    });
+    return;
+}
+
+function enable_all_auto_lvl_mode(){
+    $.ajax({
+        url: 'visualisation/visu_index.php',
+        type: 'POST',
+        cache: false,
+        data: { 'enable_auto_lvl_mode': 1 },
+        dataType: 'html',
+        success: function(fromPHP) { 
+            onSiloClicked(lastSiloID);
+        }
+    });
     return;
 }

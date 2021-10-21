@@ -1,8 +1,6 @@
 <?php
 
-function debug_drop_all_tables(){
-
-	global $dbh;
+function debug_drop_all_tables($dbh){
 
 	$query = 
 	   "DROP TABLE IF EXISTS zernoib.debug_sensors;
@@ -15,9 +13,7 @@ function debug_drop_all_tables(){
     return;
 }
 //  silo_id, grain_level
-function debug_create_silo_table($termoServerINI){
-
-    global $dbh;
+function debug_create_silo_table($dbh, $termoServerINI){
 	
 	$sql = "CREATE TABLE IF NOT EXISTS zernoib.debug_silo
 			 (silo_id INT NOT NULL,
@@ -44,9 +40,7 @@ function debug_create_silo_table($termoServerINI){
     return;
 }
 //  sensor_id, silo_id, podv_id, sensor_num, current_temperature, current_temperature_speed
-function debug_create_sensors_table($termoServerINI){
-
-    global $dbh;
+function debug_create_sensors_table($dbh, $termoServerINI){
 
 	$sql = "CREATE TABLE IF NOT EXISTS zernoib.debug_sensors
 			 (sensor_id INT NOT NULL,
@@ -91,9 +85,8 @@ function debug_create_sensors_table($termoServerINI){
 }
 
 //  Получение текущих значений параметров
-function debug_update_temperature_values(){
+function debug_update_temperature_values($dbh){
 
-    global $dbh;
     $arrayOfTemperatures=array();
 
     $sql = "SELECT sensor_id, silo_id, podv_id, sensor_num, current_temperature
@@ -113,9 +106,8 @@ function debug_update_temperature_values(){
     return $arrayOfTemperatures;
 }
 
-function debug_update_temperature_speeds_values(){
+function debug_update_temperature_speeds_values($dbh){
 
-    global $dbh;
     $arrayOfTempSpeeds=array();
 
     $sql = "SELECT sensor_id, silo_id, podv_id, sensor_num, current_temperature_speed
@@ -135,9 +127,8 @@ function debug_update_temperature_speeds_values(){
     return $arrayOfTempSpeeds;
 }
 
-function debug_update_level_values(){
+function debug_update_level_values($dbh){
 
-    global $dbh;
     $arrayOfLevels=array();
 
     $sql = "SELECT silo_id, grain_level

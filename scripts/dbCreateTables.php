@@ -254,16 +254,16 @@ function initTableProdbysilo($dbh, $termoClientINI, $termoServerINI){
     foreach ($termoServerINI as $key => $value) {
 		if( preg_match('/Silos([0-9]+)/',$key,$matches) ){
 			$currSilo_id=($matches[1]-1);
-			$query.="(".$currSilo_id.","															//	silo_id
-				."'".$termoClientINI['Silos'.($currSilo_id+1)]['Name']."'".","						//	silo_name
-				.$termoServerINI['Silos'.($currSilo_id+1)]['DeviceAddress'].","						//	bs_addr
-				."'".$product_id."'".","															//	product_id = 1
-				."TRUE".","																			//	grain_level_from_TS = 1
-				."0".","																			//	grain_level = 0
-				.$termoClientINI['Silos'.($currSilo_id+1)]['sType'].","								//	is_square
-				.str_replace(",", ".", $termoClientINI['Silos'.($currSilo_id+1)]['Size']).","		//	size
-				.$termoClientINI['Silos'.($currSilo_id+1)]['Left'].","								//	position_col
-				.$termoClientINI['Silos'.($currSilo_id+1)]['Top']									//	position_row
+			$query.="(".$currSilo_id.","																	//	silo_id
+				."'".$termoClientINI['Silos'.($currSilo_id+1)]['Name']."'".","								//	silo_name
+				.$termoServerINI['Silos'.($currSilo_id+1)]['DeviceAddress'].","								//	bs_addr
+				."'".$product_id."'".","																	//	product_id = 1
+				."TRUE".","																					//	grain_level_from_TS = 1
+				."0".","																					//	grain_level = 0
+				.$termoClientINI['Silos'.($currSilo_id+1)]['sType'].","										//	is_square
+				."'".str_replace(",", ".", $termoClientINI['Silos'.($currSilo_id+1)]['Size'])."'".","		//	size
+				."'".str_replace(",", ".", $termoClientINI['Silos'.($currSilo_id+1)]['Left'])."'".","		//	position_col
+				."'".str_replace(",", ".", $termoClientINI['Silos'.($currSilo_id+1)]['Top'])."'"			//	position_row
 				."),";			
 		}
 	}

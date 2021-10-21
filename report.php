@@ -28,7 +28,7 @@
 
                     <div class="mt-3">
                       <?php
-                        echo createMeasurementCheckboxes(getAllMeasurementDates());
+                        echo createMeasurementCheckboxes(getAllMeasurementDates($dbh));
                       ?>
                     </div>
 

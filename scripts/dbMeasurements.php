@@ -5,13 +5,11 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');
 
 if( ! $simulation_mode ){
-	addNewMeasurement($arrayOfTemperatures,$serverDate);
+	addNewMeasurement($dbh, $arrayOfTemperatures, $serverDate);
 }
 
 //	measurements
-function addNewMeasurement($arrayOfTemperatures,$serverDate){
-
-	global $dbh;
+function addNewMeasurement($dbh, $arrayOfTemperatures,$serverDate){
 
 	$query="INSERT INTO dates (date) VALUES (STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'));";
 	$stmt = $dbh->prepare($query);

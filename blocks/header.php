@@ -9,7 +9,7 @@
             <ul class="nav me-auto">
 
                 <li>
-                    <a href="debug_page.php" id="hdr-href-debug" class="nav-link text-black" data-bs-toggle="tooltip" data-bs-placement="right"
+                    <a href="#" id="hdr-href-debug" class="nav-link text-black" data-bs-toggle="tooltip" data-bs-placement="right" onclick="onPageChange(0)"
 title="Режим симуляции данных">
                         <svg width="24" height="24" fill="currentColor" class="bi d-block mx-auto mt-1" viewBox="0 0 16 16">
                             <path d="M4.978.855a.5.5 0 1 0-.956.29l.41 1.352A4.985 4.985 0 0 0 3 6h10a4.985 4.985 0 0 0-1.432-3.503l.41-1.352a.5.5 0 1 0-.956-.29l-.291.956A4.978 4.978 0 0 0 8 1a4.979 4.979 0 0 0-2.731.811l-.29-.956z"/>
@@ -20,7 +20,7 @@ title="Режим симуляции данных">
                 </li>
             
                 <li>
-                    <a href="index.php" id="hdr-href-index" class="nav-link text-black" data-bs-toggle="tooltip" data-bs-placement="right"
+                    <a href="#" id="hdr-href-index" class="nav-link text-black" data-bs-toggle="tooltip" data-bs-placement="right" onclick="onPageChange(1)"
 title="Просмотр активных сигналов АПС
 Отображение температур и скоростей их изменения">
                         <svg width="24" height="24" fill="currentColor" class="bi d-block mx-auto mt-1" viewBox="0 0 16 16">
@@ -32,7 +32,7 @@ title="Просмотр активных сигналов АПС
                 </li>
 
                 <li>
-                    <a href="report.php" id="hdr-href-report" class="nav-link text-black" data-bs-toggle="tooltip" data-bs-placement="right"
+                    <a href="#" id="hdr-href-report" class="nav-link text-black" data-bs-toggle="tooltip" data-bs-placement="right"  onclick="onPageChange(2)"
 title="Построение графиков температур
 Формирование отчетов">
                         <svg width="24" height="24" fill="currentColor" class="bi d-block mx-auto mt-1" viewBox="0 0 16 16">
@@ -43,7 +43,7 @@ title="Построение графиков температур
                 </li>
 
                 <li>
-                    <a href="silo_config.php" id="hdr-href-silo_config" class="nav-link text-black" data-bs-toggle="tooltip" data-bs-placement="right"
+                    <a href="#" id="hdr-href-silo_config" class="nav-link text-black" data-bs-toggle="tooltip" data-bs-placement="right"  onclick="onPageChange(3)"
 title="Настройки параметров продукта
 Распределение продуктов по силосам">
                         <svg width="24" height="24" fill="currentColor" class="bi d-block mx-auto mt-1" viewBox="0 0 16 16">
@@ -118,6 +118,33 @@ title="Авторизоваться как технолог">
             }
         );
         
+        const project_urls = [
+            "debug_page.php",
+            "index.php",
+            "report.php",
+            "silo_config.php"
+        ];
+
+        let curr_url_ind;
+
+        function onPageChange(url_ind){
+            curr_url_ind=url_ind;
+            if(current_page=="silo_config.php"){
+                if(tbl_prodtypes_changed || tbl_prodtypesbysilo_changed){
+                    const table_changed_name = tbl_prodtypes_changed==1 ? "\"Типы продукта\"" : "\"Загрузка силосов\"";
+                    const alert_message = "У Вас есть несохраненные изменения в таблице " + table_changed_name + ". Вы уверены, что хотите покинуть данную страницу?";
+
+                    document.getElementById("silo-config-page-change-modal-message").innerText = alert_message;
+                    $("#silo-config-page-change-modal").modal('show');
+
+                } else {
+                    document.location.href = project_urls[url_ind];
+                }
+            } else {
+                document.location.href = project_urls[url_ind];
+            }
+        }
+
     </script>
 
     

@@ -2,9 +2,8 @@
 
 require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');
 
-function drawTableProdtypes(){
+function drawTableProdtypes($dbh){
 
-    global $dbh;
     $outStr="";
 
     $sql = "SELECT p.product_id, p.product_name, p.t_min, p.t_max, p.v_min, p.v_max, pbs.silo_id 
@@ -86,9 +85,7 @@ function drawTableProdtypes(){
             }
 
             $outStr .= ">
-                   <svg width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-x-lg mx-auto\" viewBox=\"0 0 16 16\">
-                        <path d=\"M1.293 1.293a1 1 0 0 1 1.414 0L8 6.586l5.293-5.293a1 1 0 1 1 1.414 1.414L9.414 8l5.293 5.293a1 1 0 0 1-1.414 1.414L8 9.414l-5.293 5.293a1 1 0 0 1-1.414-1.414L6.586 8 1.293 2.707a1 1 0 0 1 0-1.414z\"/>
-                    </svg>
+                    <img  src=\"img/icon-remove.png\" width=\"20\" height=\"20\"/>
                 </button>
             </td>
         </tr>";
@@ -100,9 +97,7 @@ function drawTableProdtypes(){
     return $outStr;
 }
 
-function drawTableProdtypesbysilo(){
-
-    global $dbh;
+function drawTableProdtypesbysilo($dbh){
 
     $sql = "SELECT silo_id, max(sensor_num) FROM sensors GROUP BY silo_id;";
 
@@ -156,23 +151,30 @@ function drawTableProdtypesbysilo(){
             $currValue="manual";
         }
 
-        $grainLevelFromTSStr="  <select class=\"form-control mx-auto\" name=\"\"
+        $grainLevelFromTSStr = "<select class=\"form-control mx-auto\" name=\"\"
                                     id=\"prodtypesbysilo-grain-level-from-TS-".$rows[$i]['silo_id']."\"
                                     onchange=\"onChangeTblProdtypesbysilo()\"
-                                    >
-                                    <option value=\"$currValue\">$grainLevelFromTSStrV</option>
-                                    <option value=\"auto\">автоматически</option>
-                                    <option value=\"manual\">в ручную</option>
-                                </select>";
+                                    >";
+        if($currValue=="auto"){
+            $grainLevelFromTSStr .= "<option value=\"$currValue\">$grainLevelFromTSStrV</option><option value=\"manual\">в ручную</option>";
+            $grainLevelDisabled = "disabled";
+        } else {
+            $grainLevelFromTSStr .= "<option value=\"$currValue\">$grainLevelFromTSStrV</option><option value=\"auto\">автоматически</option>";
+            $grainLevelDisabled = "";
+        }
+
+        $grainLevelFromTSStr .= "</select>";
 
         $grainLevelStr = "  <select class=\"form-control mx-auto\" name=\"\"
                                 id=\"prodtypesbysilo-grain-level-".$rows[$i]['silo_id']."\"
-                                onchange=\"onChangeTblProdtypesbysilo()\"
+                                onchange=\"onChangeTblProdtypesbysilo()\" $grainLevelDisabled
                                 >
                                 <option value=\"".$rows[$i]['grain_level']."\">".$rows[$i]['grain_level']."</option>";
  
         for($j=0; $j<=($grainLevelsArr[$i]['max(sensor_num)']);$j++){
-            $grainLevelStr .= "<option value=\"$j\">".$j."</option>";
+            if( $rows[$i]['grain_level'] != $j ){
+                $grainLevelStr .= "<option value=\"$j\">".$j."</option>";
+            }
         }
  
         $grainLevelStr .= "</select>";
@@ -184,7 +186,10 @@ function drawTableProdtypesbysilo(){
                                 <option value=\"".$rows[$i]['product_id']."\">".$rows[$i]['product_name']."</option>";
 
         foreach($prodTypesArr as $product){
-            $productNameStr .= "<option value=\"".$product['product_id']."\">".$product['product_name']."</option>";
+            if($product['product_id']!=$rows[$i]['product_id']){
+                $productNameStr .= "<option value=\"".$product['product_id']."\">".$product['product_name']."</option>";
+            }
+            
         }
 
         $productNameStr .= "</select>";
@@ -219,8 +224,7 @@ function drawTableProdtypesbysilo(){
 
 /*	Можно вызывать только при отсутствии активных АПС
     Должен оставаться хотя бы один продукт*/
-function prodtypesRemove($product_id){
-    global $dbh;
+function prodtypesRemove($dbh, $product_id){
 
     $sql = "DELETE FROM prodtypes WHERE product_id=$product_id";
     $sth = $dbh->query($sql);
@@ -229,9 +233,7 @@ function prodtypesRemove($product_id){
 }
 
 /*	Функция добавления нового продукта*/
-function prodtypesInsert($product_id, $product_name, $t_min, $t_max, $v_min, $v_max){
-
-    global $dbh;
+function prodtypesInsert($dbh, $product_id, $product_name, $t_min, $t_max, $v_min, $v_max){
 
     $query="INSERT INTO prodtypes (product_id, product_name, t_min, t_max, v_min, v_max) VALUES ($product_id, \"$product_name\", $t_min, $t_max, $v_min, $v_max);";
     $stmt = $dbh->prepare($query);
@@ -241,8 +243,7 @@ function prodtypesInsert($product_id, $product_name, $t_min, $t_max, $v_min, $v_
 }
 
 /*  Можно вызывать только при отсутствии активных АПС */
-function prodtypesUpdate($product_id, $product_name, $t_min, $t_max, $v_min, $v_max){
-    global $dbh;
+function prodtypesUpdate($dbh, $product_id, $product_name, $t_min, $t_max, $v_min, $v_max){
 
     $sql = "UPDATE prodtypes SET product_name='$product_name', t_min='$t_min', t_max='$t_max', v_min ='$v_min', v_max='$v_max' WHERE product_id=$product_id";
     $stmt = $dbh->prepare($sql);
@@ -252,8 +253,7 @@ function prodtypesUpdate($product_id, $product_name, $t_min, $t_max, $v_min, $v_
 }
 
 /*  Функция изменения загрузки силоса*/
-function prodtypesbysiloUpdate($silo_id, $grainLevelFromTS, $grain_level, $product_id){
-    global $dbh;
+function prodtypesbysiloUpdate($dbh, $silo_id, $grainLevelFromTS, $grain_level, $product_id){
 
     $sql = "UPDATE prodtypesbysilo SET grain_level_FromTS='$grainLevelFromTS', grain_level='$grain_level', product_id='$product_id' WHERE silo_id=$silo_id";
     $stmt = $dbh->prepare($sql);
@@ -263,11 +263,11 @@ function prodtypesbysiloUpdate($silo_id, $grainLevelFromTS, $grain_level, $produ
 }
 
 if( isset($_POST['draw_table_prodtypes']) ) {
-    echo drawTableProdtypes();
+    echo drawTableProdtypes($dbh);
 }
 
 if( isset($_POST['draw_table_prodtypes_by_silo']) ) {
-    echo drawTableProdtypesbysilo();
+    echo drawTableProdtypesbysilo($dbh);
 }
 
 if( isset($_POST['tbl_prodtypes_changes_queue']) ) {
@@ -277,16 +277,18 @@ if( isset($_POST['tbl_prodtypes_changes_queue']) ) {
     foreach($prodTypesChangesQueue as $currChange){
 
         if (key($currChange)=="remove_row"){
-            prodtypesRemove( $currChange[key($currChange)]['product_id'] );
+            prodtypesRemove( $dbh, $currChange[key($currChange)]['product_id'] );
         } elseif(key($currChange)=="update_row"){
-            prodtypesUpdate(    $currChange[key($currChange)]['product_id'],
+            prodtypesUpdate(    $dbh,
+                                $currChange[key($currChange)]['product_id'],
                                 $currChange[key($currChange)]['product_name'],
                                 $currChange[key($currChange)]['t_min'],
                                 $currChange[key($currChange)]['t_max'],
                                 $currChange[key($currChange)]['v_min'],
                                 $currChange[key($currChange)]['v_max']);
         } elseif(key($currChange)=="insert_row"){
-            prodtypesInsert(    $currChange[key($currChange)]['product_id'],
+            prodtypesInsert(    $dbh,
+                                $currChange[key($currChange)]['product_id'],
                                 $currChange[key($currChange)]['product_name'],
                                 $currChange[key($currChange)]['t_min'],
                                 $currChange[key($currChange)]['t_max'],
@@ -305,7 +307,8 @@ if( isset($_POST['tbl_prodtypesbysilo_update_list']) ) {
 
     foreach($prodtypesBySiloUpdateList as $currUpdate){
 
-        prodtypesbysiloUpdate(  $currUpdate['silo_id'],
+        prodtypesbysiloUpdate(  $dbh,
+                                $currUpdate['silo_id'],
                                 $currUpdate['grain_level_from_TS'],
                                 $currUpdate['grain_level'],
                                 $currUpdate['product_id']);

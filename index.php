@@ -76,28 +76,28 @@
                                                       border-width: 1px;">
                     <div class="" id="ind-table-alarms">
                       <?php
-                        echo getCurrentAlarms();
+                        echo getCurrentAlarms($dbh);
                       ?>
                     </div>
                   </div>
 
                   <div class="col-sm p-1">
-                    <button type="button" class="btn btn-light" style="width: 100%;">
+                    <button type="button" class="btn btn-light" style="width: 100%;" onclick="disable_all_defective_sensors()">
                       Отключить все неисправные датчики
                     </button>
                   </div>
 
                   <div class="col-sm p-1">
-                    <button type="button" class="btn btn-light" style="width: 100%;">
+                    <button type="button" class="btn btn-light" style="width: 100%;" onclick="enable_all_sensors()">
                       Включить все отключенные датчики
                     </button>
                   </div>
 
-                  <!--    <div class="col-sm p-1">
-                    <button type="button" class="btn btn-light" style="width: 100%;">
-                      Отключить автоопределение уровня на всех силосах
+                  <div class="col-sm p-1">
+                    <button type="button" class="btn btn-light" style="width: 100%;" data-bs-toggle="modal" data-bs-target="#ind-lvl-auto-all-silo-enable">
+                      Включить автоопределение уровня на всех силосах
                     </button>
-                  </div>  -->
+                  </div>
 
                 </div>
 
@@ -121,7 +121,7 @@
 
                   <div class="col-10 col-sm-10 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
                     <?php
-                      echo createSiloPlan();
+                      echo drawSiloPlan($dbh);
                     ?>
                   </div>
 
@@ -243,9 +243,10 @@
                   </div>
 
 
-                  <div class="align-bottom" id="silo-param-table" style="position:absolute; margin-top: auto; margin-bottom: 0px; margin-left:auto; margin-right:auto; overflow: auto;">
+                  <div class="align-bottom" id="silo-param-table"
+                      style="position:absolute; min-width:300px; margin-top: auto; margin-bottom: 0px; margin-left:auto; margin-right:auto; overflow: auto;">
                       <?php
-                        echo createTemperaturesTable(0);
+                        echo createTemperaturesTable($dbh, 0);
                       ?>
                   </div>
 

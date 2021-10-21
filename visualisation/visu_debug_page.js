@@ -13,6 +13,8 @@ function init_debug_page(){
     return;
 }
 
+let dbg_message="";
+
 function redrawMainDbgTable(){
 
     $.ajax({
@@ -21,7 +23,14 @@ function redrawMainDbgTable(){
         cache: false,
         data: { 'dbg_refresh': 1 },
         dataType: 'html',
-        success: function(fromPHP) { document.getElementById("debug_parameters_table").innerHTML = fromPHP; }
+        success: function(fromPHP) {
+            document.getElementById("debug_parameters_table").innerHTML = fromPHP;
+            
+            if(dbg_message!=""){
+                document.getElementById("dbg-modal-body-message").innerText = dbg_message;
+                $("#dbg-main-modal").modal('show');
+            }
+        }
     });
 
     return;
@@ -39,7 +48,7 @@ function onClick_dbg_button_1(silo_name_id, temperature_id){
                 'dbg_1_temperature': temperature },
         dataType: 'html',
         success: function(fromPHP) {
-            alert(fromPHP);
+            dbg_message=fromPHP;
             redrawMainDbgTable();
         }
     });
@@ -59,7 +68,7 @@ function onClick_dbg_button_2(silo_name_id, temperature_speed_id){
                 'dbg_2_t_speed':   temperature_speed },
         dataType: 'html',
         success: function(fromPHP) {
-            alert(fromPHP);
+            dbg_message=fromPHP;
             redrawMainDbgTable();
         }
     });
@@ -79,7 +88,7 @@ function onClick_dbg_button_3(silo_name_id, level_id){
                 'dbg_3_grain_level':    level },
         dataType: 'html',
         success: function(fromPHP) {
-            alert(fromPHP);
+            dbg_message=fromPHP;
             redrawMainDbgTable();
         }
     });
@@ -101,7 +110,7 @@ function onClick_dbg_button_4(silo_name_id, podv_num_id, temperature_id){
                 'dbg_4_temperature':    temperature },
         dataType: 'html',
         success: function(fromPHP) {
-            alert(fromPHP);
+            dbg_message=fromPHP;
             redrawMainDbgTable();
         }
     });
@@ -123,8 +132,8 @@ function onClick_dbg_button_5(silo_name_id, podv_num_id, temperature_speed_id){
                 'dbg_5_t_speed':    temperature_speed },
         dataType: 'html',
         success: function(fromPHP) {
-          alert(fromPHP);
-          redrawMainDbgTable();
+            dbg_message=fromPHP;
+            redrawMainDbgTable();
         }
     });
 
@@ -147,8 +156,8 @@ function onClick_dbg_button_6(silo_name_id, podv_num_id, sensor_num_id, temperat
                 'dbg_6_temperature':    temperature },
         dataType: 'html',
         success: function(fromPHP) {
-          alert(fromPHP);
-          redrawMainDbgTable();
+            dbg_message=fromPHP;
+            redrawMainDbgTable();
         }
     });
 
@@ -171,8 +180,24 @@ function onClick_dbg_button_7(silo_name_id, podv_num_id, sensor_num_id, temperat
                 'dbg_7_t_speed':    temperature_speed },
         dataType: 'html',
         success: function(fromPHP) {
-          alert(fromPHP);
-          redrawMainDbgTable();
+            dbg_message=fromPHP;
+            redrawMainDbgTable();
+        }
+    });
+
+    return;
+}
+
+function onClick_dbg_button_8(){
+    $.ajax({
+        url:    'visualisation/visu_debug_page.php',
+        type:   'POST',
+        cache:  false,
+        data: { 'dbg_8_set_all_params_to_0':  1 },
+        dataType: 'html',
+        success: function(fromPHP) {
+            dbg_message = fromPHP;
+            redrawMainDbgTable();
         }
     });
 
@@ -188,7 +213,10 @@ function onClick_dbg_button_add_measurements(){
         data: { 'write_measurements_to_db': 1 },
         dataType: 'html',
         success: function(fromPHP) {
-                alert(fromPHP)
+            dbg_message=fromPHP;
+            document.getElementById("dbg-modal-body-message").innerText = dbg_message;
+            $("#dbg-main-modal").modal('show');
+
         }
     });
 

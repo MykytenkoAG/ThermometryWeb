@@ -4,9 +4,7 @@ require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.p
 
 //  Получить все даты измерений
 //  out = [дата => массив времен измерений]
-function getAllMeasurementDates(){
-
-    global $dbh;
+function getAllMeasurementDates($dbh){
 
     $sql = "SELECT DISTINCT (d.date)
                 FROM measurements m
@@ -139,9 +137,8 @@ if( isset( $_POST['get_silo_number_with_max_podv_number']) ) {
 }
 
 //  Средние температуры в слоях
-function getAvgTemperaturesByLayer($arrayOfSilos, $arrayOfLayers, $arrayOfDates){
+function getAvgTemperaturesByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $arrayOfDates){
 
-    global $dbh;
     $sql = "";  $outStr="";
     $outStr .= "<style>table, td, th {border: 1px solid black; border-collapse: collapse;}</style>";
     $strArrayOfLayers="(".implode(",",$arrayOfLayers).")";
@@ -197,9 +194,8 @@ function getAvgTemperaturesByLayer($arrayOfSilos, $arrayOfLayers, $arrayOfDates)
 }
 
 //  Температуры каждого датчика в слоях
-function getSensorTemperaturesByLayer($arrayOfSilos, $arrayOfLayers, $arrayOfDates){
+function getSensorTemperaturesByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $arrayOfDates){
 
-    global $dbh;
     $sql = "";  $outStr="";
     $outStr .= "<style>table, td, th {border: 1px solid black; border-collapse: collapse;}</style>";
 
@@ -253,9 +249,8 @@ function getSensorTemperaturesByLayer($arrayOfSilos, $arrayOfLayers, $arrayOfDat
 }
 
 //  Температуры каждого датчика в подвеске
-function getSensorTemperaturesByPodv($arrayOfSilos, $arrayOfPodv, $arrayOfSensors, $arrayOfDates){
+function getSensorTemperaturesByPodv($dbh, $arrayOfSilos, $arrayOfPodv, $arrayOfSensors, $arrayOfDates){
 
-    global $dbh;
     $sql = "";  $outStr="";
     $outStr .= "<style>table, td, th {border: 1px solid black; border-collapse: collapse;}</style>";
     $strArrayOfSensors="(".implode(",",$arrayOfSensors).")";
@@ -387,9 +382,9 @@ function getSensorTemperaturesByPodv($arrayOfSilos, $arrayOfPodv, $arrayOfSensor
 */
 
 /*
-    function getSiloPodvSensAssocArray(){
+    function getSiloPodvSensAssocArray($dbh){
 
-        global $dbh; $outArr=array();
+        $outArr=array();
 
         $sql="SELECT max(silo_id) FROM prodtypesbysilo;";
 
