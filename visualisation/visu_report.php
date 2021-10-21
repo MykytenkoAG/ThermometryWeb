@@ -47,48 +47,67 @@ function getAllMeasurementDates($dbh){
 
 function createMeasurementCheckboxes($measurementArray){
 
-    $outStr="";
+    $outStr = "<table>";
 
     if(count($measurementArray)>1){
         $outStr.= "
-        <div class=\"form-check mt-2 mb-2\">
-            <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchballdates\" onchange=\"prfChbAllDates()\">
-            <label class=\"form-check-label\">
-                Все даты
-            </label>
-        </div>";
+                    <tr>
+                        <tr>
+                            <div class=\"form-check mt-0 mb-0\" style=\"margin-left: 3px; text-align: left\">
+                                <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchballdates\" onchange=\"prfChbAllDates()\">
+                                <label class=\"form-check-label\">
+                                    Все даты
+                                </label>
+                            </div>
+                        </td>
+                    </tr>";
     }
 
     foreach($measurementArray as $date => $time){
 
-        $outStr.= " <p>
-                        <button class=\"btn btn-secondary\" type=\"button\" data-bs-toggle=\"collapse\"
-                                data-bs-target=\".prfchbmc_$date\" aria-expanded=\"false\">
-                            $date
-                        </button>
-                    </p>";
+        $outStr.= " <tr>
+                        <td colspan=\"2\" style=\"margin: 0px;\">
+                            <p style=\"margin-bottom: 0px; padding: 0px;\">
+                                <button class=\"btn btn-secondary mt-0 mb-1\" type=\"button\" data-bs-toggle=\"collapse\"
+                                        data-bs-target=\".prfchbmc_$date\" aria-expanded=\"false\">
+                                    $date
+                                </button>
+                            </p>
+                        </td>
+                    </tr>
+                    ";
 
         if(count($measurementArray[$date])>1){
-            $outStr.= "
-            <div class=\"form-check mt-2 mb-2 collapse multi-collapse prfchbmc_$date\">
-                <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchball_$date\" onchange=\"prfChbCurrDate('prfchball_$date')\">
-                <label class=\"form-check-label\">
-                    Все
-                </label>
-            </div>";
+            $outStr.= "<tr>
+                            <td>
+                                <div class=\"form-check mt-0 mb-1 collapse multi-collapse prfchbmc_$date\" style=\"margin-left: 3px; text-align: left\">
+                                    <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchball_$date\" onchange=\"prfChbCurrDate('prfchball_$date')\">
+                                    <label class=\"form-check-label\">
+                                        Все
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                            ";
         }
 
         foreach($time as $measTime){
             $outStr.= "
-                    <div class=\"form-check mt-2 mb-2 collapse multi-collapse prfchbmc_$date\">
-                        <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchb_".$date."_".$measTime."\">
-                        <label class=\"form-check-label\">
-                            $measTime
-                        </label>
-                    </div>";
+                        <tr>
+                            <td>
+                                <div class=\"form-check mt-0 mb-1 collapse multi-collapse prfchbmc_$date\" style=\"margin-left: 3px; text-align: left\">
+                                    <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchb_".$date."_".$measTime."\">
+                                    <label class=\"form-check-label\">
+                                        $measTime
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>";
         }
 
     }
+
+    $outStr .= "</table>";
 
     return $outStr;
 }

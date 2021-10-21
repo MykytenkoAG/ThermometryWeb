@@ -1,6 +1,6 @@
 <?php
 
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');
+require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');
 
 //  OUT = html table < NACK, time, silo_name, podv_num, sensor_num, reason >
 function getCurrentAlarms($dbh){
@@ -479,7 +479,35 @@ function createTemperatureSpeedsTable($dbh, $siloNum){
 
     $outStr = "<table>";
 
-    for($i = $rows_number-1; $i >= 0; $i--){
+    for($i = $rows_number; $i >= 0; $i--){
+        
+        //  Отображение метода отображения уровня
+        if($i==($rows_number)){
+            $outStr .= "<tr style=\"height: 15px; \">";
+
+            if($main_array[0]['grain_level_fromTS']){
+                $lvlModeText="A";
+                $lvlModeColour="green";
+                $lvlModeButton="<li><button class=\"dropdown-item\" type=\"button\" onclick=\"change_grain_level_mode($siloNum, '0')\">Переключить в ручной режим</button></li>";
+                $lvlSliderDisabled="disabled";
+            } else {
+                $lvlModeText="M";
+                $lvlModeColour="yellow";
+                $lvlModeButton="<li><button class=\"dropdown-item\" type=\"button\" onclick=\"change_grain_level_mode($siloNum, '1')\">Переключить в автоматический режим</button></li>";
+                $lvlSliderDisabled="";
+            }
+
+            $outStr .= "
+                    <div class=\"dropdown\" style=\"margin:0px; padding:0px;\">
+                        <button class=\"\" type=\"button\" id=\"lvl-mode-v-$siloNum\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\"
+                        style=\"border: none; width: 40px; height: 25px;
+                        padding: 0px 0px 0px 0px; text-align: center; font-weight: bold; background-color: $lvlModeColour;\"
+                        >
+                            $lvlModeText
+                        </button>
+                        <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu2\">$lvlModeButton</ul></div></td></tr>";
+            continue;
+        }
         
         $outStr .= "<tr style=\"height: 15px; \">";
 
@@ -665,8 +693,6 @@ if( isset($_POST['enable_auto_lvl_mode']) ) {
     enableAutoLvlOnAllSilo($dbh);
 }
 
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');
-
 function sensorDisable($dbh, $silo_id, $podv_id, $sensor_num){
 	
 	$query="UPDATE sensors SET is_enabled=0 WHERE silo_id=$silo_id AND podv_id=$podv_id AND sensor_num=$sensor_num";
@@ -678,6 +704,7 @@ function sensorDisable($dbh, $silo_id, $podv_id, $sensor_num){
 
 if( isset($_POST['sensor_disable_silo_id']) && isset($_POST['sensor_disable_podv_num']) && isset($_POST['sensor_disable_sensor_num']) ) {
 	sensorDisable($dbh, $_POST['sensor_disable_silo_id'], $_POST['sensor_disable_podv_num'], $_POST['sensor_disable_sensor_num']);
+    echo "Выбранный датчик отключен";
 }
 
 function sensorEnable($dbh, $silo_id, $podv_id, $sensor_num){
@@ -691,6 +718,7 @@ function sensorEnable($dbh, $silo_id, $podv_id, $sensor_num){
 
 if( isset($_POST['sensor_enable_silo_id']) && isset($_POST['sensor_enable_podv_num']) && isset($_POST['sensor_enable_sensor_num']) ) {
 	sensorEnable($dbh, $_POST['sensor_enable_silo_id'], $_POST['sensor_enable_podv_num'], $_POST['sensor_enable_sensor_num']);
+    echo "Выбранный датчик включен";
 }
 
 function podvDisable($dbh, $silo_id, $podv_id){
@@ -730,6 +758,7 @@ function disableAllDefectiveSensors($dbh){
 
 if( isset($_POST['disable_all_defective_sensors']) ) {
 	disableAllDefectiveSensors($dbh);
+    echo "Датчики включены";
 }
 
 function enableAllSensors($dbh){
@@ -743,6 +772,7 @@ function enableAllSensors($dbh){
 
 if( isset($_POST['enable_all_sensors']) ) {
 	enableAllSensors($dbh);
+    echo "датчики отключены";
 }
 
 ?>

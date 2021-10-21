@@ -1,4 +1,5 @@
 <?php
+
 $simulation_mode = true;
 $debugPageDisableElements = $simulation_mode ? "" : "disabled";
 //	Набор инициализационных параметров для работы с термосервером и БД
@@ -16,4 +17,5 @@ $password	= $settingsINI['DBPassword'];
 $dbname		= $settingsINI['DBName'];
 //	Создание объекта PDO для работы с Базой Данных
 $dbh = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);	//[PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+
 ?>

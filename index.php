@@ -10,20 +10,12 @@
   <body>
       <?php require_once "blocks/header.php"; ?>
 
-      <script>
-
-      </script>
-
       <style>
-        .silo-number:hover{
-          background-color: green;
-        }
-
         .silo:hover div {
           background-color: blue;
           color: white;
         }
-        </style>
+      </style>
 
       <main>
         <div class="row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-2 row-cols-xl-2 row-cols-xxl-3 g-0">
@@ -189,7 +181,7 @@
                   </div>
                 </div>
 
-                <div style="display: grid; height: 750px;">
+                <div style="display: grid; height: 750px; overflow: auto;">
 
                   <div class="mt-3 collapse product-characteristics">
                     <table class="table">
@@ -203,27 +195,32 @@
                           <td id="ind-prod-tbl-1-v-max" class="table-active" style="padding-top: 3px; padding-bottom: 3px;">3&deg;C/сут.</td>
                         </tr>
                         <tr>
-                          <td colspan="6" style="padding: 3px;">Температура</td>
-                        </tr>
-                        <tr>
-                          <td colspan="6" style="margin: 0px; padding: 3px;">
-                            <div class="row m-1" style="height: 25px; background-image: linear-gradient(to right, #00FF00, yellow, red);">
-                              <div id="ind-prod-tbl-3-t-min" class="col" style="padding-bottom: 3px; text-align: left;">20</div>
-                              <div id="ind-prod-tbl-3-t-avg" class="col" style="padding-bottom: 3px; text-align: center;">25</div>
-                              <div id="ind-prod-tbl-3-t-max" class="col" style="padding-bottom: 3px; text-align: right;">30</div>
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td colspan="6" style="padding: 3px;">Скорость изменения температуры</td>
-                        </tr>
-                        <tr>
-                          <td colspan="6" style="padding: 3px;">
-                            <div class="row m-1" style="height: 25px; background-image: linear-gradient(to right, #00FF00, yellow, red);">
-                              <div id="ind-prod-tbl-5-v-min" class="col" style="padding-bottom: 3px; text-align: left;">2.0</div>
-                              <div id="ind-prod-tbl-5-v-avg" class="col" style="padding-bottom: 3px; text-align: center;">2.5</div>
-                              <div id="ind-prod-tbl-5-v-max" class="col" style="padding-bottom: 3px; text-align: right;">3.0</div>
-                            </div>
+                          <td colspan="6" style="margin: 0px; padding-bottom: 3px;">
+                            <table style="width: 100%;">
+                              <tr>
+                                <td style="width: 13%; padding: 3px;">
+                                    Температура
+                                </td>
+                                <td style="width: 37%; padding: 3px;">
+                                  <div class="row m-1" style="height: 25px; background-image: linear-gradient(to right, #00FF00, yellow, red);">
+                                    <div id="ind-prod-tbl-3-t-min" class="col" style="padding: 2px; text-align: left;   font-size: 14px;">20</div>
+                                    <div id="ind-prod-tbl-3-t-avg" class="col" style="padding: 2px; text-align: center; font-size: 14px;">25</div>
+                                    <div id="ind-prod-tbl-3-t-max" class="col" style="padding: 2px; text-align: right;  font-size: 14px;">30</div>
+                                  </div>
+                                </td>
+                                <td style="width: 13%; padding: 3px;">
+                                  Скорость
+                                </td>
+                                <td style="width: 40%; padding: 0px;">
+                                  <div class="row m-1" style="height: 25px; background-image: linear-gradient(to right, #00FF00, yellow, red);">
+                                    <div id="ind-prod-tbl-5-v-min" class="col" style="padding: 2px; text-align: left;   font-size: 14px;">2.0</div>
+                                    <div id="ind-prod-tbl-5-v-avg" class="col" style="padding: 2px; text-align: center; font-size: 14px;">2.5</div>
+                                    <div id="ind-prod-tbl-5-v-max" class="col" style="padding: 2px; text-align: right;  font-size: 14px;">3.0</div>
+                                  </div>
+                                </td>
+                              </tr>
+                            </table>
+
                           </td>
                         </tr>
                         <tr>
@@ -244,7 +241,7 @@
 
 
                   <div class="align-bottom" id="silo-param-table"
-                      style="position:absolute; min-width:300px; margin-top: auto; margin-bottom: 0px; margin-left:auto; margin-right:auto; overflow: auto;">
+                      style="position:absolute; min-width:300px; margin-top: auto; margin-bottom: 0px; margin-left:auto; margin-right: auto;  overflow: auto;">
                       <?php
                         echo createTemperaturesTable($dbh, 0);
                       ?>
