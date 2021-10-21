@@ -317,9 +317,12 @@ function getColsNumberForSiloTables($dbh, $siloNum){
     $sth = $dbh->query($sql);
 
     if($sth==false){
-    return false;
+        return false;
     }
     $rows = $sth->fetchAll();
+    if(count($rows)==0){
+        return false;
+    }
 
     return $rows[0]['COUNT(DISTINCT(podv_id))'];
 }
@@ -337,237 +340,144 @@ function getShiftArrayForSiloTables($dbh, $siloNum){
     return $sth->fetchAll();
 }
 
-function createTemperaturesTable($dbh, $siloNum){
+function drawTemperaturesTable($dbh, $siloID){
 
-    $rows_number = getRowsNumberForSiloTables($dbh, $siloNum);
-    $cols_number = getColsNumberForSiloTables($dbh, $siloNum);
-    $shifts_array = getShiftArrayForSiloTables($dbh, $siloNum);
+    $rows_number  = getRowsNumberForSiloTables($dbh, $siloID);
+    $cols_number  = getColsNumberForSiloTables($dbh, $siloID);
+    $shifts_array = getShiftArrayForSiloTables($dbh, $siloID);
 
     //  Находим главный массив
     $sql = "SELECT curr_t_text, curr_t_colour, s.is_enabled, pbs.grain_level_fromTS, pbs.grain_level
             FROM sensors AS s INNER JOIN prodtypesbysilo AS pbs ON s.silo_id=pbs.silo_id
-            WHERE s.silo_id = $siloNum;";
+            WHERE s.silo_id = $siloID;";
 
     $sth = $dbh->query($sql);
 
     if($sth==false){
         return false;
     }
-    $main_array = $sth->fetchAll();
+    $dbRowsArr = $sth->fetchAll();
 
-    $outStr = "<table>";
-
-    for($i = $rows_number; $i >= 0; $i--){
-
-        //  Отображение метода отображения уровня
-        if($i==($rows_number)){
-            $outStr .= "<tr style=\"height: 15px; \">";
-
-            if($main_array[0]['grain_level_fromTS']){
-                $lvlModeText="A";
-                $lvlModeColour="green";
-                $lvlModeButton="<li><button class=\"dropdown-item\" type=\"button\" onclick=\"change_grain_level_mode($siloNum, '0')\">Переключить в ручной режим</button></li>";
-                $lvlSliderDisabled="disabled";
-            } else {
-                $lvlModeText="M";
-                $lvlModeColour="yellow";
-                $lvlModeButton="<li><button class=\"dropdown-item\" type=\"button\" onclick=\"change_grain_level_mode($siloNum, '1')\">Переключить в автоматический режим</button></li>";
-                $lvlSliderDisabled="";
-            }
-
-            $outStr .= "
-                    <div class=\"dropdown\" style=\"margin:0px; padding:0px;\">
-                        <button class=\"\" type=\"button\" id=\"lvl-mode-t-$siloNum\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\"
-                        style=\"border: none; width: 40px; height: 25px;
-                        padding: 0px 0px 0px 0px; text-align: center; font-weight: bold; background-color: $lvlModeColour;\"
-                        >
-                            $lvlModeText
-                        </button>
-                        <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu2\">$lvlModeButton</ul></div></td></tr>";
-            continue;
-        }
-        
-        $outStr .= "<tr style=\"height: 15px; \">";
-
-        //  Отображение уровня
-        if($i==($rows_number-1)){
-            $lvlSlider_rowspan = $rows_number+1;
-            $lvlSlider_max = $rows_number;
-            $lvlSlider_value = $main_array[0]['grain_level'];
-            $lvlSlider_style ="width: 15px; --tdHeight: calc(27px * $rows_number); height: var( --tdHeight );
-                            padding-right: 0px; margin-right: 0px;
-                            -webkit-appearance: slider-vertical;";
-
-            $outStr .= "<td rowspan=\"$lvlSlider_rowspan\">
-                    <input type=\"range\" id=\"lvl-slider-t-$siloNum\"
-                    name=\"\" min=\"0\" max=\"$lvlSlider_max\" value=\"$lvlSlider_value\" step=\"1\"
-                    onchange=\"change_grain_level_from_slider($siloNum)\" style=\"$lvlSlider_style\" $lvlSliderDisabled>
-            </td>";
-        }
-
-        $outStr .= "<td style=\"text-align: right; padding-right: 10px;\">".($i+1)."</td>";
-
-        for($j = 0; $j < $cols_number; $j++){
-            $outStr .= "<td >";
-
-            if($i<$shifts_array[$j]['csn']){
-
-                $curr_ind = 0;
-                for($k=0; $k<$j; $k++){
-                    $curr_ind += $shifts_array[$k]['csn'];
-                }
-                
-                $curr_ind += $i;  
-                
-                $outStr .= "
-                    <div class=\"dropdown\" style=\"margin:0px; padding:0px;\">
-                        <button class=\"\" type=\"button\" id=\"sensor-t-$siloNum-$j-$i\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\"
-                        style=\"border: none; width: 40px; height: 25px; padding: 0px 0px 0px 0px; text-align: center; font-weight: bold; background-color: ".$main_array[$curr_ind]['curr_t_colour'].";\"
-                        >"
-                            .$main_array[$curr_ind]['curr_t_text'].
-                        "</button>
-                        <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu2\">";
-
-                if($main_array[$curr_ind]['is_enabled']){
-                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorDisable($siloNum,$j,$i)\">Отключить выбранный датчик</button></li>";
-                } else {
-                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorEnable($siloNum,$j,$i)\">Включить выбранный датчик</button></li>";
-                }
-                    
-                $outStr .= "</ul></div>";
-
-            }
-
-            $outStr .= "</td>";
-        }
-        $outStr .= "</tr>";
-    }
-
-    //	Нумерация
-    $outStr .= "<tr style=\"height: 15px; text-align: center; \">";
-
-    $outStr .= "<td><div style=\"width:30px;\"></div></td>";    //
-
-    //$outStr .= "<td></td>";
-    for($j = 1; $j <= $cols_number; $j++){
-        $outStr .= "<td >".$j."</td>";
-    }
-    $outStr .= "</tr>";
-
-    $outStr .= "</table>";
-
-    return $outStr;
+    return drawParametersTable($rows_number, $cols_number, $shifts_array, $dbRowsArr, 't', $siloID);
 
 }
 
-function createTemperatureSpeedsTable($dbh, $siloNum){
+function drawTemperatureSpeedsTable($dbh, $siloID){
 
-    $rows_number = getRowsNumberForSiloTables($dbh, $siloNum);
-    $cols_number = getColsNumberForSiloTables($dbh, $siloNum);
-    $shifts_array = getShiftArrayForSiloTables($dbh, $siloNum);
+    $rows_number  = getRowsNumberForSiloTables($dbh, $siloID);
+    $cols_number  = getColsNumberForSiloTables($dbh, $siloID);
+    $shifts_array = getShiftArrayForSiloTables($dbh, $siloID);
 
     //  Находим главный массив
     $sql = "SELECT curr_v_text, curr_v_colour, s.is_enabled, pbs.grain_level_fromTS, pbs.grain_level
             FROM sensors AS s INNER JOIN prodtypesbysilo AS pbs ON s.silo_id=pbs.silo_id
-            WHERE s.silo_id =  $siloNum;";
+            WHERE s.silo_id = $siloID;";
     $sth = $dbh->query($sql);
 
     if($sth==false){
         return false;
     }
-    $main_array = $sth->fetchAll();
+    $dbRowsArr = $sth->fetchAll();
+
+    return drawParametersTable($rows_number, $cols_number, $shifts_array, $dbRowsArr, 'v', $siloID);
+
+}
+
+/*  Вспомогательная функция для построения таблицы с параметрами
+    (количество строк, количество столбцов, массив сдвигов(таблица с параметрами практически всегда не полная), массив из БД, параметр(t,v), id силоса)
+*/
+function drawParametersTable($rowsNumber, $colsNumber, $shiftsArr, $dbRowsArr, $parameter, $siloID){
+
+    $trHeight = 15; $divWidth = 40; $divHeight = 25;
 
     $outStr = "<table>";
 
-    for($i = $rows_number; $i >= 0; $i--){
-        
-        //  Отображение метода отображения уровня
-        if($i==($rows_number)){
-            $outStr .= "<tr style=\"height: 15px; \">";
+    for($i = $rowsNumber; $i >= 0; $i--){
 
-            if($main_array[0]['grain_level_fromTS']){
+        //  Кнопка для переключения режима определения уровня
+        if( $i==($rowsNumber) ){
+            $outStr .= "<tr style=\"height: ".$trHeight."px; \"><td>";
+
+            if($dbRowsArr[0]['grain_level_fromTS']){
                 $lvlModeText="A";
                 $lvlModeColour="green";
-                $lvlModeButton="<li><button class=\"dropdown-item\" type=\"button\" onclick=\"change_grain_level_mode($siloNum, '0')\">Переключить в ручной режим</button></li>";
+                $lvlModeButton="<li><button class=\"dropdown-item\" type=\"button\" onclick=\"change_grain_level_mode($siloID, '0')\">Переключить в ручной режим</button></li>";
                 $lvlSliderDisabled="disabled";
             } else {
                 $lvlModeText="M";
-                $lvlModeColour="yellow";
-                $lvlModeButton="<li><button class=\"dropdown-item\" type=\"button\" onclick=\"change_grain_level_mode($siloNum, '1')\">Переключить в автоматический режим</button></li>";
+                $lvlModeColour="orange";
+                $lvlModeButton="<li><button class=\"dropdown-item\" type=\"button\" onclick=\"change_grain_level_mode($siloID, '1')\">Переключить в автоматический режим</button></li>";
                 $lvlSliderDisabled="";
             }
 
             $outStr .= "
-                    <div class=\"dropdown\" style=\"margin:0px; padding:0px;\">
-                        <button class=\"\" type=\"button\" id=\"lvl-mode-v-$siloNum\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\"
-                        style=\"border: none; width: 40px; height: 25px;
-                        padding: 0px 0px 0px 0px; text-align: center; font-weight: bold; background-color: $lvlModeColour;\"
-                        >
+                    <div class=\"dropdown\" style=\"margin: 0px; padding: 0px;\">
+                        <button class=\"\" type=\"button\" id=\"lvl-mode-$parameter-$siloID\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\"
+                        style=\"border: none; width: ".$divWidth."px; height: ".$divHeight."px;
+                        padding: 0px 0px 0px 0px; text-align: center; font-weight: bold; background-color: $lvlModeColour;\" >
                             $lvlModeText
                         </button>
-                        <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu2\">$lvlModeButton</ul></div></td></tr>";
+                        <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu2\">$lvlModeButton</ul></div>";
+
+            $outStr .= "</td></tr>";
             continue;
         }
         
-        $outStr .= "<tr style=\"height: 15px; \">";
+        $outStr .= "<tr style=\"height: $trHeight px; \">";
 
-        //  Отображение уровня
-        if($i==($rows_number-1)){
-            $lvlSlider_rowspan = $rows_number+1;
-            $lvlSlider_max = $rows_number;
-            $lvlSlider_value = $main_array[0]['grain_level'];
-            $lvlSlider_style ="width: 15px; --tdHeight: calc(27px * $rows_number); height: var( --tdHeight );
+        //  Слайдер для отображения и выбора уровня
+        if( $i==($rowsNumber-1) ){
+            $lvlSlider_rowspan = $rowsNumber + 1;
+            $lvlSlider_max   = $rowsNumber;
+            $lvlSlider_value = $dbRowsArr[0]['grain_level'];
+            $lvlSlider_style ="width: 15px; --tdHeight: calc(27px * $rowsNumber); height: var( --tdHeight );
                             padding-right: 0px; margin-right: 0px;
                             -webkit-appearance: slider-vertical;";
 
             $outStr .= "<td rowspan=\"$lvlSlider_rowspan\">
-                    <input type=\"range\" id=\"lvl-slider-v-$siloNum\"
+                    <input type=\"range\" id=\"lvl-slider-$parameter-$siloID\"
                     name=\"\" min=\"0\" max=\"$lvlSlider_max\" value=\"$lvlSlider_value\" step=\"1\"
-                    onchange=\"change_grain_level_from_slider($siloNum)\" style=\"$lvlSlider_style\">
+                    onchange=\"change_grain_level_from_slider($siloID)\" style=\"$lvlSlider_style\" $lvlSliderDisabled>
             </td>";
         }
 
+        //  Номер слоя
         $outStr .= "<td style=\"text-align: right; padding-right: 10px;\">".($i+1)."</td>";
 
-        for($j = 0; $j < $cols_number; $j++){
+        for($j = 0; $j < $colsNumber; $j++){
             $outStr .= "<td >";
 
-            if($i<$shifts_array[$j]['csn']){
+            if($i<$shiftsArr[$j]['csn']){
 
+                //  Вычисляем индекс элемента в массиве из БД
                 $curr_ind = 0;
                 for($k=0; $k<$j; $k++){
-                    $curr_ind += $shifts_array[$k]['csn'];
+                    $curr_ind += $shiftsArr[$k]['csn'];
                 }
-                
                 $curr_ind += $i;
-
-                $currSensV = $main_array[$curr_ind]['curr_v_text'];
-                if($currSensV>100){
-                    $currSensV=100;
-                } elseif ($currSensV<-100){
-                    $currSensV=-100;
-                }
-
-                $outStr .= "
-                <div class=\"dropdown\" style=\"margin:0px; padding:0px;\">
-                    <button class=\"\" type=\"button\" id=\"sensor-v-$siloNum-$j-$i\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\"
-                    style=\"border: none; width: 40px; height: 25px; padding: 0px 0px 0px 0px; text-align: center; font-weight: bold; background-color: ".$main_array[$curr_ind]['curr_v_colour'].";\"
-                    >"
-                        .$currSensV.
-                    "</button>
-                    <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu2\">";
-
-                    
-                if($main_array[$curr_ind]['is_enabled']){
-                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorDisable($siloNum,$j,$i)\">Отключить выбранный датчик</button></li>";
-                } else {
-                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorEnable($siloNum,$j,$i)\">Включить выбранный датчик</button></li>";
-                }
-
-                $outStr .= "</ul></div>";
                 
-            }
+                $outStr .= "
+                    <div class=\"dropdown\" style=\" width: $divWidth px; margin:0px; padding:0px; \">
+                        <button class=\"\" type=\"button\" id=\"sensor-$parameter-$siloID-$j-$i\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\"
+                        style=\"border: none; width: ".$divWidth."px; height: ".$divHeight."px; padding: 0px 0px 0px 0px; text-align: center; font-weight: bold; background-color: "
+                            .$dbRowsArr[$curr_ind]["curr_".$parameter."_colour"].";\">"
+                            .$dbRowsArr[$curr_ind]["curr_".$parameter."_text"].
+                            "</button>
+                        <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu2\">";
 
+                if($dbRowsArr[$curr_ind]['is_enabled']){
+                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorDisable($siloID,$j,$i)\">Отключить выбранный датчик</button></li>";
+                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorDisable($siloID,$j,$i)\">Отключить выбранную подвеску</button></li>";
+                } else {
+                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorEnable($siloID,$j,$i)\">Включить выбранный датчик</button></li>";
+                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorEnable($siloID,$j,$i)\">Включить выбранную подвеску</button></li>";
+                }
+                $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorDisable($siloID,$j,$i)\">Отобразить график температуры за сутки</button></li>";
+                $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorDisable($siloID,$j,$i)\">Отобразить график температуры за месяц</button></li>";
+                    
+                $outStr .= "</ul></div>";
+
+            }
             $outStr .= "</td>";
         }
         $outStr .= "</tr>";
@@ -575,16 +485,15 @@ function createTemperatureSpeedsTable($dbh, $siloNum){
 
     //	Нумерация
     $outStr .= "<tr style=\"height: 15px; text-align: center; \">";
-    $outStr .= "<td></td>";
-    for($j = 1; $j <= $cols_number; $j++){
+    $outStr .= "<td><div style=\"width:30px;\"></div></td>";
+
+    for($j = 1; $j <= $colsNumber; $j++){
         $outStr .= "<td >".$j."</td>";
     }
     $outStr .= "</tr>";
-
     $outStr .= "</table>";
 
     return $outStr;
-
 }
 
 //  Получение текущих параметров для силоса
@@ -623,13 +532,13 @@ function getSiloParameters($dbh, $silo_id){
 
 //  Отрисовка текущих значений температур
 if(isset($_POST['silo_id_for_temperature_table']) && !empty($_POST['silo_id_for_temperature_table'])) {
-    echo createTemperaturesTable($dbh, preg_split('/-/', $_POST['silo_id_for_temperature_table'], -1, PREG_SPLIT_NO_EMPTY)[1]);
+    echo drawTemperaturesTable($dbh, preg_split('/-/', $_POST['silo_id_for_temperature_table'], -1, PREG_SPLIT_NO_EMPTY)[1]);
     //echo update_t_v($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate);
 }
 
 //  Отрисовка текущих значений скоростей
 if(isset($_POST['silo_id_for_speeds_table']) && !empty($_POST['silo_id_for_speeds_table'])) {
-    echo createTemperatureSpeedsTable($dbh, preg_split('/-/', $_POST['silo_id_for_speeds_table'], -1, PREG_SPLIT_NO_EMPTY)[1]);
+    echo drawTemperatureSpeedsTable($dbh, preg_split('/-/', $_POST['silo_id_for_speeds_table'], -1, PREG_SPLIT_NO_EMPTY)[1]);
 }
 
 //  Отрисовка текста названия силоса

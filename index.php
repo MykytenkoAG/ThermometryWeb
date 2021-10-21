@@ -181,7 +181,7 @@
                   </div>
                 </div>
 
-                <div style="display: grid; height: 750px; overflow: auto;">
+                <div style="display: grid; height: 750px;">
 
                   <div class="mt-3 collapse product-characteristics">
                     <table class="table">
@@ -241,9 +241,9 @@
 
 
                   <div class="align-bottom" id="silo-param-table"
-                      style="position:absolute; min-width:300px; margin-top: auto; margin-bottom: 0px; margin-left:auto; margin-right: auto;  overflow: auto;">
+                      style="position:relative; min-width:300px; margin-top: auto; margin-bottom: 0px; margin-left:auto; margin-right: auto; overflow: auto;">
                       <?php
-                        echo createTemperaturesTable($dbh, 0);
+                        echo drawTemperaturesTable($dbh, 0);
                       ?>
                   </div>
 
