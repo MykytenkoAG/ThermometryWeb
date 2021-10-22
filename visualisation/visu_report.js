@@ -1,4 +1,7 @@
 function init_report(){
+
+    $('#hdr-href-report').removeClass("text-black");
+    $('#hdr-href-report').addClass("text-primary");
     //console.log(project_conf_array);
 
     setSelectOptions( document.getElementById("rprtprf_silo_1"),    ["all"].concat( Object.keys(project_conf_array) ) );
@@ -98,8 +101,8 @@ function addNewLineOnChart(){
     let selects = document.getElementById("sensor-temperatures-table").getElementsByTagName('select');
 
     let silo_id     = selects.item(selects.length - 4).value;
-    let podv_id     = selects.item(selects.length - 3).value;
-    let sensor_num  = selects.item(selects.length - 2).value;
+    let podv_id     = +selects.item(selects.length - 3).value - 1;
+    let sensor_num  = +selects.item(selects.length - 2).value - 1;
     let line_colour = inputs.item(inputs.length - 1).value;
     let period      = selects.item(selects.length - 1).value;
 

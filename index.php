@@ -1,3 +1,4 @@
+<?php require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/auth.php'); ?>
 <!doctype html>
 <html lang="ru">
   <head>
@@ -9,6 +10,7 @@
   </head>
   <body>
       <?php require_once "blocks/header.php"; ?>
+      <?php require_once "blocks/modals.php"; ?>
 
       <style>
         .silo:hover div {
@@ -91,6 +93,13 @@
                     </button>
                   </div>
 
+                  
+                  <div class="col-sm p-1">
+                    <button type="button" class="btn btn-light" style="width: 100%;" onclick="ind_session_start()">
+                      START SESSION
+                    </button>
+                  </div>
+
                 </div>
 
               </div>
@@ -113,6 +122,9 @@
 
                   <div class="col-10 col-sm-10 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
                     <?php
+
+                      echo $accessLevel;
+
                       echo drawSiloPlan($dbh);
                     ?>
                   </div>

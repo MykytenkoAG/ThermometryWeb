@@ -1,3 +1,4 @@
+<?php require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/auth.php'); ?>
 <!doctype html>
 <html lang="en">
   <head>
@@ -10,6 +11,7 @@
   <body>
     <?php
       require_once "blocks/header.php";
+      require_once "blocks/modals.php";
       require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');
     ?>
     <div class="container-fluid h-100">
@@ -307,6 +309,14 @@
                 </button>
                 <?php
                   require_once "scripts/currValsFromTS.php";
+
+                  if (isset($_SESSION["session_is_working"]))
+                  {
+                      echo "session is working!";
+                  } else {
+                      echo "session is NOT working!";
+                  }
+
                   if($simulation_mode){
                     echo "<div style=\"position: absolute; bottom: 2%; right:2%\">ВКЛЮЧЕН РЕЖИМ ОТЛАДКИ</div>";
                   }

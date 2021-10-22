@@ -1,5 +1,5 @@
 <?php
-
+require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/auth.php');
 require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');   //  ! Можно оптимизировать
 
 //  OUT = html table < NACK, time, silo_name, podv_num, sensor_num, reason >
@@ -271,25 +271,7 @@ function drawSiloPlan($dbh){
     $outStr .= "</table>";
 
     $outStr .= "
-      <div class=\"modal fade\" id=\"ind-lvl-auto-all-silo-enable\" data-bs-backdrop=\"static\" data-bs-keyboard=\"false\" tabindex=\"-1\" aria-labelledby=\"staticBackdropLabel\" aria-hidden=\"true\">
-        <div class=\"modal-dialog modal-dialog-centered\">
-          <div class=\"modal-content\">
-            <div class=\"modal-header\">
-                <h5 class=\"modal-title\" id=\"staticBackdropLabel\">Автоматическое определение уровня</h5>
-                <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\" aria-label=\"Close\"></button>
-            </div>
-            <div class=\"modal-body\">
-                Установить автоопределение уровня на всех силосах?
-            </div>
-            <div class=\"modal-footer\">
-                <div style=\"margin: auto;\">
-                    <button type=\"button\" class=\"btn btn-primary\" data-bs-dismiss=\"modal\" onclick=\"enable_all_auto_lvl_mode()\">Да</button>
-                    <button type=\"button\" class=\"btn btn-secondary\" data-bs-dismiss=\"modal\">Отмена</button>
-                </div>
-            </div>
-          </div>
-        </div>
-      </div>
+
     ";
 
     return $outStr;
@@ -347,6 +329,7 @@ function getShiftArrayForSiloTables($dbh, $siloNum){
 
 function drawTemperaturesTable($dbh, $siloID){
 
+    global $accessLevel;
     $rows_number  = getRowsNumberForSiloTables($dbh, $siloID);
     $cols_number  = getColsNumberForSiloTables($dbh, $siloID);
     $shifts_array = getShiftArrayForSiloTables($dbh, $siloID);
@@ -363,12 +346,13 @@ function drawTemperaturesTable($dbh, $siloID){
     }
     $dbRowsArr = $sth->fetchAll();
 
-    return drawParametersTable($rows_number, $cols_number, $shifts_array, $dbRowsArr, 't', $siloID);
+    return drawParametersTable($accessLevel, $rows_number, $cols_number, $shifts_array, $dbRowsArr, 't', $siloID);
 
 }
 
 function drawTemperatureSpeedsTable($dbh, $siloID){
 
+    global $accessLevel;
     $rows_number  = getRowsNumberForSiloTables($dbh, $siloID);
     $cols_number  = getColsNumberForSiloTables($dbh, $siloID);
     $shifts_array = getShiftArrayForSiloTables($dbh, $siloID);
@@ -384,14 +368,16 @@ function drawTemperatureSpeedsTable($dbh, $siloID){
     }
     $dbRowsArr = $sth->fetchAll();
 
-    return drawParametersTable($rows_number, $cols_number, $shifts_array, $dbRowsArr, 'v', $siloID);
+    return drawParametersTable($accessLevel, $rows_number, $cols_number, $shifts_array, $dbRowsArr, 'v', $siloID);
 
 }
 
 /*  Вспомогательная функция для построения таблицы с параметрами
     (количество строк, количество столбцов, массив сдвигов(таблица с параметрами практически всегда не полная), массив из БД, параметр(t,v), id силоса)
 */
-function drawParametersTable($rowsNumber, $colsNumber, $shiftsArr, $dbRowsArr, $parameter, $siloID){
+function drawParametersTable($accessLevel, $rowsNumber, $colsNumber, $shiftsArr, $dbRowsArr, $parameter, $siloID){
+
+    $btnDisabled = $accessLevel<1 ? "disabled" : "";
 
     $trHeight = 15; $divWidth = 40; $divHeight = 25;
 
@@ -407,19 +393,19 @@ function drawParametersTable($rowsNumber, $colsNumber, $shiftsArr, $dbRowsArr, $
                 $lvlModeText="A";
                 $lvlModeColour="green";
                 $lvlModeButton="<li><button class=\"dropdown-item\" type=\"button\" onclick=\"change_grain_level_mode($siloID, '0')\">Переключить в ручной режим</button></li>";
-                $lvlSliderDisabled="disabled";
             } else {
                 $lvlModeText="M";
                 $lvlModeColour="orange";
                 $lvlModeButton="<li><button class=\"dropdown-item\" type=\"button\" onclick=\"change_grain_level_mode($siloID, '1')\">Переключить в автоматический режим</button></li>";
-                $lvlSliderDisabled="";
             }
+
+            $lvlSliderDisabled = $dbRowsArr[0]['grain_level_fromTS']==1 || $accessLevel<1 ? "disabled" : "";
 
             $outStr .= "
                     <div class=\"dropdown\" style=\"margin: 0px; padding: 0px;\">
                         <button class=\"\" type=\"button\" id=\"lvl-mode-$parameter-$siloID\" data-bs-toggle=\"dropdown\" aria-expanded=\"false\"
                         style=\"border: none; width: ".$divWidth."px; height: ".$divHeight."px;
-                        padding: 0px 0px 0px 0px; text-align: center; font-weight: bold; background-color: $lvlModeColour;\" >
+                        padding: 0px 0px 0px 0px; text-align: center; font-weight: bold; background-color: $lvlModeColour;\" $btnDisabled>
                             $lvlModeText
                         </button>
                         <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu2\">$lvlModeButton</ul></div>";
@@ -471,11 +457,11 @@ function drawParametersTable($rowsNumber, $colsNumber, $shiftsArr, $dbRowsArr, $
                         <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu2\">";
 
                 if($dbRowsArr[$curr_ind]['is_enabled']){
-                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorDisable($siloID,$j,$i)\">Отключить выбранный датчик</button></li>";
-                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedPodvDisable($siloID,$j)\">Отключить выбранную подвеску</button></li>";
+                    $outStr .= "<li><button class=\"btn dropdown-item\" type=\"button\" onclick=\"selectedSensorDisable($siloID,$j,$i)\" $btnDisabled>Отключить выбранный датчик</button></li>";
+                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedPodvDisable($siloID,$j)\" $btnDisabled>Отключить выбранную подвеску</button></li>";
                 } else {
-                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorEnable($siloID,$j,$i)\">Включить выбранный датчик</button></li>";
-                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedPodvEnable($siloID,$j)\">Включить выбранную подвеску</button></li>";
+                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorEnable($siloID,$j,$i)\" $btnDisabled>Включить выбранный датчик</button></li>";
+                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedPodvEnable($siloID,$j)\" $btnDisabled>Включить выбранную подвеску</button></li>";
                 }
                 $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorDrawChart($siloID,$j,$i,'month')\">Отобразить график температуры за месяц</button></li>";
                 $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorDrawChart($siloID,$j,$i,'day')\">Отобразить график температуры за сутки</button></li>";
@@ -683,5 +669,10 @@ if(isset($_POST['silo_id_forText']) && !empty($_POST['silo_id_forText'])) {
     $silo_name = $sth->fetch()['silo_name'];
     echo "Силос $silo_name";
 }
+
+if(isset($_POST['start_session_1'])) {
+    $_SESSION["session_is_working"] = 1;
+}
+
 
 ?>

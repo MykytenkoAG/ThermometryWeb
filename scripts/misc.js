@@ -1,14 +1,17 @@
-let current_page;
 let mainTimer;
+const mainTimerPeriod = 10000;
 let serverDateTime;
 let project_conf_array=[];
 let silo_name_with_id_0;
 let silo_name_with_max_podv_number;
 
+//  Действия при загрузке каждой страницы
 document.addEventListener("DOMContentLoaded", () => {
 
     current_page = window.location.pathname.split("/").pop();
-    mainTimer = setInterval( periodicActions, 10000);
+    mainTimer = setInterval( periodicActions, mainTimerPeriod);
+
+    isSoundOn();
 
     if              (current_page === "index.php" || current_page === ""){
         init_index();
@@ -17,33 +20,31 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if       (current_page === "silo_config.php"){
         init_silo_config();
     }
-
-    isSoundOn();
     
 });
 
+//  Работа с cookie
 function getCookie(cname) {
     let name = cname + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
     let ca = decodedCookie.split(';');
     for(let i = 0; i <ca.length; i++) {
-      let c = ca[i];
-      while (c.charAt(0) == ' ') {
-        c = c.substring(1);
-      }
-      if (c.indexOf(name) == 0) {
-        return c.substring(name.length, c.length);
-      }
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
     }
     return "";
-  }
+}
 
 function deleteCookie(name) {
     document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 };
 
-/*  Получение главного конфигурационного ассоциативного массива
-*/
+//  Получение главного конфигурационного ассоциативного массива
 function getProjectConfArr(){
     $.ajax({
         url: '/webTermometry/scripts/currValsFromTS.php',
@@ -92,8 +93,7 @@ function getSiloNameWithMaxPodvNumber(){
     return;
 }
 
-/*  Функция для установки аттрибутов option элемента select
-*/
+//  Функция для установки аттрибутов option элемента select
 function setSelectOptions(dom_element, options_arr){
     while (dom_element.options.length) {
         dom_element.remove(0);
@@ -107,6 +107,7 @@ function setSelectOptions(dom_element, options_arr){
     });
     return;
 }
+
 /*  Функция для установки атрибутов option для строки из элементов select
     Использует:
         главный конфигурационный ассоциативный массив project_conf_array
@@ -175,9 +176,12 @@ function isSoundOn(){
             if(fromPHP=="YES"){
                 document.getElementById("alarm-sound").loop = true;
                 document.getElementById("alarm-sound").play();
+                $('#hdr-ack').removeClass("text-black");
+                $('#hdr-ack').addClass("text-danger");
             }else {
                 
                 document.getElementById("alarm-sound").pause();
+
             }
 
         }
@@ -197,6 +201,15 @@ function acknowledgeAlarms(){
         success: function(fromPHP) {
             console.log(fromPHP);
             if(current_page === "index.php"){
+                $('#hdr-ack').removeClass("text-danger");
+                $('#hdr-ack').addClass("text-black");
+                
+                $('#hdr-ack').removeClass("text-black");
+                $('#hdr-ack').addClass("text-primary");
+                $('#hdr-ack').removeClass("text-primary");
+                $('#hdr-ack').addClass("text-black");
+
+
                 redrawTableCurrentAlarms();
 
                 redrawSiloStatus();

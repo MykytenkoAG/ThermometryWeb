@@ -1,3 +1,4 @@
+<?php require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/auth.php'); ?>
 <!doctype html>
 <html lang="en">
   <head>
@@ -8,6 +9,7 @@
   </head>
   <body>
       <?php require_once "blocks/header.php"; ?>
+      <?php require_once "blocks/modals.php"; ?>
       <main>
 
         <div class="row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-1 row-cols-xl-2 row-cols-xxl-3 m-0 g-0">

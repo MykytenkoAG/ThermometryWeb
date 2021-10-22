@@ -20,7 +20,7 @@ function getAllMeasurementDates($dbh){
     $rows = $sth->fetchAll();
 
     $outArr = array();
-    $daysArr=array(); $timesArr=array(); $currDay='';
+    $daysArr = array(); $timesArr = array(); $currDay = '';
     $daysIndArr = array();
 
     for($i=0; $i<count($rows); $i++){

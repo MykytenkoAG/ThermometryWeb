@@ -1,5 +1,8 @@
 function init_index() {
 
+    $('#hdr-href-index').removeClass("text-black");
+    $('#hdr-href-index').addClass("text-primary");
+
     redrawSiloStatus();
 
     lastParamSelectButtonID = "btn-temperatures";
@@ -133,8 +136,6 @@ let lastParamSelectButtonID; //  Кнопка для выбора отображ
 let lastSiloID;
 
 function onSiloClicked(silo_id) {
-
-    console.log("on silo clicked");
 
     if (lastParamSelectButtonID === "btn-temperatures") {
         redrawTableTemperatures(silo_id); //  таблица температур
@@ -331,5 +332,20 @@ function selectedSensorDrawChart(silo_id, podv_num, sensor_num, period){
     document.cookie = "chart_sensor_num="   + sensor_num + ";";
     document.cookie = "chart_period="       + period + ";";
     document.location.href = "report.php";
+    return;
+}
+
+
+function ind_session_start(){
+    $.ajax({
+        url: 'visualisation/visu_index.php',
+        type: 'POST',
+        cache: false,
+        data: { 'start_session_1': 1 },
+        dataType: 'html',
+        success: function(fromPHP) {
+            console.log("Данные сохранены в сессии");
+        }
+    });
     return;
 }

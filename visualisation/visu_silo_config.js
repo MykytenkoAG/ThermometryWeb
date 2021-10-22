@@ -24,6 +24,10 @@
 */
 
 function init_silo_config() {
+
+    $('#hdr-href-silo_config').removeClass("text-black");
+    $('#hdr-href-silo_config').addClass("text-primary");
+
     buttonDisable("table-prodtypes-btn-save-changes");
     buttonDisable("table-prodtypes-btn-discard-changes");
     buttonDisable("table-prodtypesbysilo-btn-save-changes");

@@ -45,25 +45,6 @@ function debug_get_debug_table($dbh){
 
     $outStr .= "</table>";
 
-    $outStr .= "
-      <div class=\"modal fade\" id=\"dbg-main-modal\" data-bs-backdrop=\"static\" data-bs-keyboard=\"false\" tabindex=\"-1\" aria-labelledby=\"staticBackdropLabel\" aria-hidden=\"true\">
-        <div class=\"modal-dialog modal-dialog-centered\">
-          <div class=\"modal-content\">
-            <div class=\"modal-header\">
-                <h5 class=\"modal-title\" id=\"staticBackdropLabel\">Debug</h5>
-                <button type=\"button\" class=\"btn-close\" data-bs-dismiss=\"modal\" aria-label=\"Close\"></button>
-            </div>
-            <div class=\"modal-body\"><h5 id=\"dbg-modal-body-message\"></h5></div>
-            <div class=\"modal-footer\">
-                <div style=\"margin: auto;\">
-                    <button type=\"button\" class=\"btn btn-primary\" data-bs-dismiss=\"modal\">OK</button>
-                </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    ";
-
     return $outStr;
 }
 

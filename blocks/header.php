@@ -5,7 +5,7 @@
             <ul class="nav me-auto">
 
                 <li>
-                    <a href="#" id="hdr-href-debug" class="nav-link text-black" data-bs-toggle="tooltip" data-bs-placement="right" onclick="onPageChange(0)"
+                    <a href="#" id="hdr-href-debug_page" class="nav-link text-black" data-bs-toggle="tooltip" data-bs-placement="right" onclick="onPageChange(0)"
 title="Режим симуляции данных">
                         <svg width="24" height="24" fill="currentColor" class="bi d-block mx-auto mt-1" viewBox="0 0 16 16">
                             <path d="M4.978.855a.5.5 0 1 0-.956.29l.41 1.352A4.985 4.985 0 0 0 3 6h10a4.985 4.985 0 0 0-1.432-3.503l.41-1.352a.5.5 0 1 0-.956-.29l-.291.956A4.978 4.978 0 0 0 8 1a4.979 4.979 0 0 0-2.731.811l-.29-.956z"/>
@@ -62,7 +62,7 @@ title="Инструкция по применению системы">
             </ul>
             <ul class="nav">
                 <li>
-                    <a href="#" class="nav-link text-black" data-bs-toggle="tooltip" data-bs-placement="right" onclick="acknowledgeAlarms()"
+                    <a href="#" id="hdr-ack"  class="nav-link text-black" data-bs-toggle="tooltip" data-bs-placement="right" onclick="acknowledgeAlarms()"
 title="Квитировать сигналы АПС">
                     <svg width="24" height="24" fill="currentColor" class="bi d-block mx-auto mt-1" viewBox="0 0 16 16">
                         <path d="M5.164 14H15c-1.5-1-2-5.902-2-7 0-.264-.02-.523-.06-.776L5.164 14zm6.288-10.617A4.988 4.988 0 0 0 8.995 2.1a1 1 0 1 0-1.99 0A5.002 5.002 0 0 0 3 7c0 .898-.335 4.342-1.278 6.113l9.73-9.73zM10 15a2 2 0 1 1-4 0h4zm-9.375.625a.53.53 0 0 0 .75.75l14.75-14.75a.53.53 0 0 0-.75-.75L.625 15.625z"/>
@@ -70,33 +70,51 @@ title="Квитировать сигналы АПС">
                         Квитировать АПС
                     </a>
                 </li>
+<?php
+    if( in_array( $accessLevel, array(0,1) ) ){
+        echo "
                 <li>
-                    <a href="#" class="nav-link text-black" data-bs-toggle="tooltip" data-bs-placement="right"
-title="Авторизоваться как Оператор">
-                        <svg width="24" height="24" fill="currentColor" class="bi d-block mx-auto mt-1" viewBox="0 0 16 16">
-                            <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>                
+                    <a href=\"#\" id=\"hdr-auth-oper\" class=\"nav-link text-black\" data-bs-toggle=\"tooltip\" data-bs-placement=\"right\"
+title=\"Авторизоваться как Оператор\">
+                        <svg width=\"24\" height=\"24\" fill=\"currentColor\" class=\"bi d-block mx-auto mt-1\" viewBox=\"0 0 16 16\">
+                            <path d=\"M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z\"/>                
                         </svg>
                         Оператор
                     </a>
                 </li>
+        ";
+    }
+
+    if( in_array( $accessLevel, array(0,2) ) ){
+
+        echo "
                 <li>
-                    <a href="#" class="nav-link text-black" data-bs-toggle="tooltip" data-bs-placement="right"
-title="Авторизоваться как технолог">
-                        <svg width="24" height="24" fill="currentColor" class="bi d-block mx-auto mt-1" viewBox="0 0 16 16">
-                            <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/>                
+                    <a href=\"#\" id=\"hdr-auth-tehn\" class=\"nav-link text-black\" data-bs-toggle=\"tooltip\" data-bs-placement=\"right\"
+title=\"Авторизоваться как технолог\">
+                        <svg width=\"24\" height=\"24\" fill=\"currentColor\" class=\"bi d-block mx-auto mt-1\" viewBox=\"0 0 16 16\">
+                            <path d=\"M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z\"/>                
                         </svg>
                         Технолог
                     </a>
                 </li>
+        ";
 
+    }
+
+    if($accessLevel>0){
+        echo "
                 <li>
-                    <a href="#" class="nav-link text-black" style="display: none;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi d-block mx-auto mt-1" viewBox="0 0 16 16">
-                            <path d="M14 0a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12zM5.904 10.803 10 6.707v2.768a.5.5 0 0 0 1 0V5.5a.5.5 0 0 0-.5-.5H6.525a.5.5 0 1 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 .707.707z"/>
+                    <a href=\"#\" id=\"hdr-sign-out\" class=\"nav-link text-black\" onclick=\"auth_sign_out()\">
+                        <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" fill=\"currentColor\" class=\"bi d-block mx-auto mt-1\" viewBox=\"0 0 16 16\">
+                            <path d=\"M14 0a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12zM5.904 10.803 10 6.707v2.768a.5.5 0 0 0 1 0V5.5a.5.5 0 0 0-.5-.5H6.525a.5.5 0 1 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 .707.707z\"/>
                         </svg>
                         Выйти
                     </a>
                 </li>
+        ";
+    }
+
+?>
                 
             </ul>
         </div>
