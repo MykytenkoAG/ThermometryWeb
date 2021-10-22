@@ -134,6 +134,8 @@ let lastSiloID;
 
 function onSiloClicked(silo_id) {
 
+    console.log("on silo clicked");
+
     if (lastParamSelectButtonID === "btn-temperatures") {
         redrawTableTemperatures(silo_id); //  таблица температур
     } else if (lastParamSelectButtonID === "btn-speeds") {
@@ -256,15 +258,31 @@ function selectedSensorEnable(silo_id, podv_num, sensor_num) {
     return;
 }
 
-//  !   TODO
-function disableCurrentPodv(silo_id, podv_num, sensor_num) {
-
+function selectedPodvDisable(silo_id, podv_num) {
+    $.ajax({
+        url: 'visualisation/visu_index.php',
+        type: 'POST',
+        cache: false,
+        data: { 'podv_disable_silo_id': silo_id, 'podv_disable_podv_num': podv_num },
+        dataType: 'html',
+        success: function(fromPHP) {
+            onSiloClicked(lastSiloID);
+        }
+    });
     return;
 }
 
-//  !   TODO
-function enableCurrentPodv(silo_id, podv_num, sensor_num) {
-
+function selectedPodvEnable(silo_id, podv_num) {
+    $.ajax({
+        url: 'visualisation/visu_index.php',
+        type: 'POST',
+        cache: false,
+        data: { 'podv_enable_silo_id': silo_id, 'podv_enable_podv_num': podv_num },
+        dataType: 'html',
+        success: function(fromPHP) {
+            onSiloClicked(lastSiloID);
+        }
+    });
     return;
 }
 
@@ -304,5 +322,14 @@ function change_grain_level_mode(silo_id, lvl_mode) {
             onSiloClicked(lastSiloID);
         }
     });
+    return;
+}
+
+function selectedSensorDrawChart(silo_id, podv_num, sensor_num, period){
+    document.cookie = "chart_silo_id="      + silo_id + ";";
+    document.cookie = "chart_podv_num="     + podv_num + ";";
+    document.cookie = "chart_sensor_num="   + sensor_num + ";";
+    document.cookie = "chart_period="       + period + ";";
+    document.location.href = "report.php";
     return;
 }

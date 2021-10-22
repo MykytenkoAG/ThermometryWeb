@@ -1,6 +1,6 @@
 <?php
 
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');
+require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');   //  ! Можно оптимизировать
 
 //  OUT = html table < NACK, time, silo_name, podv_num, sensor_num, reason >
 function getCurrentAlarms($dbh){
@@ -98,6 +98,11 @@ function getCurrentAlarms($dbh){
     $outStr .= "</tr></table>";
     
     return $outStr;
+}
+
+//  Получение текущих алармов
+if( isset($_POST['get_current_alarms']) ) {
+    echo getCurrentAlarms($dbh);
 }
 
 //  out: = [silo_id=>[{round,square},img_index]]
@@ -467,13 +472,13 @@ function drawParametersTable($rowsNumber, $colsNumber, $shiftsArr, $dbRowsArr, $
 
                 if($dbRowsArr[$curr_ind]['is_enabled']){
                     $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorDisable($siloID,$j,$i)\">Отключить выбранный датчик</button></li>";
-                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorDisable($siloID,$j,$i)\">Отключить выбранную подвеску</button></li>";
+                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedPodvDisable($siloID,$j)\">Отключить выбранную подвеску</button></li>";
                 } else {
                     $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorEnable($siloID,$j,$i)\">Включить выбранный датчик</button></li>";
-                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorEnable($siloID,$j,$i)\">Включить выбранную подвеску</button></li>";
+                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedPodvEnable($siloID,$j)\">Включить выбранную подвеску</button></li>";
                 }
-                $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorDisable($siloID,$j,$i)\">Отобразить график температуры за сутки</button></li>";
-                $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorDisable($siloID,$j,$i)\">Отобразить график температуры за месяц</button></li>";
+                $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorDrawChart($siloID,$j,$i,'month')\">Отобразить график температуры за месяц</button></li>";
+                $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorDrawChart($siloID,$j,$i,'day')\">Отобразить график температуры за сутки</button></li>";
                     
                 $outStr .= "</ul></div>";
 
@@ -494,6 +499,16 @@ function drawParametersTable($rowsNumber, $colsNumber, $shiftsArr, $dbRowsArr, $
     $outStr .= "</table>";
 
     return $outStr;
+}
+
+//  Отрисовка текущих значений температур
+if(isset($_POST['silo_id_for_temperature_table']) && !empty($_POST['silo_id_for_temperature_table'])) {
+    echo drawTemperaturesTable($dbh, preg_split('/-/', $_POST['silo_id_for_temperature_table'], -1, PREG_SPLIT_NO_EMPTY)[1]);
+}
+
+//  Отрисовка текущих значений скоростей
+if(isset($_POST['silo_id_for_speeds_table']) && !empty($_POST['silo_id_for_speeds_table'])) {
+    echo drawTemperatureSpeedsTable($dbh, preg_split('/-/', $_POST['silo_id_for_speeds_table'], -1, PREG_SPLIT_NO_EMPTY)[1]);
 }
 
 //  Получение текущих параметров для силоса
@@ -530,35 +545,9 @@ function getSiloParameters($dbh, $silo_id){
     return array($prodName, $prodTmax, $prodVmax, $prodTmin, $prodTavg, $prodTmax, $prodVmin, $prodVavg, $prodVmax, $rngTmin, $rngTmax, $rngVmax);
 }
 
-//  Отрисовка текущих значений температур
-if(isset($_POST['silo_id_for_temperature_table']) && !empty($_POST['silo_id_for_temperature_table'])) {
-    echo drawTemperaturesTable($dbh, preg_split('/-/', $_POST['silo_id_for_temperature_table'], -1, PREG_SPLIT_NO_EMPTY)[1]);
-    //echo update_t_v($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate);
-}
-
-//  Отрисовка текущих значений скоростей
-if(isset($_POST['silo_id_for_speeds_table']) && !empty($_POST['silo_id_for_speeds_table'])) {
-    echo drawTemperatureSpeedsTable($dbh, preg_split('/-/', $_POST['silo_id_for_speeds_table'], -1, PREG_SPLIT_NO_EMPTY)[1]);
-}
-
-//  Отрисовка текста названия силоса
-if(isset($_POST['silo_id_forText']) && !empty($_POST['silo_id_forText'])) {
-    $sql = "SELECT silo_name
-                FROM prodtypesbysilo
-                WHERE silo_id=".(preg_split('/-/', $_POST['silo_id_forText'], -1, PREG_SPLIT_NO_EMPTY)[1]).";";
-    $sth = $dbh->query($sql);
-    $silo_name = $sth->fetch()['silo_name'];
-    echo "Силос $silo_name";
-}
-
 //  Отрисовка текущих значений параметров силоса
 if( isset($_POST['silo_id_for_silo_parameters']) ) {
     echo json_encode(getSiloParameters($dbh, $_POST['silo_id_for_silo_parameters']));
-}
-
-//  Получение текущих алармов
-if( isset($_POST['get_current_alarms']) ) {
-    echo getCurrentAlarms($dbh);
 }
 
 function changeLevelFromSlider($dbh, $silo_id, $grainLevel){
@@ -640,7 +629,7 @@ function podvDisable($dbh, $silo_id, $podv_id){
 }
 
 if( isset($_POST['podv_disable_silo_id']) && isset($_POST['podv_disable_podv_num']) ) {
-	
+	podvDisable($dbh, $_POST['podv_disable_silo_id'], $_POST['podv_disable_podv_num']);
 }
 
 function podvEnable($dbh, $silo_id, $podv_id){
@@ -653,7 +642,7 @@ function podvEnable($dbh, $silo_id, $podv_id){
 }
 
 if( isset($_POST['podv_enable_silo_id']) && isset($_POST['podv_enable_podv_num']) ) {
-	
+	podvEnable($dbh, $_POST['podv_enable_silo_id'], $_POST['podv_enable_podv_num']);
 }
 
 function disableAllDefectiveSensors($dbh){
@@ -682,6 +671,17 @@ function enableAllSensors($dbh){
 if( isset($_POST['enable_all_sensors']) ) {
 	enableAllSensors($dbh);
     echo "датчики отключены";
+}
+
+//  Отрисовка текста названия силоса
+//  Необходимо заменить!
+if(isset($_POST['silo_id_forText']) && !empty($_POST['silo_id_forText'])) {
+    $sql = "SELECT silo_name
+                FROM prodtypesbysilo
+                WHERE silo_id=".(preg_split('/-/', $_POST['silo_id_forText'], -1, PREG_SPLIT_NO_EMPTY)[1]).";";
+    $sth = $dbh->query($sql);
+    $silo_name = $sth->fetch()['silo_name'];
+    echo "Силос $silo_name";
 }
 
 ?>

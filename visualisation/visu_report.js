@@ -6,17 +6,37 @@ function init_report(){
     setSelectOptions( document.getElementById("rprtprf_layer_1"),   ["all"].concat( Object.keys(project_conf_array[silo_name_with_max_podv_number][1]) ) );
     setSelectOptions( document.getElementById("rprtprf_sensor_1"),  ["all"].concat( Object.keys(project_conf_array[silo_name_with_max_podv_number][1]) ) );
 
-    const selects = document.getElementById("sensor-temperatures-table").getElementsByTagName('select');
+    let selects = document.getElementById("sensor-temperatures-table").getElementsByTagName('select');
 
     let chart_silo_1   = selects.item(selects.length - 4);
     let chart_podv_1   = selects.item(selects.length - 3);
     let chart_sensor_1 = selects.item(selects.length - 2);
 
     setSelectOptions( chart_silo_1,   Object.keys(project_conf_array) );
-    setSelectOptions( chart_podv_1,   Object.keys(project_conf_array[silo_name_with_max_podv_number]) );
-    setSelectOptions( chart_sensor_1, Object.keys(project_conf_array[silo_name_with_max_podv_number][1]) );
+    setSelectOptions( chart_podv_1,   Object.keys(project_conf_array[silo_name_with_id_0]) );
+    setSelectOptions( chart_sensor_1, Object.keys(project_conf_array[silo_name_with_id_0][1]) );
 
     prfSelectsDisable();
+
+
+    const chart_silo_id = getCookie("chart_silo_id");
+    const chart_podv_num = getCookie("chart_podv_num");
+    const chart_sensor_num = getCookie("chart_sensor_num");
+    const chart_period = getCookie("chart_period");
+    if( chart_silo_id!=""    && chart_silo_id!=null &&
+        chart_podv_num!=""   && chart_podv_num!=null &&
+        chart_sensor_num!="" && chart_sensor_num!=null &&
+        chart_period!=""     && chart_period!=null){
+
+        const chart_silo_name = Object.keys(project_conf_array)[chart_silo_id];
+        selects.item(selects.length - 4).value = chart_silo_name;
+        selects.item(selects.length - 3).value = Object.keys(project_conf_array[chart_silo_name])[chart_podv_num];
+        selects.item(selects.length - 2).value = project_conf_array[chart_silo_name][+chart_podv_num+1][+chart_sensor_num+1];
+        selects.item(selects.length - 1).value = chart_period;
+
+        addNewLineOnChart();
+
+    }
 }
 
 //  Функции управления чекбоксами
@@ -119,6 +139,11 @@ function addNewLineOnChart(){
 
             myChart.data.datasets.push(newDataset);
             myChart.update();
+
+            deleteCookie("chart_silo_id");
+            deleteCookie("chart_podv_num");
+            deleteCookie("chart_sensor_num");
+            deleteCookie("chart_period");
 
             addNewTableRow();
 
