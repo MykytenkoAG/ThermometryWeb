@@ -1,8 +1,11 @@
 <?php
 
+require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/auth.php');
 require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');
 
-function drawTableProdtypes($dbh){
+function drawTableProdtypes($dbh, $accessLevel){
+
+    $inputsDisabled = $accessLevel<2 ? "disabled" : "";
 
     $outStr="";
 
@@ -38,7 +41,7 @@ function drawTableProdtypes($dbh){
                     onchange=\"onClickTblProdtypesUpdateRow(".$row['product_id'].")\"
 
                     class=\"form-control mx-auto\" aria-label=\"Sizing example input\" aria-describedby=\"inputGroup-sizing-sm\" style=\"width: 300px;\"
-                    value=\"".$row['product_name']."\"></input>
+                    value=\"".$row['product_name']."\" $inputsDisabled></input>
             </td>
             <td>
                 <input type=\"number\"
@@ -47,7 +50,7 @@ function drawTableProdtypes($dbh){
                     onchange=\"onClickTblProdtypesUpdateRow(".$row['product_id'].")\"
 
                     class=\"form-control mx-auto\" aria-label=\"Sizing example input\" aria-describedby=\"inputGroup-sizing-sm\" style=\"width: 80px;\"
-                    value=\"".$row['t_min']."\"></input>
+                    value=\"".$row['t_min']."\" $inputsDisabled></input>
             </td>
             <td>
                 <input type=\"number\"
@@ -56,7 +59,7 @@ function drawTableProdtypes($dbh){
                     onchange=\"onClickTblProdtypesUpdateRow(".$row['product_id'].")\"
 
                     class=\"form-control mx-auto\" aria-label=\"Sizing example input\" aria-describedby=\"inputGroup-sizing-sm\" style=\"width: 80px;\"
-                    value=\"".$row['t_max']."\"></input>
+                    value=\"".$row['t_max']."\" $inputsDisabled></input>
             </td>
             <td>
                 <input type=\"number\"
@@ -65,7 +68,7 @@ function drawTableProdtypes($dbh){
                     onchange=\"onClickTblProdtypesUpdateRow(".$row['product_id'].")\"
 
                     class=\"form-control mx-auto\" aria-label=\"Sizing example input\" aria-describedby=\"inputGroup-sizing-sm\" style=\"width: 60px;\"
-                    value=\"".$row['v_min']."\"></input>
+                    value=\"".$row['v_min']."\" $inputsDisabled></input>
             </td>
             <td>
                 <input type=\"number\"
@@ -74,13 +77,13 @@ function drawTableProdtypes($dbh){
                     onchange=\"onClickTblProdtypesUpdateRow(".$row['product_id'].")\"
 
                     class=\"form-control mx-auto\" aria-label=\"Sizing example input\" aria-describedby=\"inputGroup-sizing-sm\" style=\"width: 60px;\"
-                    value=\"".$row['v_max']."\"></input>
+                    value=\"".$row['v_max']."\" $inputsDisabled></input>
             </td>
             <td>
                 <button type=\"submit\" class=\"btn btn-danger mx-auto\"
                     id=\"prodtypes-remove-btn-".$row['product_id']."\" onclick=\"onClickTblProdtypesRemoveRow(".$row['product_id'].")\" ";
                     
-            if( ! is_null($row['silo_id']) || count($rows)==1 ){
+            if( ! is_null($row['silo_id']) || count($rows)==1 || $accessLevel<2){
                 $outStr .= "disabled";
             }
 
@@ -97,7 +100,9 @@ function drawTableProdtypes($dbh){
     return $outStr;
 }
 
-function drawTableProdtypesbysilo($dbh){
+function drawTableProdtypesbysilo($dbh, $accessLevel){
+
+    $inputsDisabled = $accessLevel<1 ? "disabled" : "";
 
     $sql = "SELECT silo_id, max(sensor_num) FROM sensors GROUP BY silo_id;";
 
@@ -153,15 +158,15 @@ function drawTableProdtypesbysilo($dbh){
 
         $grainLevelFromTSStr = "<select class=\"form-control mx-auto\" name=\"\"
                                     id=\"prodtypesbysilo-grain-level-from-TS-".$rows[$i]['silo_id']."\"
-                                    onchange=\"onChangeTblProdtypesbysilo()\"
-                                    >";
+                                    onchange=\"onChangeTblProdtypesbysilo()\" $inputsDisabled>";
+
         if($currValue=="auto"){
             $grainLevelFromTSStr .= "<option value=\"$currValue\">$grainLevelFromTSStrV</option><option value=\"manual\">в ручную</option>";
-            $grainLevelDisabled = "disabled";
         } else {
             $grainLevelFromTSStr .= "<option value=\"$currValue\">$grainLevelFromTSStrV</option><option value=\"auto\">автоматически</option>";
-            $grainLevelDisabled = "";
         }
+
+        $grainLevelDisabled = $currValue=="auto" || $accessLevel<1 ? "disabled" : "";
 
         $grainLevelFromTSStr .= "</select>";
 
@@ -181,8 +186,7 @@ function drawTableProdtypesbysilo($dbh){
  
         $productNameStr =   "<select class=\"form-control mx-auto\" name=\"\"
                                 id=\"prodtypesbysilo-product-name-".$rows[$i]['silo_id']."\"
-                                onchange=\"onChangeTblProdtypesbysilo()\"
-                                >
+                                onchange=\"onChangeTblProdtypesbysilo()\" $inputsDisabled>
                                 <option value=\"".$rows[$i]['product_id']."\">".$rows[$i]['product_name']."</option>";
 
         foreach($prodTypesArr as $product){
@@ -263,11 +267,11 @@ function prodtypesbysiloUpdate($dbh, $silo_id, $grainLevelFromTS, $grain_level, 
 }
 
 if( isset($_POST['draw_table_prodtypes']) ) {
-    echo drawTableProdtypes($dbh);
+    echo drawTableProdtypes($dbh, $accessLevel);
 }
 
 if( isset($_POST['draw_table_prodtypes_by_silo']) ) {
-    echo drawTableProdtypesbysilo($dbh);
+    echo drawTableProdtypesbysilo($dbh, $accessLevel);
 }
 
 if( isset($_POST['tbl_prodtypes_changes_queue']) ) {

@@ -2,8 +2,7 @@ let dbg_message="";
 
 function init_debug_page(){
 
-    $('#hdr-href-debug_page').removeClass("text-black");
-    $('#hdr-href-debug_page').addClass("text-primary");
+    document.getElementById("hdr-href-debug_page.php").setAttribute("class", "nav-link text-primary");
 
     //  Инициализация элементов select
     for(let i=1; i<=7; i++){

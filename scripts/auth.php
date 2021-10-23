@@ -39,4 +39,23 @@ if (isset($_SESSION["access_level"]))
     $accessLevel = $_SESSION["access_level"];
 }
 
+if( isset($_POST['get_current_user']) ) {
+
+    $current_user = "anonymous";
+
+    if ( isset($_SESSION["access_level"]) ){
+
+        switch($_SESSION["access_level"]){
+        case 1:
+            $current_user =  "oper";
+            break;
+        case 2:
+            $current_user =  "tehn";
+            break;
+        }
+    }
+
+    echo $current_user;
+}
+
 ?>

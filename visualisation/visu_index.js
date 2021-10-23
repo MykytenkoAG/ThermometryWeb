@@ -1,7 +1,5 @@
 function init_index() {
-
-    $('#hdr-href-index').removeClass("text-black");
-    $('#hdr-href-index').addClass("text-primary");
+    document.getElementById("hdr-href-index.php").setAttribute("class", "nav-link text-primary");
 
     redrawSiloStatus();
 

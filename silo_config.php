@@ -21,24 +21,32 @@
                 <div class="card-body mb-0">
                   <div id="table-product-types">
                     <?php
-                      echo drawTableProdtypes($dbh);
+                      echo drawTableProdtypes($dbh, $accessLevel);
                     ?>
                   </div>
-                  <button type="submit" class="btn btn-primary" id="table-prodtypes-btn-add" onclick="onClickTblProdtypesAddRow()">
-                    <svg width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
-                      <path d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z"/>
-                    </svg>
-                    Добавить
-                  </button>
-                  <button type="submit" class="btn btn-success" id="table-prodtypes-btn-save-changes">
-                    <img  src="img/button-save-changes.png" width="20" height="20"/>
-                    <span>Сохранить изменения</span>
-                  </button>
-                  <button type="submit" class="btn btn-danger"  id="table-prodtypes-btn-discard-changes"
-                          onclick="onClickTblProdtypesDiscardChanges()" >
-                          <img  src="img/button-discard-changes.png" width="20" height="20"/>
-                          <span>Отменить изменения</span>
-                  </button>
+                  <?php
+                    $tableProdtypesBtnDisabled = $accessLevel==2 ? "" : "disabled";
+
+                    echo "
+                      <button type=\"submit\" class=\"btn btn-primary\" id=\"table-prodtypes-btn-add\" onclick=\"onClickTblProdtypesAddRow()\" $tableProdtypesBtnDisabled>
+                        <svg width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-plus-lg\" viewBox=\"0 0 16 16\">
+                          <path d=\"M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z\"/>
+                        </svg>
+                        Добавить
+                      </button>
+                      <button type=\"submit\" class=\"btn btn-success\" id=\"table-prodtypes-btn-save-changes\" $tableProdtypesBtnDisabled>
+                        <img  src=\"img/button-save-changes.png\" width=\"20\" height=\"20\"/>
+                        <span>Сохранить изменения</span>
+                      </button>
+                      <button type=\"submit\" class=\"btn btn-danger\"  id=\"table-prodtypes-btn-discard-changes\"
+                              onclick=\"onClickTblProdtypesDiscardChanges()\" $tableProdtypesBtnDisabled>
+                              <img  src=\"img/button-discard-changes.png\" width=\"20\" height=\"20\"/>
+                              <span>Отменить изменения</span>
+                      </button>
+                    ";
+
+                  ?>
+
                 </div>
               </div>
             </div>
@@ -53,17 +61,25 @@
                 <div class="card-body mb-0">
                   <div id="table-product-types-by-silo" class="">
                     <?php
-                        echo drawTableProdtypesbysilo($dbh);
+                        echo drawTableProdtypesbysilo($dbh, $accessLevel);
                     ?>
                   </div>
-                  <button type="submit" class="btn btn-success"
-                          id="table-prodtypesbysilo-btn-save-changes">
-                          <img  src="img/button-save-changes.png" width="20" height="20"/>
-                          <span>Сохранить изменения</span></button>
-                  <button type="submit" class="btn btn-danger" id="table-prodtypesbysilo-btn-discard-changes"
-                          onclick="onClickTblProdtypesbysiloDiscardChanges()">
-                    <img  src="img/button-discard-changes.png" width="20" height="20"/>
-                          <span>Отменить изменения</span></button>
+
+                  <?php
+                    $tableProdtypesbysiloBtnDisabled = $accessLevel==2 ? "" : "disabled";
+                    echo "
+                      <button type=\"submit\" class=\"btn btn-success\"
+                              id=\"table-prodtypesbysilo-btn-save-changes\" $tableProdtypesbysiloBtnDisabled>
+                              <img  src=\"img/button-save-changes.png\" width=\"20\" height=\"20\"/>
+                              <span>Сохранить изменения</span></button>
+                      <button type=\"submit\" class=\"btn btn-danger\" id=\"table-prodtypesbysilo-btn-discard-changes\"
+                              onclick=\"onClickTblProdtypesbysiloDiscardChanges()\" $tableProdtypesbysiloBtnDisabled>
+                        <img  src=\"img/button-discard-changes.png\" width=\"20\" height=\"20\"/>
+                              <span>Отменить изменения</span>
+                      </button>
+                    ";
+                  ?>
+
                 </div>
               </div>
             </div>

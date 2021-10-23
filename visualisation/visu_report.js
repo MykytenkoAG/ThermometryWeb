@@ -1,8 +1,6 @@
 function init_report(){
 
-    $('#hdr-href-report').removeClass("text-black");
-    $('#hdr-href-report').addClass("text-primary");
-    //console.log(project_conf_array);
+    document.getElementById("hdr-href-report.php").setAttribute("class", "nav-link text-primary");
 
     setSelectOptions( document.getElementById("rprtprf_silo_1"),    ["all"].concat( Object.keys(project_conf_array) ) );
     setSelectOptions( document.getElementById("rprtprf_podv_1"),    ["all"].concat( Object.keys(project_conf_array[silo_name_with_max_podv_number]) ) );         //  проблема, в случае, если в проекте нет силоса с номером один

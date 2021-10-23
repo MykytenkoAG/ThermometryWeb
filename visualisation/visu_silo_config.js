@@ -25,8 +25,7 @@
 
 function init_silo_config() {
 
-    $('#hdr-href-silo_config').removeClass("text-black");
-    $('#hdr-href-silo_config').addClass("text-primary");
+    document.getElementById("hdr-href-silo_config.php").setAttribute("class", "nav-link text-primary");
 
     buttonDisable("table-prodtypes-btn-save-changes");
     buttonDisable("table-prodtypes-btn-discard-changes");

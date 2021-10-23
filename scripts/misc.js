@@ -1,19 +1,20 @@
-let mainTimer;
+let curr_user;
+const current_page = window.location.pathname.split("/").pop() === "" ? "index.php" : window.location.pathname.split("/").pop();
+
 const mainTimerPeriod = 10000;
+const mainTimer = setInterval( periodicActions, mainTimerPeriod);
 let serverDateTime;
 let project_conf_array=[];
 let silo_name_with_id_0;
 let silo_name_with_max_podv_number;
 
+let alarmSound=0;
+
 //  Действия при загрузке каждой страницы
 document.addEventListener("DOMContentLoaded", () => {
-
-    current_page = window.location.pathname.split("/").pop();
-    mainTimer = setInterval( periodicActions, mainTimerPeriod);
-
+    authGetCurrentUser();
     isSoundOn();
-
-    if              (current_page === "index.php" || current_page === ""){
+    if              (current_page === "index.php"){
         init_index();
     } else if       (current_page === "report.php" || current_page === "debug_page.php"){
         getProjectConfArr();
@@ -174,10 +175,11 @@ function isSoundOn(){
             console.log(fromPHP);
 
             if(fromPHP=="YES"){
+                alarmSound = 1;
                 document.getElementById("alarm-sound").loop = true;
                 document.getElementById("alarm-sound").play();
                 $('#hdr-ack').removeClass("text-black");
-                $('#hdr-ack').addClass("text-danger");
+                $('#hdr-ack').addClass("text-primart");
             }else {
                 
                 document.getElementById("alarm-sound").pause();
@@ -199,9 +201,10 @@ function acknowledgeAlarms(){
         data: { 'acknowledge': 1 },
         dataType: 'html',
         success: function(fromPHP) {
+            alarmSound = 0;
             console.log(fromPHP);
             if(current_page === "index.php"){
-                $('#hdr-ack').removeClass("text-danger");
+                $('#hdr-ack').removeClass("text-primary");
                 $('#hdr-ack').addClass("text-black");
                 
                 $('#hdr-ack').removeClass("text-black");
@@ -231,6 +234,8 @@ function periodicActions() {
         dataType: 'html',
         success: function(fromPHP) {
             console.log(fromPHP);
+            console.log(curr_user);
+            console.log(current_page);
             isSoundOn();
 
             if(current_page === "index.php" || current_page === ""){
