@@ -39,8 +39,9 @@ function drawTableProdtypes($dbh, $accessLevel){
 
                     id=\"prodtypes-product-name-".$row['product_id']."\"
                     onchange=\"onClickTblProdtypesUpdateRow(".$row['product_id'].")\"
+                    oninput=\"checkProducts()\"
 
-                    class=\"form-control mx-auto\" aria-label=\"Sizing example input\" aria-describedby=\"inputGroup-sizing-sm\" style=\"width: 300px;\"
+                    class=\"form-control mx-auto productname\" aria-label=\"Sizing example input\" aria-describedby=\"inputGroup-sizing-sm\" style=\"width: 300px;\"
                     value=\"".$row['product_name']."\" $inputsDisabled></input>
             </td>
             <td>

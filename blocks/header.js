@@ -2,7 +2,7 @@ let intent_page;
 $("a").hover(
     function() {
         if(  ($(this).attr('id').split("-").pop()  === current_page) ||
-             ($(this).attr('id').split("-").pop()  === curr_user)            ||
+             ($(this).attr('id').split("-").pop()  === curr_user)    ||
              (($(this).attr('id').split("-").pop() === "ack") && alarmSound===1) ){
             return;
         }
@@ -11,7 +11,7 @@ $("a").hover(
     },
     function() {
         if(  ($(this).attr('id').split("-").pop()  === current_page) ||
-             ($(this).attr('id').split("-").pop()  === curr_user)            ||
+             ($(this).attr('id').split("-").pop()  === curr_user)    ||
              (($(this).attr('id').split("-").pop() === "ack") && alarmSound===1)){
             return;
         }
@@ -48,11 +48,19 @@ $("a").click(
             }
         } else if (lastIDSymbols.substr(-4)==="oper"){
             if(curr_user !== "oper"){
-                $("#modal-sign-in-oper").modal('show');
+                document.getElementById("modal-sign-in-btn-close").setAttribute("onclick","modalClearInput('modal-sign-in-password')");
+                document.getElementById("modal-sign-in-btn-cancel").setAttribute("onclick","modalClearInput('modal-sign-in-password')");
+                document.getElementById("modal-sign-in-user-name").innerText = "Оператор";
+                document.getElementById("modal-sign-in-btn-ok").setAttribute("onclick","authSignIn('oper', 'modal-sign-in-password')");
+                $("#modal-sign-in").modal('show');
             }
         } else if (lastIDSymbols.substr(-4)==="tehn"){
             if(curr_user !== "tehn"){
-                $("#modal-sign-in-tehn").modal('show');
+                document.getElementById("modal-sign-in-btn-close").setAttribute("onclick","modalClearInput('modal-sign-in-password')");
+                document.getElementById("modal-sign-in-btn-cancel").setAttribute("onclick","modalClearInput('modal-sign-in-password')");
+                document.getElementById("modal-sign-in-user-name").innerText = "Технолог";
+                document.getElementById("modal-sign-in-btn-ok").setAttribute("onclick","authSignIn('tehn', 'modal-sign-in-password')");
+                $("#modal-sign-in").modal('show');
             }
         } else if (lastIDSymbols==="ack"){
             acknowledgeAlarms();

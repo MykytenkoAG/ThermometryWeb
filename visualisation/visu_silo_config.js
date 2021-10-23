@@ -186,7 +186,8 @@ function onClickTblProdtypesAddRow() {
     input_product_name.setAttribute("type", "text");
     input_product_name.setAttribute("id", "prodtypes-product-name-" + new_id);
     input_product_name.setAttribute("onchange", "onClickTblProdtypesUpdateRow(" + new_id + ")");
-    input_product_name.setAttribute("class", "form-control mx-auto");
+    input_product_name.setAttribute("oninput", "checkProducts()");
+    input_product_name.setAttribute("class", "form-control mx-auto productname");
     input_product_name.setAttribute("style", "width: 300px;");
     input_product_name.value = "Новый продукт";
 
@@ -320,6 +321,37 @@ function onClickTblProdtypesSaveChanges() {
     redrawTableProdtypesbysilo();
 
     return;
+}
+
+function checkProducts(){
+
+    let inputs = document.getElementById("table-prodtypes").getElementsByClassName("productname");
+
+    for(let i=0; i<inputs.length; i++){
+        inputs[i].setAttribute("style", "width: 300px;");
+    }
+
+    for(let i=0; i<inputs.length; i++){
+        for(let j=0; j<inputs.length; j++){
+            if(i==j){
+                continue;
+            }
+            if(inputs[i].value==inputs[j].value || !checkProductName(inputs[i].value)){
+                inputs[i].setAttribute("style", "width: 300px; color:red");
+            }
+        }
+    }
+
+
+    return;
+}
+
+function checkProductName(value) {
+    var pattern = new RegExp(/[~`!#$\^&*+=\\[\]\\';/{}|\\":<>\?]/); //unacceptable chars
+    if (pattern.test(value)) {
+        return false;
+    }
+    return true; //good input
 }
 
 //  Таблица "Загрузка силосов"

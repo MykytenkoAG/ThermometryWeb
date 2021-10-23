@@ -81,7 +81,7 @@
                           <div class="row mt-2">
 
                             <div class="col-4 mr-1">
-                              <label for="rprtprf_podv_1" class="form-label">Подвеска</label>
+                              <label for="rprtprf_podv_1" class="form-label" disabled>Подвеска</label>
                               <select class="form-control"
                                 id="rprtprf_podv_1" onchange="redrawSelectsRow(event.target.id)"
                                 style="width: 70px">
@@ -99,7 +99,7 @@
                             </div>
 
                             <div class="col-4 mr-1">
-                              <label for="rprtprf_sensor_1" class="form-label">Датчик</label>
+                              <label for="rprtprf_sensor_1" class="form-label" disabled>Датчик</label>
                               <select class="form-control"
                                 id="rprtprf_sensor_1"
                                 style="width: 70px">

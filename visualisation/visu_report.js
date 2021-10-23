@@ -20,10 +20,10 @@ function init_report(){
     prfSelectsDisable();
 
 
-    const chart_silo_id = getCookie("chart_silo_id");
-    const chart_podv_num = getCookie("chart_podv_num");
-    const chart_sensor_num = getCookie("chart_sensor_num");
-    const chart_period = getCookie("chart_period");
+    const chart_silo_id     = getCookie("chart_silo_id");
+    const chart_podv_num    = getCookie("chart_podv_num");
+    const chart_sensor_num  = getCookie("chart_sensor_num");
+    const chart_period      = getCookie("chart_period");
     if( chart_silo_id!=""    && chart_silo_id!=null &&
         chart_podv_num!=""   && chart_podv_num!=null &&
         chart_sensor_num!="" && chart_sensor_num!=null &&
