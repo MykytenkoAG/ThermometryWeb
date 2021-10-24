@@ -29,6 +29,39 @@
     </div>
 </div>
 
+<div class="modal fade" id="modal-pass-change" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #4046ff;">
+                <h5 class="modal-title" id="" style="color: #ffffff;">Изменение пароля</h5>
+                <button type="button" id="modal-sign-in-btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="margin-left: auto; margin-right: auto;">
+                <table>
+                    <tr>
+                        <td style="padding-right: 10px;">Новый пароль:</td>
+                        <td>
+                            <input type="password" id="modal-pass-change-pwd1" value="" onchange="" class="form-control mx-auto" style="width: 200px;" value=""></input>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-right: 10px;">Подтверждение:</td>
+                        <td>
+                            <input type="password" id="modal-pass-change-pwd2" value="" onchange="" class="form-control mx-auto" style="width: 200px;" value=""></input>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <div style="margin: auto;">
+                    <button type="button" id="modal-pass-change-btn-ok" class="btn btn-primary" data-bs-dismiss="modal" style="width: 100px;">OK</button>
+                    <button type="button" id="modal-pass-change-btn-cancel" class="btn btn-secondary" data-bs-dismiss="modal" style="width: 100px;">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="modal-info" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">

@@ -3,11 +3,11 @@
 <html lang="en">
   <head>
     <?php
-      $webSiteTitle="DEBUG"; require_once "blocks/head.php";
+      $webSiteTitle="DEBUG";
+      require_once "blocks/head.php";
+      require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/visualisation/visu_debug_page.php');
     ?>
-    <script type="text/javascript" src="visualisation/visu_debug_page.js"></script>
   </head>
-
   <body>
     <?php
       require_once "blocks/header.php";
@@ -308,15 +308,6 @@
                     Сохранить текущие показания в БД
                 </button>
                 <?php
-                  require_once "scripts/currValsFromTS.php";
-
-                  if (isset($_SESSION["session_is_working"]))
-                  {
-                      echo "session is working!";
-                  } else {
-                      echo "session is NOT working!";
-                  }
-
                   if($simulation_mode){
                     echo "<div style=\"position: absolute; bottom: 2%; right:2%\">ВКЛЮЧЕН РЕЖИМ ОТЛАДКИ</div>";
                   }
@@ -331,7 +322,6 @@
               </div>  
               <div class="card-body d-flex justify-content-center" style="height:750px; overflow: auto;" id="debug_parameters_table">
                 <?php
-                  require_once "visualisation/visu_debug_page.php";
                   echo debug_get_debug_table($dbh);
                 ?>
               </div>
@@ -340,5 +330,6 @@
         </div>
       </main>
     </div>
+    <script type="text/javascript" src="visualisation/visu_debug_page.js"></script>
   </body>
 </html>

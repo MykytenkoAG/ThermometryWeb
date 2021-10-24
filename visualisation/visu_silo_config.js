@@ -448,3 +448,11 @@ function tblProdtypesbysiloUpdate() {
 
     return;
 }
+
+//  Опции
+$("#silo-config-btn-change-password").click(function() {
+    document.getElementById("modal-sign-in-btn-close").setAttribute("onclick","modalClearInput('modal-pass-change-pwd1');modalClearInput('modal-pass-change-pwd2')");
+    document.getElementById("modal-sign-in-btn-cancel").setAttribute("onclick","modalClearInput('modal-pass-change-pwd1');modalClearInput('modal-pass-change-pwd2')");
+    document.getElementById("modal-pass-change-btn-ok").setAttribute("onclick","authPasswordChange('"+curr_user+"', 'modal-pass-change-pwd1', 'modal-pass-change-pwd2')");
+    $("#modal-pass-change").modal('show');
+});

@@ -34,8 +34,22 @@ if( isset($_POST['auth_sign_out']) ) {
 
 }
 
-if (isset($_SESSION["access_level"]))
-{
+if( isset($_POST['auth_pwd_change_user_name']) && isset($_POST['auth_pwd_change_password']) ) {
+
+    require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');
+
+    $hash = "jasdghlkjsdh";
+    $userName = $_POST['auth_pwd_change_user_name'];
+    $password = md5($hash.$_POST['auth_pwd_change_password']);
+
+    $query = "UPDATE users SET password='$password' WHERE user_name = '$userName';" ;
+    $stmt = $dbh->prepare($query);
+    $stmt->execute();
+
+    echo "OK";
+}
+
+if (isset($_SESSION["access_level"])){
     $accessLevel = $_SESSION["access_level"];
 }
 

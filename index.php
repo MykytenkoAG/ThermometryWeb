@@ -3,14 +3,16 @@
 <html lang="ru">
   <head>
     <?php
-      $webSiteTitle="Термометрия"; require_once "blocks/head.php";
+      $webSiteTitle="Термометрия";
+      require_once "blocks/head.php";
       require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/visualisation/visu_index.php');
     ?>
-
   </head>
   <body>
-      <?php require_once "blocks/header.php"; ?>
-      <?php require_once "blocks/modals.php"; ?>
+      <?php
+        require_once "blocks/header.php";
+        require_once "blocks/modals.php";
+      ?>
 
       <style>
         .silo:hover div {

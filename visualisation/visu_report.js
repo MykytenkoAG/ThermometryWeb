@@ -99,8 +99,8 @@ function addNewLineOnChart(){
     let selects = document.getElementById("sensor-temperatures-table").getElementsByTagName('select');
 
     let silo_id     = selects.item(selects.length - 4).value;
-    let podv_id     = +selects.item(selects.length - 3).value - 1;
-    let sensor_num  = +selects.item(selects.length - 2).value - 1;
+    let podv_id     = +selects.item(selects.length - 3).value;
+    let sensor_num  = +selects.item(selects.length - 2).value;
     let line_colour = inputs.item(inputs.length - 1).value;
     let period      = selects.item(selects.length - 1).value;
 
@@ -109,7 +109,7 @@ function addNewLineOnChart(){
         url: 'visualisation/visu_report.php',
         type: 'POST',
         cache: false,
-        data: { 'silo_id': silo_id, 'podv_id': podv_id, 'sensor_num': sensor_num, 'period': period },
+        data: { 'silo_id': silo_id, 'podv_id': podv_id-1, 'sensor_num': sensor_num-1, 'period': period },
         dataType: 'html',
         success: function(fromPHP) {
 

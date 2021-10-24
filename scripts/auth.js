@@ -36,6 +36,9 @@ function authSignIn(user, inputPassID){
                 document.getElementById("modal-info-header").setAttribute("style","background-color: #520007;");
                 document.getElementById("modal-info-title").innerText = "Ошибка";
                 document.getElementById("modal-info-body-message").innerText = "Пароль не верный!";
+                modalClearInput('modal-sign-in-password');
+                modalClearInput('modal-pass-change-pwd1');
+                modalClearInput('modal-pass-change-pwd2');
                 $("#modal-info").modal('show');
             } else {
                 document.location.href = current_page;
@@ -62,6 +65,38 @@ function authSignOut(){
             }
         }
     });
+
+    return;
+}
+
+function authPasswordChange(user, inputPassID1, inputPassID2){
+
+    pwd1 = document.getElementById(inputPassID1).value;
+    pwd2 = document.getElementById(inputPassID2).value;
+
+    if(pwd1!==pwd2){
+        document.getElementById("modal-info-header").setAttribute("style","background-color: #520007;");
+        document.getElementById("modal-info-title").innerText = "Ошибка";
+        document.getElementById("modal-info-body-message").innerText = "Введенные пароли не совпадают!";
+        modalClearInput('modal-sign-in-password');
+        modalClearInput('modal-pass-change-pwd1');
+        modalClearInput('modal-pass-change-pwd2');
+        $("#modal-info").modal('show');
+    } else {
+        $.ajax({
+            url: '/webTermometry/scripts/auth.php',
+            type: 'POST',
+            cache: false,
+            data: { 'auth_pwd_change_user_name': user , 'auth_pwd_change_password': pwd1 },
+            dataType: 'html',
+            success: function(fromPHP) {
+                document.getElementById("modal-info-header").setAttribute("style","background-color: #4046ff;");
+                document.getElementById("modal-info-title").innerText = "";
+                document.getElementById("modal-info-body-message").innerText = "Пароль успешно изменен!";
+                $("#modal-info").modal('show');
+            }
+        });
+    }
 
     return;
 }

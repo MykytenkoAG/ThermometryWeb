@@ -101,6 +101,10 @@ function drawTableProdtypes($dbh, $accessLevel){
     return $outStr;
 }
 
+if( isset($_POST['draw_table_prodtypes']) ) {
+    echo drawTableProdtypes($dbh, $accessLevel);
+}
+
 function drawTableProdtypesbysilo($dbh, $accessLevel){
 
     $inputsDisabled = $accessLevel<1 ? "disabled" : "";
@@ -226,6 +230,10 @@ function drawTableProdtypesbysilo($dbh, $accessLevel){
     return $outStr;
 }
 
+if( isset($_POST['draw_table_prodtypes_by_silo']) ) {
+    echo drawTableProdtypesbysilo($dbh, $accessLevel);
+}
+
 function prodtypesRemove($dbh, $product_id){
 
     $sql = "DELETE FROM prodtypes WHERE product_id=$product_id";
@@ -250,23 +258,6 @@ function prodtypesUpdate($dbh, $product_id, $product_name, $t_min, $t_max, $v_mi
     $stmt->execute();
 
     return $sql;
-}
-
-function prodtypesbysiloUpdate($dbh, $silo_id, $grainLevelFromTS, $grain_level, $product_id){
-
-    $sql = "UPDATE prodtypesbysilo SET grain_level_FromTS='$grainLevelFromTS', grain_level='$grain_level', product_id='$product_id' WHERE silo_id=$silo_id";
-    $stmt = $dbh->prepare($sql);
-    $stmt->execute();
-
-    return $sql;
-}
-
-if( isset($_POST['draw_table_prodtypes']) ) {
-    echo drawTableProdtypes($dbh, $accessLevel);
-}
-
-if( isset($_POST['draw_table_prodtypes_by_silo']) ) {
-    echo drawTableProdtypesbysilo($dbh, $accessLevel);
 }
 
 if( isset($_POST['tbl_prodtypes_changes_queue']) ) {
@@ -298,6 +289,15 @@ if( isset($_POST['tbl_prodtypes_changes_queue']) ) {
     }
 
     echo "Изменения успешно внесены в Базу Данных";
+}
+
+function prodtypesbysiloUpdate($dbh, $silo_id, $grainLevelFromTS, $grain_level, $product_id){
+
+    $sql = "UPDATE prodtypesbysilo SET grain_level_FromTS='$grainLevelFromTS', grain_level='$grain_level', product_id='$product_id' WHERE silo_id=$silo_id";
+    $stmt = $dbh->prepare($sql);
+    $stmt->execute();
+
+    return $sql;
 }
 
 if( isset($_POST['tbl_prodtypesbysilo_update_list']) ) {

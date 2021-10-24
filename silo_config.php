@@ -3,13 +3,16 @@
 <html lang="en">
   <head>
     <?php
-      $webSiteTitle="Настройки"; require_once "blocks/head.php";
+      $webSiteTitle="Настройки";
+      require_once "blocks/head.php";
       require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/visualisation/visu_silo_config.php');
     ?>
   </head>
   <body>
-      <?php require_once "blocks/header.php"; ?>
-      <?php require_once "blocks/modals.php"; ?>
+      <?php
+        require_once "blocks/header.php";
+        require_once "blocks/modals.php";
+      ?>
       <main>
         <div class="row row-cols-1 row-cols-sm-1 row-cols-xxl-3 g-0">
           <div class="col-12 col-xxl-5 g-1">
@@ -95,7 +98,7 @@
                         Протокол работы программы
                       </div>
                       <div class="row p-1">
-                        <button type="submit" class="btn btn-light" onclick="add_row()">
+                        <button type="submit" id="silo-config-btn-web-server-log-download" class="btn btn-light">
                           <svg width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
                             <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
                             <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
@@ -110,7 +113,7 @@
                         Протокол работы АПС
                       </div>
                       <div class="row p-1">
-                        <button type="submit" class="btn btn-light" onclick="add_row()">
+                        <button type="submit" id="silo-config-btn-alarms-log-download" class="btn btn-light">
                           <svg width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
                             <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
                             <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
@@ -125,22 +128,22 @@
                         Пользователь
                       </div>
                       <div class="row p-1">
-                        <button type="submit" class="btn btn-light" onclick="add_row()">
+                        <button type="submit" id="silo-config-btn-change-password" class="btn btn-light">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-key" viewBox="0 0 16 16">
+                            <path d="M0 8a4 4 0 0 1 7.465-2H14a.5.5 0 0 1 .354.146l1.5 1.5a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0L13 9.207l-.646.647a.5.5 0 0 1-.708 0L11 9.207l-.646.647a.5.5 0 0 1-.708 0L9 9.207l-.646.647A.5.5 0 0 1 8 10h-.535A4 4 0 0 1 0 8zm4-3a3 3 0 1 0 2.712 4.285A.5.5 0 0 1 7.163 9h.63l.853-.854a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.793-.793-1-1h-6.63a.5.5 0 0 1-.451-.285A3 3 0 0 0 4 5z"/>
+                            <path d="M4 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                          </svg>
                           Сменить пароль
                         </button>
                       </div>                   
                     </div>
-
                   </div>
-                  
                 </div>
               </div>
             </div>
           </div>
-
         </div>
       </main>
-      
-      <script src="visualisation/visu_silo_config.js"></script>
+     <script src="visualisation/visu_silo_config.js"></script>
     </body>
 </html>

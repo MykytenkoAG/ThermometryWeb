@@ -3,13 +3,16 @@
 <html lang="en">
   <head>
     <?php
-      $webSiteTitle="Отчет"; require_once "blocks/head.php";
+      $webSiteTitle="Отчет";
+      require_once "blocks/head.php";
       require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/visualisation/visu_report.php');
     ?>
   </head>
   <body>
-      <?php require_once "blocks/header.php"; ?>
-      <?php require_once "blocks/modals.php"; ?>
+      <?php
+        require_once "blocks/header.php";
+        require_once "blocks/modals.php";
+      ?>
       <main>
 
         <div class="row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-1 row-cols-xl-2 row-cols-xxl-3 m-0 g-0">

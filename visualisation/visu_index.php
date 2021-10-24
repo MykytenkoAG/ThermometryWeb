@@ -100,7 +100,6 @@ function getCurrentAlarms($dbh){
     return $outStr;
 }
 
-//  Получение текущих алармов
 if( isset($_POST['get_current_alarms']) ) {
     echo getCurrentAlarms($dbh);
 }
@@ -275,6 +274,45 @@ function drawSiloPlan($dbh){
     ";
 
     return $outStr;
+}
+
+//  Получение текущих параметров для силоса
+//  out: [название продукта, Tmax, Vmax, ProdTmin, ProdTavg, ProdTmax, ProdVmin, ProdVavg, ProdVmax, RngTmin, RngTmax, RngVmax]
+function getSiloParameters($dbh, $silo_id){
+
+    $silo_id = preg_split('/-/',$silo_id,-1,PREG_SPLIT_NO_EMPTY)[count(preg_split('/-/',$silo_id,-1,PREG_SPLIT_NO_EMPTY))-1];
+
+    $sql = "SELECT  pbs.silo_id,
+                    pt.product_name, pt.t_max, pt.t_min, pt.v_max, pt.v_min,
+                    MAX(s.current_temperature), MIN(s.current_temperature), MAX(s.current_speed)
+            FROM prodtypesbysilo AS pbs INNER JOIN prodtypes AS pt ON pbs.product_id=pt.product_id INNER JOIN sensors AS s ON pbs.silo_id=s.silo_id
+            GROUP BY s.silo_id
+            HAVING silo_id=$silo_id";
+
+    $sth = $dbh->query($sql);
+    if($sth==false){
+        return false;
+    }
+    $row = $sth->fetch();
+
+    $prodName = $row['product_name'];
+    $prodTmin = $row['t_min']."&deg;C";
+    $prodTavg = (($row['t_min']+$row['t_max'])/2)."&deg;C";
+    $prodTmax = $row['t_max']."&deg;C";
+    $prodVmin = $row['v_min']."&deg;C/сут.";
+    $prodVavg = (($row['v_min']+$row['v_max'])/2)."&deg;C/сут.";
+    $prodVmax = $row['v_max']."&deg;C/сут.";
+    $rngTmin  = $row['MIN(s.current_temperature)']."&deg;C";
+    $rngTmax  = $row['MAX(s.current_temperature)']."&deg;C";
+    $rngVmax  = $row['MAX(s.current_speed)']."&deg;C/сут.";
+
+    //return $sql;
+    return array($prodName, $prodTmax, $prodVmax, $prodTmin, $prodTavg, $prodTmax, $prodVmin, $prodVavg, $prodVmax, $rngTmin, $rngTmax, $rngVmax);
+}
+
+//  Отрисовка текущих значений параметров силоса
+if( isset($_POST['silo_id_for_silo_parameters']) ) {
+    echo json_encode(getSiloParameters($dbh, $_POST['silo_id_for_silo_parameters']));
 }
 
 //  Функции для отрисовки таблиц параметров
@@ -497,43 +535,17 @@ if(isset($_POST['silo_id_for_speeds_table']) && !empty($_POST['silo_id_for_speed
     echo drawTemperatureSpeedsTable($dbh, preg_split('/-/', $_POST['silo_id_for_speeds_table'], -1, PREG_SPLIT_NO_EMPTY)[1]);
 }
 
-//  Получение текущих параметров для силоса
-//  out: [название продукта, Tmax, Vmax, ProdTmin, ProdTavg, ProdTmax, ProdVmin, ProdVavg, ProdVmax, RngTmin, RngTmax, RngVmax]
-function getSiloParameters($dbh, $silo_id){
+function changeLevelMode($dbh, $silo_id, $levelMode){
+    $query="UPDATE prodtypesbysilo SET grain_level_fromTS = $levelMode WHERE silo_id=$silo_id;";
 
-    $silo_id = preg_split('/-/',$silo_id,-1,PREG_SPLIT_NO_EMPTY)[count(preg_split('/-/',$silo_id,-1,PREG_SPLIT_NO_EMPTY))-1];
+	$stmt = $dbh->prepare($query);
+	$stmt->execute();
 
-    $sql = "SELECT  pbs.silo_id,
-                    pt.product_name, pt.t_max, pt.t_min, pt.v_max, pt.v_min,
-                    MAX(s.current_temperature), MIN(s.current_temperature), MAX(s.current_speed)
-            FROM prodtypesbysilo AS pbs INNER JOIN prodtypes AS pt ON pbs.product_id=pt.product_id INNER JOIN sensors AS s ON pbs.silo_id=s.silo_id
-            GROUP BY s.silo_id
-            HAVING silo_id=$silo_id";
-
-    $sth = $dbh->query($sql);
-    if($sth==false){
-        return false;
-    }
-    $row = $sth->fetch();
-
-    $prodName = $row['product_name'];
-    $prodTmin = $row['t_min']."&deg;C";
-    $prodTavg = (($row['t_min']+$row['t_max'])/2)."&deg;C";
-    $prodTmax = $row['t_max']."&deg;C";
-    $prodVmin = $row['v_min']."&deg;C/сут.";
-    $prodVavg = (($row['v_min']+$row['v_max'])/2)."&deg;C/сут.";
-    $prodVmax = $row['v_max']."&deg;C/сут.";
-    $rngTmin  = $row['MIN(s.current_temperature)']."&deg;C";
-    $rngTmax  = $row['MAX(s.current_temperature)']."&deg;C";
-    $rngVmax  = $row['MAX(s.current_speed)']."&deg;C/сут.";
-
-    //return $sql;
-    return array($prodName, $prodTmax, $prodVmax, $prodTmin, $prodTavg, $prodTmax, $prodVmin, $prodVavg, $prodVmax, $rngTmin, $rngTmax, $rngVmax);
+    return;
 }
 
-//  Отрисовка текущих значений параметров силоса
-if( isset($_POST['silo_id_for_silo_parameters']) ) {
-    echo json_encode(getSiloParameters($dbh, $_POST['silo_id_for_silo_parameters']));
+if( isset($_POST['change_level_mode_silo_id']) && isset($_POST['change_level_mode_level_mode']) ) {
+    changeLevelMode($dbh, $_POST['change_level_mode_silo_id'], $_POST['change_level_mode_level_mode']);
 }
 
 function changeLevelFromSlider($dbh, $silo_id, $grainLevel){
@@ -551,19 +563,6 @@ if( isset($_POST['change_level_from_slider_silo_id']) && isset($_POST['change_le
     changeLevelFromSlider($dbh, $_POST['change_level_from_slider_silo_id'], $_POST['change_level_from_slider_grain_level']);
 }
 
-function changeLevelMode($dbh, $silo_id, $levelMode){
-    $query="UPDATE prodtypesbysilo SET grain_level_fromTS = $levelMode WHERE silo_id=$silo_id;";
-
-	$stmt = $dbh->prepare($query);
-	$stmt->execute();
-
-    return;
-}
-
-if( isset($_POST['change_level_mode_silo_id']) && isset($_POST['change_level_mode_level_mode']) ) {
-    changeLevelMode($dbh, $_POST['change_level_mode_silo_id'], $_POST['change_level_mode_level_mode']);
-}
-
 function enableAutoLvlOnAllSilo($dbh){
     $query="UPDATE prodtypesbysilo SET grain_level_fromTS = 1;";
 
@@ -575,6 +574,34 @@ function enableAutoLvlOnAllSilo($dbh){
 
 if( isset($_POST['enable_auto_lvl_mode']) ) {
     enableAutoLvlOnAllSilo($dbh);
+}
+
+function disableAllDefectiveSensors($dbh){
+	
+	$query="UPDATE sensors SET is_enabled=0 WHERE current_temperature > 84";
+	$stmt = $dbh->prepare($query);
+	$stmt->execute();
+
+	return;
+}
+
+if( isset($_POST['disable_all_defective_sensors']) ) {
+	disableAllDefectiveSensors($dbh);
+    echo "Датчики включены";
+}
+
+function enableAllSensors($dbh){
+	
+	$query="UPDATE sensors SET is_enabled=1";
+	$stmt = $dbh->prepare($query);
+	$stmt->execute();
+
+	return;
+}
+
+if( isset($_POST['enable_all_sensors']) ) {
+	enableAllSensors($dbh);
+    echo "датчики отключены";
 }
 
 function sensorDisable($dbh, $silo_id, $podv_id, $sensor_num){
@@ -631,34 +658,6 @@ if( isset($_POST['podv_enable_silo_id']) && isset($_POST['podv_enable_podv_num']
 	podvEnable($dbh, $_POST['podv_enable_silo_id'], $_POST['podv_enable_podv_num']);
 }
 
-function disableAllDefectiveSensors($dbh){
-	
-	$query="UPDATE sensors SET is_enabled=0 WHERE current_temperature > 84";
-	$stmt = $dbh->prepare($query);
-	$stmt->execute();
-
-	return;
-}
-
-if( isset($_POST['disable_all_defective_sensors']) ) {
-	disableAllDefectiveSensors($dbh);
-    echo "Датчики включены";
-}
-
-function enableAllSensors($dbh){
-	
-	$query="UPDATE sensors SET is_enabled=1";
-	$stmt = $dbh->prepare($query);
-	$stmt->execute();
-
-	return;
-}
-
-if( isset($_POST['enable_all_sensors']) ) {
-	enableAllSensors($dbh);
-    echo "датчики отключены";
-}
-
 //  Отрисовка текста названия силоса
 //  Необходимо заменить!
 if(isset($_POST['silo_id_forText']) && !empty($_POST['silo_id_forText'])) {
@@ -669,10 +668,5 @@ if(isset($_POST['silo_id_forText']) && !empty($_POST['silo_id_forText'])) {
     $silo_name = $sth->fetch()['silo_name'];
     echo "Силос $silo_name";
 }
-
-if(isset($_POST['start_session_1'])) {
-    $_SESSION["session_is_working"] = 1;
-}
-
 
 ?>
