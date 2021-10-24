@@ -26,6 +26,30 @@ function redrawTableCurrentAlarms() {
     return;
 }
 
+$('#ind-btn-disable-all-def-sensors').click(function() {
+    document.getElementById("modal-are-you-sure-text").innerText = "Отключить все неисправные датчики?";
+    document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
+    document.getElementById("modal-are-you-sure-btn-cancel").innerText = "Отмена";
+    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick","disable_all_defective_sensors()");
+    $("#modal-are-you-sure").modal('show');
+});
+
+$('#ind-btn-enable-all-sensors').click(function() {
+    document.getElementById("modal-are-you-sure-text").innerText = "Включить все отключенные датчики?";
+    document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
+    document.getElementById("modal-are-you-sure-btn-cancel").innerText = "Отмена";
+    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick","enable_all_sensors()");
+    $("#modal-are-you-sure").modal('show');
+});
+
+$('#btn-enable-all-auto-lvl-mode').click(function() {
+    document.getElementById("modal-are-you-sure-text").innerText = "Включить автоопределение уровня на всех силосах?";
+    document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
+    document.getElementById("modal-are-you-sure-btn-cancel").innerText = "Отмена";
+    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick","enable_all_auto_lvl_mode()");
+    $("#modal-are-you-sure").modal('show');
+});
+
 function disable_all_defective_sensors() {
     $.ajax({
         url: 'visualisation/visu_index.php',
@@ -87,11 +111,11 @@ const img_arr_silo_status = [
         ["img/silo_square_OK.png", "img/silo_square_OK.png"]
     ]
 ];
-
 let arr_silo_status = [];
 let curr_NACK_state = 0;
 
-let timer_silo_blink = setInterval(() => {
+const silo_blink_period = 1000;
+const timer_silo_blink = setInterval(() => {
 
     for (let i = 0; i < arr_silo_status.length; i++) {
         document.getElementById("silo-" + i).setAttribute("src", img_arr_silo_status[arr_silo_status[i][0]][arr_silo_status[i][1]][curr_NACK_state]);
@@ -99,7 +123,7 @@ let timer_silo_blink = setInterval(() => {
 
     curr_NACK_state = 1 - curr_NACK_state;
 
-}, 1000);
+}, silo_blink_period);
 
 function redrawSiloStatus() {
 
@@ -285,6 +309,20 @@ function selectedPodvEnable(silo_id, podv_num) {
     return;
 }
 
+function change_grain_level_mode(silo_id, lvl_mode) {
+    $.ajax({
+        url: 'visualisation/visu_index.php',
+        type: 'POST',
+        cache: false,
+        data: { 'change_level_mode_silo_id': silo_id, 'change_level_mode_level_mode': lvl_mode },
+        dataType: 'html',
+        success: function(fromPHP) {
+            onSiloClicked(lastSiloID);
+        }
+    });
+    return;
+}
+
 function change_grain_level_from_slider(silo_id) {
 
     let lvl_slider;
@@ -310,40 +348,11 @@ function change_grain_level_from_slider(silo_id) {
     return;
 }
 
-function change_grain_level_mode(silo_id, lvl_mode) {
-    $.ajax({
-        url: 'visualisation/visu_index.php',
-        type: 'POST',
-        cache: false,
-        data: { 'change_level_mode_silo_id': silo_id, 'change_level_mode_level_mode': lvl_mode },
-        dataType: 'html',
-        success: function(fromPHP) {
-            onSiloClicked(lastSiloID);
-        }
-    });
-    return;
-}
-
 function selectedSensorDrawChart(silo_id, podv_num, sensor_num, period){
     document.cookie = "chart_silo_id="      + silo_id + ";";
     document.cookie = "chart_podv_num="     + podv_num + ";";
     document.cookie = "chart_sensor_num="   + sensor_num + ";";
     document.cookie = "chart_period="       + period + ";";
     document.location.href = "report.php";
-    return;
-}
-
-
-function ind_session_start(){
-    $.ajax({
-        url: 'visualisation/visu_index.php',
-        type: 'POST',
-        cache: false,
-        data: { 'start_session_1': 1 },
-        dataType: 'html',
-        success: function(fromPHP) {
-            console.log("Данные сохранены в сессии");
-        }
-    });
     return;
 }

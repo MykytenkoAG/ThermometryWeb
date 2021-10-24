@@ -3,8 +3,9 @@ const current_page = window.location.pathname.split("/").pop() === "" ? "index.p
 
 const mainTimerPeriod = 10000;
 const mainTimer = setInterval( periodicActions, mainTimerPeriod);
+
 let serverDateTime;
-let project_conf_array=[];
+let project_conf_array = [];
 let silo_name_with_id_0;
 let silo_name_with_max_podv_number;
 

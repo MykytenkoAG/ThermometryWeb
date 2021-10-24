@@ -6,7 +6,7 @@
       $webSiteTitle="Термометрия"; require_once "blocks/head.php";
       require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/visualisation/visu_index.php');
     ?>
-    <script type="text/javascript" src="visualisation/visu_index.js"></script>
+
   </head>
   <body>
       <?php require_once "blocks/header.php"; ?>
@@ -75,23 +75,31 @@
                     </div>
                   </div>
 
-                  <div class="col-sm p-1">
-                    <button type="button" class="btn btn-light" style="width: 100%;" onclick="disable_all_defective_sensors()">
+                  <?php
+                  
+                    $leftSiteBarDisabled = ($accessLevel>0) ? "" : "disabled";
+
+                    echo "<div class=\"col-sm p-1\">
+                    <button type=\"button\" id=\"ind-btn-disable-all-def-sensors\" class=\"btn btn-light\" style=\"width: 100%;\" $leftSiteBarDisabled>
                       Отключить все неисправные датчики
                     </button>
                   </div>
 
-                  <div class="col-sm p-1">
-                    <button type="button" class="btn btn-light" style="width: 100%;" onclick="enable_all_sensors()">
+                  <div class=\"col-sm p-1\">
+                    <button type=\"button\" id=\"ind-btn-enable-all-sensors\" class=\"btn btn-light\" style=\"width: 100%;\" $leftSiteBarDisabled>
                       Включить все отключенные датчики
                     </button>
                   </div>
 
-                  <div class="col-sm p-1">
-                    <button type="button" class="btn btn-light" style="width: 100%;" data-bs-toggle="modal" data-bs-target="#ind-lvl-auto-all-silo-enable">
+                  <div class=\"col-sm p-1\">
+                    <button type=\"button\" id=\"btn-enable-all-auto-lvl-mode\" class=\"btn btn-light\" style=\"width: 100%;\" $leftSiteBarDisabled>
                       Включить автоопределение уровня на всех силосах
                     </button>
-                  </div>
+                  </div>";
+
+                  ?>
+
+                  
 
                 </div>
 
@@ -115,9 +123,6 @@
 
                   <div class="col-10 col-sm-10 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
                     <?php
-
-                      echo $accessLevel;
-
                       echo drawSiloPlan($dbh);
                     ?>
                   </div>
@@ -262,6 +267,7 @@
         </div>
 
       </main>
-      
+          
   </body>
+  <script type="text/javascript" src="visualisation/visu_index.js"></script>
 </html>

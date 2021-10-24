@@ -29,8 +29,8 @@ function redrawMainDbgTable(){
             document.getElementById("debug_parameters_table").innerHTML = fromPHP;
             
             if(dbg_message!=""){
-                document.getElementById("dbg-modal-body-message").innerText = dbg_message;
-                $("#dbg-main-modal").modal('show');
+                document.getElementById("modal-info-body-message").innerText = dbg_message;
+                $("#modal-info").modal('show');
             }
         }
     });
@@ -216,9 +216,8 @@ function onClick_dbg_button_add_measurements(){
         dataType: 'html',
         success: function(fromPHP) {
             dbg_message=fromPHP;
-            document.getElementById("dbg-modal-body-message").innerText = dbg_message;
-            $("#dbg-main-modal").modal('show');
-
+            document.getElementById("modal-info-body-message").innerText = dbg_message;
+            $("#modal-info").modal('show');
         }
     });
 

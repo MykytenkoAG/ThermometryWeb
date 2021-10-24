@@ -74,10 +74,10 @@ title="Квитировать сигналы АПС">
 <?php
     if( in_array( $accessLevel, array(0,1) ) ){
         $textColor = $accessLevel==1 ? "text-primary" : "text-black";
+        $operTooltip = $accessLevel==1 ? "" : "data-bs-toggle=\"tooltip\" data-bs-placement=\"right\" title=\"Авторизоваться как оператор\"";
         echo "
                 <li>
-                    <a href=\"#\" id=\"hdr-auth-oper\" class=\"nav-link $textColor\" style=\"width: 100px;\" data-bs-toggle=\"tooltip\" data-bs-placement=\"right\"
-title=\"Авторизоваться как Оператор\">
+                    <a href=\"#\" id=\"hdr-auth-oper\" class=\"nav-link $textColor\" style=\"width: 100px;\" $operTooltip>
                         <svg width=\"24\" height=\"24\" fill=\"currentColor\" class=\"bi d-block mx-auto mt-1\" viewBox=\"0 0 16 16\">
                             <path d=\"M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z\"/>                
                         </svg>
@@ -89,10 +89,10 @@ title=\"Авторизоваться как Оператор\">
 
     if( in_array( $accessLevel, array(0,2) ) ){
         $textColor = $accessLevel==2 ? "text-primary" : "text-black";
+        $tehnTooltip = $accessLevel==2 ? "" : "data-bs-toggle=\"tooltip\" data-bs-placement=\"right\" title=\"Авторизоваться как технолог\"";
         echo "
                 <li>
-                    <a href=\"#\" id=\"hdr-auth-tehn\" class=\"nav-link $textColor\" style=\"width: 100px;\" data-bs-toggle=\"tooltip\" data-bs-placement=\"right\"
-title=\"Авторизоваться как технолог\">
+                    <a href=\"#\" id=\"hdr-auth-tehn\" class=\"nav-link $textColor\" style=\"width: 100px;\" $tehnTooltip>
                         <svg width=\"24\" height=\"24\" fill=\"currentColor\" class=\"bi d-block mx-auto mt-1\" viewBox=\"0 0 16 16\">
                             <path d=\"M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z\"/>                
                         </svg>
@@ -104,9 +104,11 @@ title=\"Авторизоваться как технолог\">
     }
 
     if($accessLevel>0){
+        $signOutTooltip = $accessLevel==1 ? "data-bs-toggle=\"tooltip\" data-bs-placement=\"right\"
+        title=\"Выйти из учетной записи оператора\"" : "data-bs-toggle=\"tooltip\" data-bs-placement=\"right\" title=\"Выйти из учетной записи технолога\"";
         echo "
                 <li>
-                    <a href=\"#\" id=\"hdr-sign-out\" class=\"nav-link text-black\" style=\"width: 100px; text-align: center;\">
+                    <a href=\"#\" id=\"hdr-sign-out\" class=\"nav-link text-black\" style=\"width: 100px; text-align: center;\" $signOutTooltip>
                         <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" fill=\"currentColor\" class=\"bi d-block mx-auto mt-1\" viewBox=\"0 0 16 16\">
                             <path d=\"M14 0a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12zM5.904 10.803 10 6.707v2.768a.5.5 0 0 0 1 0V5.5a.5.5 0 0 0-.5-.5H6.525a.5.5 0 1 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 .707.707z\"/>
                         </svg>

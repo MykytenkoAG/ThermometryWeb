@@ -7,6 +7,12 @@ function authGetCurrentUser(){
         dataType: 'html',
         success: function(fromPHP) {
             curr_user = fromPHP;
+            if((current_page==="silo_config.php") && !["oper","tehn"].includes(curr_user)){
+                document.location.href = "index.php";
+            }
+            if((current_page==="silo_config.php") && curr_user==="tehn"){
+                buttonEnable("table-prodtypes-btn-add");
+            }
         }
     });
 }

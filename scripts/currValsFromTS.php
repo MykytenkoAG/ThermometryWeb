@@ -26,6 +26,10 @@ if( isset($_POST['acknowledge']) ) {
     echo "Произведено подтверждение сигналов АПС" ;
 }
 
+if( isset($_POST['get_array_of_levels']) ) {
+    echo json_encode( $arrayOfLevels ) ;
+}
+
 if( isset($_POST['get_project_conf_array']) ) {
     echo json_encode( getProjectConfArr($dbh) ) ;
 }

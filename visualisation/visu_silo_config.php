@@ -38,8 +38,8 @@ function drawTableProdtypes($dbh, $accessLevel){
                 <input type=\"text\"
 
                     id=\"prodtypes-product-name-".$row['product_id']."\"
-                    onchange=\"onClickTblProdtypesUpdateRow(".$row['product_id'].")\"
-                    oninput=\"checkProducts()\"
+                    onchange=\"tblProdtypesUpdateRow(".$row['product_id'].")\"
+                    oninput=\"checkProductNames()\"
 
                     class=\"form-control mx-auto productname\" aria-label=\"Sizing example input\" aria-describedby=\"inputGroup-sizing-sm\" style=\"width: 300px;\"
                     value=\"".$row['product_name']."\" $inputsDisabled></input>
@@ -48,7 +48,7 @@ function drawTableProdtypes($dbh, $accessLevel){
                 <input type=\"number\"
 
                     id=\"prodtypes-t-min-".$row['product_id']."\"
-                    onchange=\"onClickTblProdtypesUpdateRow(".$row['product_id'].")\"
+                    onchange=\"tblProdtypesUpdateRow(".$row['product_id'].")\"
 
                     class=\"form-control mx-auto\" aria-label=\"Sizing example input\" aria-describedby=\"inputGroup-sizing-sm\" style=\"width: 80px;\"
                     value=\"".$row['t_min']."\" $inputsDisabled></input>
@@ -57,7 +57,7 @@ function drawTableProdtypes($dbh, $accessLevel){
                 <input type=\"number\"
 
                     id=\"prodtypes-t-max-".$row['product_id']."\"
-                    onchange=\"onClickTblProdtypesUpdateRow(".$row['product_id'].")\"
+                    onchange=\"tblProdtypesUpdateRow(".$row['product_id'].")\"
 
                     class=\"form-control mx-auto\" aria-label=\"Sizing example input\" aria-describedby=\"inputGroup-sizing-sm\" style=\"width: 80px;\"
                     value=\"".$row['t_max']."\" $inputsDisabled></input>
@@ -66,7 +66,7 @@ function drawTableProdtypes($dbh, $accessLevel){
                 <input type=\"number\"
 
                     id=\"prodtypes-v-min-".$row['product_id']."\"
-                    onchange=\"onClickTblProdtypesUpdateRow(".$row['product_id'].")\"
+                    onchange=\"tblProdtypesUpdateRow(".$row['product_id'].")\"
 
                     class=\"form-control mx-auto\" aria-label=\"Sizing example input\" aria-describedby=\"inputGroup-sizing-sm\" style=\"width: 60px;\"
                     value=\"".$row['v_min']."\" $inputsDisabled></input>
@@ -75,14 +75,14 @@ function drawTableProdtypes($dbh, $accessLevel){
                 <input type=\"number\"
 
                     id=\"prodtypes-v-max-".$row['product_id']."\"
-                    onchange=\"onClickTblProdtypesUpdateRow(".$row['product_id'].")\"
+                    onchange=\"tblProdtypesUpdateRow(".$row['product_id'].")\"
 
                     class=\"form-control mx-auto\" aria-label=\"Sizing example input\" aria-describedby=\"inputGroup-sizing-sm\" style=\"width: 60px;\"
                     value=\"".$row['v_max']."\" $inputsDisabled></input>
             </td>
             <td>
                 <button type=\"submit\" class=\"btn btn-danger mx-auto\"
-                    id=\"prodtypes-remove-btn-".$row['product_id']."\" onclick=\"onClickTblProdtypesRemoveRow(".$row['product_id'].")\" ";
+                    id=\"prodtypes-remove-btn-".$row['product_id']."\" onclick=\"tblProdtypesRemoveRow(".$row['product_id'].")\" ";
                     
             if( ! is_null($row['silo_id']) || count($rows)==1 || $accessLevel<2){
                 $outStr .= "disabled";
@@ -159,7 +159,7 @@ function drawTableProdtypesbysilo($dbh, $accessLevel){
 
         $grainLevelFromTSStr = "<select class=\"form-control mx-auto\" name=\"\"
                                     id=\"prodtypesbysilo-grain-level-from-TS-".$rows[$i]['silo_id']."\"
-                                    onchange=\"onChangeTblProdtypesbysilo()\" $inputsDisabled>";
+                                    onchange=\"tblProdtypesbysiloUpdate()\" $inputsDisabled>";
 
         if($currValue=="auto"){
             $grainLevelFromTSStr .= "<option value=\"$currValue\">$grainLevelFromTSStrV</option><option value=\"manual\">в ручную</option>";
@@ -173,11 +173,10 @@ function drawTableProdtypesbysilo($dbh, $accessLevel){
 
         $grainLevelStr = "  <select class=\"form-control mx-auto\" name=\"\"
                                 id=\"prodtypesbysilo-grain-level-".$rows[$i]['silo_id']."\"
-                                onchange=\"onChangeTblProdtypesbysilo()\" $grainLevelDisabled
-                                >
+                                onchange=\"tblProdtypesbysiloUpdate()\" $grainLevelDisabled>
                                 <option value=\"".$rows[$i]['grain_level']."\">".$rows[$i]['grain_level']."</option>";
  
-        for($j=0; $j<=($grainLevelsArr[$i]['max(sensor_num)']);$j++){
+        for($j=0; $j<=($grainLevelsArr[$i]['max(sensor_num)']+1);$j++){
             if( $rows[$i]['grain_level'] != $j ){
                 $grainLevelStr .= "<option value=\"$j\">".$j."</option>";
             }
@@ -187,7 +186,7 @@ function drawTableProdtypesbysilo($dbh, $accessLevel){
  
         $productNameStr =   "<select class=\"form-control mx-auto\" name=\"\"
                                 id=\"prodtypesbysilo-product-name-".$rows[$i]['silo_id']."\"
-                                onchange=\"onChangeTblProdtypesbysilo()\" $inputsDisabled>
+                                onchange=\"tblProdtypesbysiloUpdate()\" $inputsDisabled>
                                 <option value=\"".$rows[$i]['product_id']."\">".$rows[$i]['product_name']."</option>";
 
         foreach($prodTypesArr as $product){
@@ -227,8 +226,6 @@ function drawTableProdtypesbysilo($dbh, $accessLevel){
     return $outStr;
 }
 
-/*	Можно вызывать только при отсутствии активных АПС
-    Должен оставаться хотя бы один продукт*/
 function prodtypesRemove($dbh, $product_id){
 
     $sql = "DELETE FROM prodtypes WHERE product_id=$product_id";
@@ -237,7 +234,6 @@ function prodtypesRemove($dbh, $product_id){
     return;
 }
 
-/*	Функция добавления нового продукта*/
 function prodtypesInsert($dbh, $product_id, $product_name, $t_min, $t_max, $v_min, $v_max){
 
     $query="INSERT INTO prodtypes (product_id, product_name, t_min, t_max, v_min, v_max) VALUES ($product_id, \"$product_name\", $t_min, $t_max, $v_min, $v_max);";
@@ -247,7 +243,6 @@ function prodtypesInsert($dbh, $product_id, $product_name, $t_min, $t_max, $v_mi
     return $query;
 }
 
-/*  Можно вызывать только при отсутствии активных АПС */
 function prodtypesUpdate($dbh, $product_id, $product_name, $t_min, $t_max, $v_min, $v_max){
 
     $sql = "UPDATE prodtypes SET product_name='$product_name', t_min='$t_min', t_max='$t_max', v_min ='$v_min', v_max='$v_max' WHERE product_id=$product_id";
@@ -257,7 +252,6 @@ function prodtypesUpdate($dbh, $product_id, $product_name, $t_min, $t_max, $v_mi
     return $sql;
 }
 
-/*  Функция изменения загрузки силоса*/
 function prodtypesbysiloUpdate($dbh, $silo_id, $grainLevelFromTS, $grain_level, $product_id){
 
     $sql = "UPDATE prodtypesbysilo SET grain_level_FromTS='$grainLevelFromTS', grain_level='$grain_level', product_id='$product_id' WHERE silo_id=$silo_id";

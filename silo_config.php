@@ -24,31 +24,24 @@
                       echo drawTableProdtypes($dbh, $accessLevel);
                     ?>
                   </div>
-                  <?php
-                    $tableProdtypesBtnDisabled = $accessLevel==2 ? "" : "disabled";
 
-                    echo "
-                      <button type=\"submit\" class=\"btn btn-primary\" id=\"table-prodtypes-btn-add\" onclick=\"onClickTblProdtypesAddRow()\" $tableProdtypesBtnDisabled>
-                        <svg width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-plus-lg\" viewBox=\"0 0 16 16\">
-                          <path d=\"M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z\"/>
-                        </svg>
-                        Добавить
-                      </button>
-                      <button type=\"submit\" class=\"btn btn-success\" id=\"table-prodtypes-btn-save-changes\" $tableProdtypesBtnDisabled>
-                        <img  src=\"img/button-save-changes.png\" width=\"16\" height=\"16\"/>
-                        <span>Сохранить изменения</span>
-                      </button>
-                      <button type=\"submit\" class=\"btn btn-danger\"  id=\"table-prodtypes-btn-discard-changes\"
-                              onclick=\"onClickTblProdtypesDiscardChanges()\" $tableProdtypesBtnDisabled>
-                              <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-arrow-counterclockwise\" viewBox=\"0 0 16 16\">
-                                <path fill-rule=\"evenodd\" d=\"M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z\"/>
-                                <path d=\"M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z\"/>
-                              </svg>
-                              <span>Отменить изменения</span>
-                      </button>
-                    ";
-
-                  ?>
+                    <button type="submit" class="btn btn-primary" id="table-prodtypes-btn-add" disabled>
+                      <svg width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
+                        <path d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z"/>
+                      </svg>
+                      Добавить
+                    </button>
+                    <button type="submit" class="btn btn-success" id="table-prodtypes-btn-save-changes" disabled>
+                      <img  src="img/button-save-changes.png" width="16" height="16"/>
+                      <span>Сохранить изменения</span>
+                    </button>
+                    <button type="submit" class="btn btn-danger"  id="table-prodtypes-btn-discard-changes" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+                              <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+                              <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+                            </svg>
+                            <span>Отменить изменения</span>
+                    </button>
 
                 </div>
               </div>
@@ -68,23 +61,17 @@
                     ?>
                   </div>
 
-                  <?php
-                    $tableProdtypesbysiloBtnDisabled = $accessLevel==2 ? "" : "disabled";
-                    echo "
-                      <button type=\"submit\" class=\"btn btn-success\"
-                              id=\"table-prodtypesbysilo-btn-save-changes\" $tableProdtypesbysiloBtnDisabled>
-                              <img  src=\"img/button-save-changes.png\" width=\"16\" height=\"16\"/>
-                              <span>Сохранить изменения</span></button>
-                      <button type=\"submit\" class=\"btn btn-danger\" id=\"table-prodtypesbysilo-btn-discard-changes\"
-                              onclick=\"onClickTblProdtypesbysiloDiscardChanges()\" $tableProdtypesbysiloBtnDisabled>
-                              <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"16\" height=\"16\" fill=\"currentColor\" class=\"bi bi-arrow-counterclockwise\" viewBox=\"0 0 16 16\">
-                                <path fill-rule=\"evenodd\" d=\"M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z\"/>
-                                <path d=\"M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z\"/>
-                              </svg>
-                              <span>Отменить изменения</span>
-                      </button>
-                    ";
-                  ?>
+                    <button type="submit" class="btn btn-success"
+                            id="table-prodtypesbysilo-btn-save-changes" disabled>
+                            <img  src="img/button-save-changes.png" width="16" height="16"/>
+                            <span>Сохранить изменения</span></button>
+                    <button type="submit" class="btn btn-danger" id="table-prodtypesbysilo-btn-discard-changes" disabled>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
+                              <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+                              <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+                            </svg>
+                            <span>Отменить изменения</span>
+                    </button>
 
                 </div>
               </div>
