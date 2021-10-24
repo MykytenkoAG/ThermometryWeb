@@ -658,15 +658,4 @@ if( isset($_POST['podv_enable_silo_id']) && isset($_POST['podv_enable_podv_num']
 	podvEnable($dbh, $_POST['podv_enable_silo_id'], $_POST['podv_enable_podv_num']);
 }
 
-//  Отрисовка текста названия силоса
-//  Необходимо заменить!
-if(isset($_POST['silo_id_forText']) && !empty($_POST['silo_id_forText'])) {
-    $sql = "SELECT silo_name
-                FROM prodtypesbysilo
-                WHERE silo_id=".(preg_split('/-/', $_POST['silo_id_forText'], -1, PREG_SPLIT_NO_EMPTY)[1]).";";
-    $sth = $dbh->query($sql);
-    $silo_name = $sth->fetch()['silo_name'];
-    echo "Силос $silo_name";
-}
-
 ?>

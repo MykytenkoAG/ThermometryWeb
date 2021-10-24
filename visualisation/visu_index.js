@@ -1,6 +1,6 @@
 function init_index() {
     document.getElementById("hdr-href-index.php").setAttribute("class", "nav-link text-primary");
-
+    getArrayOfSiloNames();
     redrawSiloStatus();
 
     lastParamSelectButtonID = "btn-temperatures";
@@ -164,8 +164,7 @@ function onSiloClicked(silo_id) {
     } else if (lastParamSelectButtonID === "btn-speeds") {
         redrawTableTemperatureSpeeds(silo_id); //  таблица скоростей
     }
-
-    redrawSiloNameText(silo_id); //  Название силоса
+    
     redrawProductParametersTable(silo_id); //  Параметры продукта
 
     lastSiloID = silo_id;
@@ -178,18 +177,6 @@ function onBtnClicked(btn_id) {
     document.getElementById("btn-temperatures").className = "btn btn-light";
     document.getElementById("btn-speeds").className = "btn btn-light";
     document.getElementById(btn_id).className = "btn btn-success"; //  Подсвечиваем выбранную кнопку
-    return;
-}
-
-function redrawSiloNameText(silo_id) {
-    $.ajax({
-        url: 'visualisation/visu_index.php',
-        type: 'POST',
-        cache: false,
-        data: { 'silo_id_forText': silo_id },
-        dataType: 'html',
-        success: function(fromPHP) { document.getElementById("current-silo-name").innerHTML = fromPHP; }
-    });
     return;
 }
 
@@ -215,6 +202,7 @@ function redrawProductParametersTable(silo_id) {
             document.getElementById("ind-prod-tbl-6-rng-t-max").innerHTML = JSON.parse(fromPHP)[10];
             document.getElementById("ind-prod-tbl-6-v-max").innerHTML = JSON.parse(fromPHP)[11];
 
+            document.getElementById("current-silo-name").innerHTML = "Силос " + silo_names_array[silo_id.split("-").pop()];
         }
     });
     return;

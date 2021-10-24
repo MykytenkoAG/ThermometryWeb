@@ -268,4 +268,20 @@ function getProjectConfArr($dbh){
     return $projectConfArr;
 }
 
+function getArrayOfSiloNames($dbh){
+
+    $arrayOfSiloNames = array();
+
+    $sql = "SELECT silo_id, silo_name FROM zernoib.prodtypesbysilo ORDER BY silo_id;";
+    $sth = $dbh->query($sql);
+    
+    $rows = $sth->fetchAll();
+
+	foreach($rows as $row){
+		array_push($arrayOfSiloNames, $row['silo_name']);
+	}
+
+    return $arrayOfSiloNames;
+}
+
 ?>

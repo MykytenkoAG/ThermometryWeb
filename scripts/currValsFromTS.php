@@ -34,4 +34,8 @@ if( isset($_POST['get_project_conf_array']) ) {
     echo json_encode( getProjectConfArr($dbh) ) ;
 }
 
+if( isset($_POST['get_silo_names_array']) ) {
+    echo json_encode( getArrayOfSiloNames($dbh) ) ;
+}
+
 ?>

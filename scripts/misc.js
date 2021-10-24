@@ -5,6 +5,7 @@ const mainTimerPeriod = 10000;
 const mainTimer = setInterval( periodicActions, mainTimerPeriod);
 
 let serverDateTime;
+let silo_names_array = [];
 let project_conf_array = [];
 let silo_name_with_id_0;
 let silo_name_with_max_podv_number;
@@ -45,6 +46,21 @@ function getCookie(cname) {
 function deleteCookie(name) {
     document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 };
+
+function getArrayOfSiloNames(){
+    $.ajax({
+        url: '/webTermometry/scripts/currValsFromTS.php',
+        type: 'POST',
+        cache: false,
+        data: { 'get_silo_names_array': 1 },
+        dataType: 'html',
+        success: function(fromPHP) {
+            silo_names_array = (JSON.parse(fromPHP));
+            document.getElementById("current-silo-name").innerHTML = "Силос " + silo_names_array[0];
+        }
+    });
+    return;
+}
 
 //  Получение главного конфигурационного ассоциативного массива
 function getProjectConfArr(){
