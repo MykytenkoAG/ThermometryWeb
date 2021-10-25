@@ -424,13 +424,13 @@ function getTimeTemperatureTable($dbh,$silo_name, $podv_id, $sens_num, $dateStar
    return $outArr;
 }
 
-if( isset($_POST['silo_id']) && isset($_POST['podv_id']) && isset($_POST['sensor_num']) && isset($_POST['period']) ) {
+if( isset($_POST['get_t_chart_silo_id']) && isset($_POST['get_t_chart_podv_id']) && isset($_POST['get_t_chart_sensor_num']) && isset($_POST['get_t_chart_period']) ) {
 
     $dateEnd = DateTime::createFromFormat('d.m.Y H:i:s', $serverDate);
     $dateStart = DateTime::createFromFormat('d.m.Y H:i:s', $serverDate);
-    $dateStart->modify("-1 ".$_POST['period']);
+    $dateStart->modify("-1 ".$_POST['get_t_chart_period']);
 
-    echo json_encode( getTimeTemperatureTable( $dbh, $_POST['silo_id'], $_POST['podv_id'], $_POST['sensor_num'], $dateStart->format('Y-m-d H:i:s'), $dateEnd->format('Y-m-d H:i:s') ) );
+    echo json_encode( getTimeTemperatureTable( $dbh, $_POST['get_t_chart_silo_id'], $_POST['get_t_chart_podv_id'], $_POST['get_t_chart_sensor_num'], $dateStart->format('Y-m-d H:i:s'), $dateEnd->format('Y-m-d H:i:s') ) );
 }
 
 ?>

@@ -109,7 +109,7 @@ function addNewLineOnChart() {
         url: 'visualisation/visu_report.php',
         type: 'POST',
         cache: false,
-        data: { 'silo_id': silo_id, 'podv_id': podv_id - 1, 'sensor_num': sensor_num - 1, 'period': period },
+        data: { 'get_t_chart_silo_id': silo_id, 'get_t_chart_podv_id': podv_id - 1, 'get_t_chart_sensor_num': sensor_num - 1, 'get_t_chart_period': period },
         dataType: 'html',
         success: function(fromPHP) {
 
@@ -293,4 +293,150 @@ function createPDF(image) {
 
 function ConvertPxToMM(pixels) {
     return Math.floor(pixels * 0.264583);
+}
+
+function rprtprfbtnDownloadPDF() {
+
+    let dateCheckboxes = document.getElementsByTagName("input");
+    const re = /\w+_(\d{4}-\d{2}-\d{2}_\d{2}:\d{2}:\d{2})/;
+    let arrayOfDates = [];
+
+    for (let i = 0; i < dateCheckboxes.length; i++) {
+        if (dateCheckboxes[i].id.match(re)) {
+            if (dateCheckboxes[i].checked) {
+                arrayOfDates.push(dateCheckboxes[i].id.match(re)[1].replace('_', ' '));
+            }
+        }
+    }
+
+    if (document.getElementById("prfrb_avg-t-by-layer").checked) {
+
+        let arrayOfSilo = [];
+        let currSilo = document.getElementById("rprtprf_silo_1");
+
+        if (currSilo.value === "all") {
+            for (let i = 0; i < currSilo.options.length; i++) {
+                if (currSilo.options[i].value === "all") {
+                    continue;
+                }
+                arrayOfSilo.push(currSilo.options[i].value);
+            }
+        } else {
+            arrayOfSilo.push(currSilo.value);
+        }
+
+        let arrayOfLayers = [];
+        let currLayer = document.getElementById("rprtprf_layer_1");
+
+        if (currLayer.value === "all") {
+            for (let i = 0; i < currLayer.options.length; i++) {
+                if (currLayer.options[i].value === "all") {
+                    continue;
+                }
+                arrayOfLayers.push(currLayer.options[i].value);
+            }
+        } else {
+            arrayOfLayers.push(currLayer.value);
+        }
+
+        console.log(arrayOfSilo);
+        console.log(arrayOfLayers);
+        console.log(arrayOfDates);
+
+    } else if (document.getElementById("prfrb_t-by-layer").checked) {
+
+        let arrayOfSilo = [];
+        let currSilo = document.getElementById("rprtprf_silo_1");
+
+        if (currSilo.value === "all") {
+            for (let i = 0; i < currSilo.options.length; i++) {
+                if (currSilo.options[i].value === "all") {
+                    continue;
+                }
+                arrayOfSilo.push(currSilo.options[i].value);
+            }
+        } else {
+            arrayOfSilo.push(currSilo.value);
+        }
+
+        let arrayOfLayers = [];
+        let currLayer = document.getElementById("rprtprf_layer_1");
+
+        if (currLayer.value === "all") {
+            for (let i = 0; i < currLayer.options.length; i++) {
+                if (currLayer.options[i].value === "all") {
+                    continue;
+                }
+                arrayOfLayers.push(currLayer.options[i].value);
+            }
+        } else {
+            arrayOfLayers.push(currLayer.value);
+        }
+
+        console.log(arrayOfSilo);
+        console.log(arrayOfLayers);
+        console.log(arrayOfDates);
+
+    } else if (document.getElementById("prfrb_t-by-sensor").checked) {
+        let arrayOfSilo = [];
+        let currSilo = document.getElementById("rprtprf_silo_1");
+
+        if (currSilo.value === "all") {
+            for (let i = 0; i < currSilo.options.length; i++) {
+                if (currSilo.options[i].value === "all") {
+                    continue;
+                }
+                arrayOfSilo.push(currSilo.options[i].value);
+            }
+        } else {
+            arrayOfSilo.push(currSilo.value);
+        }
+
+        let arrayOfPodvs = [];
+        let currPodv = document.getElementById("rprtprf_podv_1");
+
+        if (currPodv.value === "all") {
+            for (let i = 0; i < currPodv.options.length; i++) {
+                if (currPodv.options[i].value === "all") {
+                    continue;
+                }
+                arrayOfPodvs.push(currPodv.options[i].value);
+            }
+        } else {
+            arrayOfPodvs.push(currPodv.value);
+        }
+
+        let arrayOfSensors = [];
+        let currSensor = document.getElementById("rprtprf_sensor_1");
+
+        if (currSensor.value === "all") {
+            for (let i = 0; i < currSensor.options.length; i++) {
+                if (currSensor.options[i].value === "all") {
+                    continue;
+                }
+                arrayOfSensors.push(currSensor.options[i].value);
+            }
+        } else {
+            arrayOfSensors.push(currSensor.value);
+        }
+
+
+        console.log(arrayOfSilo);
+        console.log(arrayOfPodvs);
+        console.log(arrayOfSensors);
+        console.log(arrayOfDates);
+
+    }
+
+    return;
+}
+
+function rprtprfbtnDownloadXLS() {
+
+    return;
+}
+
+function rprtprfbtnDownloadCSV() {
+
+    return;
 }
