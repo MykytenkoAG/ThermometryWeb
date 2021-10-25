@@ -32,15 +32,16 @@ function init_silo_config() {
     tbl_prodtypesbysilo_update_list.length = 0;
 }
 
-function getArrayOfLevels(){
+function getArrayOfLevels() {
     $.ajax({
-        url: '/webTermometry/scripts/currValsFromTS.php',
+        url: '/webTermometry/scripts/dataForJS.php',
         type: 'POST',
         cache: false,
         data: { 'get_array_of_levels': 1 },
         dataType: 'html',
         success: function(fromPHP) {
             arrayOfLevels = (JSON.parse(fromPHP));
+            console.log(arrayOfLevels);
         }
     });
     return;
@@ -109,9 +110,9 @@ function redrawTableProdtypesbysilo() {
     return;
 }
 
-function silo_config_save_changes(){
+function silo_config_save_changes() {
 
-    if(tbl_prodtypes_changed==1){
+    if (tbl_prodtypes_changed == 1) {
         $.ajax({
             url: 'visualisation/visu_silo_config.php',
             type: 'POST',
@@ -127,7 +128,7 @@ function silo_config_save_changes(){
         });
     }
 
-    if(tbl_prodtypesbysilo_changed==1){
+    if (tbl_prodtypesbysilo_changed == 1) {
         $.ajax({
             url: 'visualisation/visu_silo_config.php',
             type: 'POST',
@@ -146,11 +147,11 @@ function silo_config_save_changes(){
     return;
 }
 
-function silo_config_discard_changes(){
+function silo_config_discard_changes() {
 
     redrawTableProdtypes();
     redrawTableProdtypesbysilo();
-    if(curr_user=="tehn"){
+    if (curr_user == "tehn") {
         buttonEnable("table-prodtypes-btn-add");
     }
 
@@ -164,7 +165,7 @@ $("#table-prodtypes-btn-save-changes").click(function() {
     document.getElementById("modal-are-you-sure-text").innerText = "Сохранить изменения?";
     document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
     document.getElementById("modal-are-you-sure-btn-cancel").innerText = "Отмена";
-    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick","silo_config_save_changes()");
+    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "silo_config_save_changes()");
     $("#modal-are-you-sure").modal('show');
 });
 
@@ -176,8 +177,8 @@ $("#table-prodtypesbysilo-btn-save-changes").click(function() {
     document.getElementById("modal-are-you-sure-text").innerText = "Сохранить изменения?";
     document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
     document.getElementById("modal-are-you-sure-btn-cancel").innerText = "Отмена";
-    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick","silo_config_save_changes()");
-    $("#modal-are-you-sure").modal('show');    
+    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "silo_config_save_changes()");
+    $("#modal-are-you-sure").modal('show');
 });
 
 $("#table-prodtypesbysilo-btn-discard-changes").click(function() {
@@ -209,7 +210,7 @@ function tblProdtypesUpdateRow(tbl_prodtypes_row_id) {
 
     tableInputsDisable("table-prodtypesbysilo");
 
-    if(checkProductNames()){
+    if (checkProductNames()) {
         buttonEnable("table-prodtypes-btn-save-changes");
     }
     buttonEnable("table-prodtypes-btn-discard-changes");
@@ -235,7 +236,7 @@ function tblProdtypesAddRow() {
     //  Отключаем другую таблицу
     tableInputsDisable("table-prodtypesbysilo");
     //  Включаем кнопки "сохранить" и "отменить изменения"
-    if(checkProductNames()){
+    if (checkProductNames()) {
         buttonEnable("table-prodtypes-btn-save-changes");
     }
     buttonEnable("table-prodtypes-btn-discard-changes");
@@ -262,14 +263,15 @@ function tblProdtypesAddRow() {
     input_product_name.setAttribute("class", "form-control mx-auto productname");
     input_product_name.setAttribute("style", "width: 300px;");
 
-    let k=1; let new_name = "Новый продукт "+k;
+    let k = 1;
+    let new_name = "Новый продукт " + k;
     let currProductNames = document.getElementById("table-prodtypes").getElementsByClassName("productname");
     let i = 0;
-    while( i < currProductNames.length ){
-        if(new_name == currProductNames[i].value){
+    while (i < currProductNames.length) {
+        if (new_name == currProductNames[i].value) {
             k++;
-            new_name = "Новый продукт "+k;
-            i=0;
+            new_name = "Новый продукт " + k;
+            i = 0;
             continue;
         }
         i++;
@@ -368,7 +370,7 @@ function tblProdtypesAddRow() {
     return;
 }
 
-function checkProductNames(){
+function checkProductNames() {
 
     tbl_prodtypes_changed = 1;
     tableInputsDisable("table-prodtypesbysilo");
@@ -376,19 +378,19 @@ function checkProductNames(){
     let inputs = document.getElementById("table-prodtypes").getElementsByClassName("productname");
     let checkOK = true;
 
-    for(let i=0; i<inputs.length; i++){
+    for (let i = 0; i < inputs.length; i++) {
         inputs[i].setAttribute("style", "width: 300px;");
     }
     buttonEnable("table-prodtypes-btn-save-changes");
     buttonEnable("table-prodtypes-btn-discard-changes");
-    for(let i=0; i<inputs.length; i++){
-        if(!isProductNameValid(inputs[i].value)){
+    for (let i = 0; i < inputs.length; i++) {
+        if (!isProductNameValid(inputs[i].value)) {
             checkOK = false;
             inputs[i].setAttribute("style", "width: 300px; color:red");
             buttonDisable("table-prodtypes-btn-save-changes");
         }
-        for(let j=i+1; j<inputs.length; j++){
-            if(inputs[i].value==inputs[j].value){
+        for (let j = i + 1; j < inputs.length; j++) {
+            if (inputs[i].value == inputs[j].value) {
                 checkOK = false;
                 inputs[i].setAttribute("style", "width: 300px; color:red");
                 inputs[j].setAttribute("style", "width: 300px; color:red");
@@ -427,8 +429,8 @@ function tblProdtypesbysiloUpdate() {
         const silo_id = selects[i].id.split('-').pop();
         const grain_level_from_TS = selects[i].value == "auto" ? 1 : 0;
         i++;
-        if(grain_level_from_TS==1){
-            selects[i].value = arrayOfLevels[Math.floor(i/3)];
+        if (grain_level_from_TS == 1) {
+            selects[i].value = arrayOfLevels[Math.floor(i / 3)];
         }
         selects[i].disabled = grain_level_from_TS;
         const grain_level = selects[i].value;
@@ -451,8 +453,8 @@ function tblProdtypesbysiloUpdate() {
 
 //  Опции
 $("#silo-config-btn-change-password").click(function() {
-    document.getElementById("modal-sign-in-btn-close").setAttribute("onclick","modalClearInput('modal-pass-change-pwd1');modalClearInput('modal-pass-change-pwd2')");
-    document.getElementById("modal-sign-in-btn-cancel").setAttribute("onclick","modalClearInput('modal-pass-change-pwd1');modalClearInput('modal-pass-change-pwd2')");
-    document.getElementById("modal-pass-change-btn-ok").setAttribute("onclick","authPasswordChange('"+curr_user+"', 'modal-pass-change-pwd1', 'modal-pass-change-pwd2')");
+    document.getElementById("modal-sign-in-btn-close").setAttribute("onclick", "modalClearInput('modal-pass-change-pwd1');modalClearInput('modal-pass-change-pwd2')");
+    document.getElementById("modal-sign-in-btn-cancel").setAttribute("onclick", "modalClearInput('modal-pass-change-pwd1');modalClearInput('modal-pass-change-pwd2')");
+    document.getElementById("modal-pass-change-btn-ok").setAttribute("onclick", "authPasswordChange('" + curr_user + "', 'modal-pass-change-pwd1', 'modal-pass-change-pwd2')");
     $("#modal-pass-change").modal('show');
 });

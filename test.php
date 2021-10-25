@@ -30,6 +30,8 @@
         $dbh = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);	//[PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
         $serverDate="19.10.2021 14:05:00";
 
+        $a=1;
+
     ?>
 
 </body>

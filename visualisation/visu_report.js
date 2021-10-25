@@ -1,38 +1,38 @@
-function init_report(){
+function init_report() {
 
     document.getElementById("hdr-href-report.php").setAttribute("class", "nav-link text-primary");
 
-    setSelectOptions( document.getElementById("rprtprf_silo_1"),    ["all"].concat( Object.keys(project_conf_array) ) );
-    setSelectOptions( document.getElementById("rprtprf_podv_1"),    ["all"].concat( Object.keys(project_conf_array[silo_name_with_max_podv_number]) ) );         //  проблема, в случае, если в проекте нет силоса с номером один
-    setSelectOptions( document.getElementById("rprtprf_layer_1"),   ["all"].concat( Object.keys(project_conf_array[silo_name_with_max_podv_number][1]) ) );
-    setSelectOptions( document.getElementById("rprtprf_sensor_1"),  ["all"].concat( Object.keys(project_conf_array[silo_name_with_max_podv_number][1]) ) );
+    setSelectOptions(document.getElementById("rprtprf_silo_1"), ["all"].concat(Object.keys(project_conf_array)));
+    setSelectOptions(document.getElementById("rprtprf_podv_1"), ["all"].concat(Object.keys(project_conf_array[silo_name_with_max_podv_number]))); //  проблема, в случае, если в проекте нет силоса с номером один
+    setSelectOptions(document.getElementById("rprtprf_layer_1"), ["all"].concat(Object.keys(project_conf_array[silo_name_with_max_podv_number][1])));
+    setSelectOptions(document.getElementById("rprtprf_sensor_1"), ["all"].concat(Object.keys(project_conf_array[silo_name_with_max_podv_number][1])));
 
     let selects = document.getElementById("sensor-temperatures-table").getElementsByTagName('select');
 
-    let chart_silo_1   = selects.item(selects.length - 4);
-    let chart_podv_1   = selects.item(selects.length - 3);
+    let chart_silo_1 = selects.item(selects.length - 4);
+    let chart_podv_1 = selects.item(selects.length - 3);
     let chart_sensor_1 = selects.item(selects.length - 2);
 
-    setSelectOptions( chart_silo_1,   Object.keys(project_conf_array) );
-    setSelectOptions( chart_podv_1,   Object.keys(project_conf_array[silo_name_with_id_0]) );
-    setSelectOptions( chart_sensor_1, Object.keys(project_conf_array[silo_name_with_id_0][1]) );
+    setSelectOptions(chart_silo_1, Object.keys(project_conf_array));
+    setSelectOptions(chart_podv_1, Object.keys(project_conf_array[silo_name_with_id_0]));
+    setSelectOptions(chart_sensor_1, Object.keys(project_conf_array[silo_name_with_id_0][1]));
 
     prfSelectsDisable();
 
 
-    const chart_silo_id     = getCookie("chart_silo_id");
-    const chart_podv_num    = getCookie("chart_podv_num");
-    const chart_sensor_num  = getCookie("chart_sensor_num");
-    const chart_period      = getCookie("chart_period");
-    if( chart_silo_id!=""    && chart_silo_id!=null &&
-        chart_podv_num!=""   && chart_podv_num!=null &&
-        chart_sensor_num!="" && chart_sensor_num!=null &&
-        chart_period!=""     && chart_period!=null){
+    const chart_silo_id = getCookie("chart_silo_id");
+    const chart_podv_num = getCookie("chart_podv_num");
+    const chart_sensor_num = getCookie("chart_sensor_num");
+    const chart_period = getCookie("chart_period");
+    if (chart_silo_id != "" && chart_silo_id != null &&
+        chart_podv_num != "" && chart_podv_num != null &&
+        chart_sensor_num != "" && chart_sensor_num != null &&
+        chart_period != "" && chart_period != null) {
 
         const chart_silo_name = Object.keys(project_conf_array)[chart_silo_id];
         selects.item(selects.length - 4).value = chart_silo_name;
         selects.item(selects.length - 3).value = Object.keys(project_conf_array[chart_silo_name])[chart_podv_num];
-        selects.item(selects.length - 2).value = project_conf_array[chart_silo_name][+chart_podv_num+1][+chart_sensor_num+1];
+        selects.item(selects.length - 2).value = project_conf_array[chart_silo_name][+chart_podv_num + 1][+chart_sensor_num + 1];
         selects.item(selects.length - 1).value = chart_period;
 
         addNewLineOnChart();
@@ -42,47 +42,47 @@ function init_report(){
 
 //  Функции управления чекбоксами
 //  Вкл/Откл все чекбоксы
-function prfChbAllDates(){
+function prfChbAllDates() {
     const value = document.getElementById("prfchballdates").checked;
     let checkboxes = document.getElementsByTagName("input");
 
-    for(let i=0; i<checkboxes.length; i++){
-            if(checkboxes[i].id.split("_")[0]==="prfchball" || checkboxes[i].id.split("_")[0]==="prfchb"){
-                checkboxes[i].checked = value;
-            }
+    for (let i = 0; i < checkboxes.length; i++) {
+        if (checkboxes[i].id.split("_")[0] === "prfchball" || checkboxes[i].id.split("_")[0] === "prfchb") {
+            checkboxes[i].checked = value;
+        }
     }
 
     return;
 }
 //  Вкл/Откл все чекбоксы для определенного дня
-function prfChbCurrDate(element_id){
-    
+function prfChbCurrDate(element_id) {
+
     const prfChbDate = document.getElementById(element_id);
     const date = element_id.split("_")[1];
     const value = prfChbDate.checked;
 
     let checkboxes = document.getElementsByTagName("input");
 
-    for(let i=0; i<checkboxes.length; i++){
-            if(checkboxes[i].id.split("_")[0]==="prfchb" && checkboxes[i].id.split("_")[1]===date){
-                checkboxes[i].checked = value;
-            }
+    for (let i = 0; i < checkboxes.length; i++) {
+        if (checkboxes[i].id.split("_")[0] === "prfchb" && checkboxes[i].id.split("_")[1] === date) {
+            checkboxes[i].checked = value;
+        }
     }
 
     return;
 }
 
 //  Включение/Отключение элементов выбора при нажатых радиокнопках
-function prfSelectsDisable(){
-    
-    if( document.getElementById("prfrb_avg-t-by-layer").checked || document.getElementById("prfrb_t-by-layer").checked ){
+function prfSelectsDisable() {
+
+    if (document.getElementById("prfrb_avg-t-by-layer").checked || document.getElementById("prfrb_t-by-layer").checked) {
         document.getElementById("rprtprf_podv_1").disabled = true;
         document.getElementById("rprtprf_layer_1").disabled = false;
         document.getElementById("rprtprf_sensor_1").disabled = true;
 
     }
 
-    if( document.getElementById("prfrb_t-by-sensor").checked ){
+    if (document.getElementById("prfrb_t-by-sensor").checked) {
         document.getElementById("rprtprf_podv_1").disabled = false;
         document.getElementById("rprtprf_layer_1").disabled = true;
         document.getElementById("rprtprf_sensor_1").disabled = false;
@@ -92,24 +92,24 @@ function prfSelectsDisable(){
 }
 
 //  Добавление кривой на график
-function addNewLineOnChart(){
+function addNewLineOnChart() {
 
     //  Получаем доступ ко всем полям
     let inputs = document.getElementById("sensor-temperatures-table").getElementsByTagName('input');
     let selects = document.getElementById("sensor-temperatures-table").getElementsByTagName('select');
 
-    let silo_id     = selects.item(selects.length - 4).value;
-    let podv_id     = +selects.item(selects.length - 3).value;
-    let sensor_num  = +selects.item(selects.length - 2).value;
+    let silo_id = selects.item(selects.length - 4).value;
+    let podv_id = +selects.item(selects.length - 3).value;
+    let sensor_num = +selects.item(selects.length - 2).value;
     let line_colour = inputs.item(inputs.length - 1).value;
-    let period      = selects.item(selects.length - 1).value;
+    let period = selects.item(selects.length - 1).value;
 
     //  !       Передаем параметры в PHP
     $.ajax({
         url: 'visualisation/visu_report.php',
         type: 'POST',
         cache: false,
-        data: { 'silo_id': silo_id, 'podv_id': podv_id-1, 'sensor_num': sensor_num-1, 'period': period },
+        data: { 'silo_id': silo_id, 'podv_id': podv_id - 1, 'sensor_num': sensor_num - 1, 'period': period },
         dataType: 'html',
         success: function(fromPHP) {
 
@@ -128,15 +128,15 @@ function addNewLineOnChart(){
             };
 
             JSON.parse(fromPHP).forEach(element => {
-                newDataset.data.push( {x: element["date"], y: element["temperature"]} );
+                newDataset.data.push({ x: element["date"], y: element["temperature"] });
             });
             newDataset.label = silo_id + '.' + podv_id + '.' + sensor_num;
-            newDataset.backgroundColor[0] = 'rgba(' + parseInt(line_colour.slice(1,3),16) + ","
-                                                    + parseInt(line_colour.slice(3,5),16) + ","
-                                                    + parseInt(line_colour.slice(5,7), 16) + ",1)";
-            newDataset.borderColor[0] = 'rgba('     + parseInt(line_colour.slice(1,3),16)+ ","
-                                                    + parseInt(line_colour.slice(3,5),16) + ","
-                                                    + parseInt(line_colour.slice(5,7),16) + ",1)";
+            newDataset.backgroundColor[0] = 'rgba(' + parseInt(line_colour.slice(1, 3), 16) + "," +
+                parseInt(line_colour.slice(3, 5), 16) + "," +
+                parseInt(line_colour.slice(5, 7), 16) + ",1)";
+            newDataset.borderColor[0] = 'rgba(' + parseInt(line_colour.slice(1, 3), 16) + "," +
+                parseInt(line_colour.slice(3, 5), 16) + "," +
+                parseInt(line_colour.slice(5, 7), 16) + ",1)";
 
             myChart.data.datasets.push(newDataset);
             myChart.update();
@@ -152,7 +152,7 @@ function addNewLineOnChart(){
     });
 }
 //  Добавление строки в таблицу
-function addNewTableRow(){
+function addNewTableRow() {
 
     //  Отключаем элементы на последней строке
     let inputs = document.getElementById("sensor-temperatures-table").getElementsByTagName('input');
@@ -161,10 +161,10 @@ function addNewTableRow(){
     selects.item(selects.length - 4).disabled = true;
     selects.item(selects.length - 3).disabled = true;
     selects.item(selects.length - 2).disabled = true;
-    inputs.item(inputs.length - 1).disabled   = true;
+    inputs.item(inputs.length - 1).disabled = true;
     selects.item(selects.length - 1).disabled = true;
 
-    row_num = +selects.item(selects.length - 4).id.split("_")[2] + 1;   //  Номер строки. Вычисляем для присваивания нового id элементам
+    row_num = +selects.item(selects.length - 4).id.split("_")[2] + 1; //  Номер строки. Вычисляем для присваивания нового id элементам
 
     //  получаем доступ к tbody
     let tbody = document.getElementById("sensor-temperatures-table").getElementsByTagName("tbody")[0];
@@ -173,40 +173,40 @@ function addNewTableRow(){
     //  создаем столбцы
     let td1 = document.createElement("td");
     let input_silo_num = document.createElement("select");
-    input_silo_num.setAttribute("id","rprtchart_silo_"+row_num);
-    input_silo_num.setAttribute("onchange","redrawSelectsRow(event.target.id)");
+    input_silo_num.setAttribute("id", "rprtchart_silo_" + row_num);
+    input_silo_num.setAttribute("onchange", "redrawSelectsRow(event.target.id)");
     input_silo_num.className = "form-control";
     td1.appendChild(input_silo_num);
 
     let td2 = document.createElement("TD");
     let input_podv_num = document.createElement("select");
-    input_podv_num.setAttribute("id","rprtchart_podv_"+row_num);
-    input_podv_num.setAttribute("onchange","redrawSelectsRow(event.target.id)");
+    input_podv_num.setAttribute("id", "rprtchart_podv_" + row_num);
+    input_podv_num.setAttribute("onchange", "redrawSelectsRow(event.target.id)");
     input_podv_num.className = "form-control";
     td2.appendChild(input_podv_num);
 
     let td3 = document.createElement("TD");
     var input_sensor_num = document.createElement("select");
-    input_sensor_num.setAttribute("id","rprtchart_sensor_"+row_num);
+    input_sensor_num.setAttribute("id", "rprtchart_sensor_" + row_num);
     input_sensor_num.className = "form-control";
     td3.appendChild(input_sensor_num);
     //  Новый цвет выбирается случайным образом
     let td4 = document.createElement("TD");
     let input_color = document.createElement("input");
     input_color.type = "color";
-    let colour_value="";
-    for(let i=0; i<3; i++){
-        if(i==0){
+    let colour_value = "";
+    for (let i = 0; i < 3; i++) {
+        if (i == 0) {
             colour_value += "#";
         }
         const current_colour = Math.floor(Math.random() * 256).toString(16);
-        if(current_colour.length<2){
+        if (current_colour.length < 2) {
             colour_value += "0" + current_colour;
-        } else{
+        } else {
             colour_value += current_colour;
         }
-        if(i==2){
-            input_color.setAttribute("value",colour_value);
+        if (i == 2) {
+            input_color.setAttribute("value", colour_value);
         }
     }
     input_color.className = "form-control form-control-color";
@@ -227,9 +227,9 @@ function addNewTableRow(){
     tbody.appendChild(row);
 
     //  Производим инициализацию элементов select
-    setSelectOptions( input_silo_num,   Object.keys(project_conf_array) );
-    setSelectOptions( input_podv_num,   Object.keys(project_conf_array[silo_name_with_id_0]) );
-    setSelectOptions( input_sensor_num, Object.keys(project_conf_array[silo_name_with_id_0][1]) );
+    setSelectOptions(input_silo_num, Object.keys(project_conf_array));
+    setSelectOptions(input_podv_num, Object.keys(project_conf_array[silo_name_with_id_0]));
+    setSelectOptions(input_sensor_num, Object.keys(project_conf_array[silo_name_with_id_0][1]));
 
     return;
 }
@@ -245,16 +245,52 @@ const config = {
     options: {
         scales: {
             x: {
-            type: 'time',
-            time: {
-                unit: 'day'
-            }
+                type: 'time',
+                time: {
+                    unit: 'day'
+                }
             },
             y: {
                 beginAtZero: true
             }
         }
     }
-};    
+};
 //  render / init block
 let myChart = new Chart(document.getElementById('myChart'), config);
+
+function Convert() {
+    //По нажатию на кнопку получаем канвас
+    var canvas = document.getElementById('myChart');
+    // И создаем из него картиику в base64
+    var quality = 1; // качество от 0 до 1, заодно и сжать можно
+    var myImage = {
+        data: canvas.toDataURL('image/png', quality),
+        height: canvas.height,
+        width: canvas.width
+    };
+    // теперь из картинки делаем PDF
+    createPDF(myImage);
+}
+
+//image - должен иметь свойста height,width и data - хранит картинку в base64
+function createPDF(image) {
+    let w = ConvertPxToMM(image.width);
+    let h = ConvertPxToMM(image.height);
+    var orientation = w > h ? 'l' : 'p';
+
+    //Создаем документ PDF размером с нашу картинку
+    var docPDF = new jsPDF(orientation, 'mm', [w, h]);
+    //рисуем картинку на всю страницу
+
+    docPDF.addImage(image.data, 'PNG', 0, 0);
+
+
+    //Сохраням полученный файл
+    //Возможные значения : dataurl, datauristring, bloburl, blob, arraybuffer, ('save', filename)
+    docPDF.output('save', 'График температуры.pdf');
+}
+
+function ConvertPxToMM(pixels) {
+    return Math.floor(pixels * 0.264583);
+}

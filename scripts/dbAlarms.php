@@ -416,7 +416,7 @@ function resetACK($dbh, $serverDate){
 				$query.="WHEN sensor_id = ".$s_id." THEN 0 ";
 			}
 		
-			$query.=" END), TIME_NACK_err = NULL, TIME_ACK_err = NULL WHERE sensor_id IN (";
+			$query.=" END), TIME_NACK_err = NULL, TIME_ACK_err = NULL, error_id = NULL WHERE sensor_id IN (";
 
 			foreach($sensor_ids as $s_id){
 				$query.= "$s_id,";

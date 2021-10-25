@@ -1,6 +1,6 @@
 function init_index() {
     document.getElementById("hdr-href-index.php").setAttribute("class", "nav-link text-primary");
-    getArrayOfSiloNames();
+    getConf_ArrayOfSiloNames();
     redrawSiloStatus();
 
     lastParamSelectButtonID = "btn-temperatures";
@@ -30,7 +30,7 @@ $('#ind-btn-disable-all-def-sensors').click(function() {
     document.getElementById("modal-are-you-sure-text").innerText = "Отключить все неисправные датчики?";
     document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
     document.getElementById("modal-are-you-sure-btn-cancel").innerText = "Отмена";
-    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick","disable_all_defective_sensors()");
+    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "disable_all_defective_sensors()");
     $("#modal-are-you-sure").modal('show');
 });
 
@@ -38,7 +38,7 @@ $('#ind-btn-enable-all-sensors').click(function() {
     document.getElementById("modal-are-you-sure-text").innerText = "Включить все отключенные датчики?";
     document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
     document.getElementById("modal-are-you-sure-btn-cancel").innerText = "Отмена";
-    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick","enable_all_sensors()");
+    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "enable_all_sensors()");
     $("#modal-are-you-sure").modal('show');
 });
 
@@ -46,7 +46,7 @@ $('#btn-enable-all-auto-lvl-mode').click(function() {
     document.getElementById("modal-are-you-sure-text").innerText = "Включить автоопределение уровня на всех силосах?";
     document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
     document.getElementById("modal-are-you-sure-btn-cancel").innerText = "Отмена";
-    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick","enable_all_auto_lvl_mode()");
+    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "enable_all_auto_lvl_mode()");
     $("#modal-are-you-sure").modal('show');
 });
 
@@ -164,7 +164,7 @@ function onSiloClicked(silo_id) {
     } else if (lastParamSelectButtonID === "btn-speeds") {
         redrawTableTemperatureSpeeds(silo_id); //  таблица скоростей
     }
-    
+
     redrawProductParametersTable(silo_id); //  Параметры продукта
 
     lastSiloID = silo_id;
@@ -336,11 +336,11 @@ function change_grain_level_from_slider(silo_id) {
     return;
 }
 
-function selectedSensorDrawChart(silo_id, podv_num, sensor_num, period){
-    document.cookie = "chart_silo_id="      + silo_id + ";";
-    document.cookie = "chart_podv_num="     + podv_num + ";";
-    document.cookie = "chart_sensor_num="   + sensor_num + ";";
-    document.cookie = "chart_period="       + period + ";";
+function selectedSensorDrawChart(silo_id, podv_num, sensor_num, period) {
+    document.cookie = "chart_silo_id=" + silo_id + ";";
+    document.cookie = "chart_podv_num=" + podv_num + ";";
+    document.cookie = "chart_sensor_num=" + sensor_num + ";";
+    document.cookie = "chart_period=" + period + ";";
     document.location.href = "report.php";
     return;
 }

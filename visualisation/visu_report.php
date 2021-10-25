@@ -112,49 +112,6 @@ function createMeasurementCheckboxes($measurementArray){
     return $outStr;
 }
 
-function getSiloNameWithID0($dbh){
-
-    $sql = "SELECT silo_name
-            FROM prodtypesbysilo
-            WHERE silo_id=0";
-
-    $sth = $dbh->query($sql);
-
-    if($sth==false){
-        return false;
-    }
-
-    $rows = $sth->fetchAll();
-    
-    return $rows[0]['silo_name'];
-}
-
-if( isset( $_POST['get_silo_name_with_id_0']) ) {
-    echo getSiloNameWithID0($dbh);
-}
-
-function getSiloNameWithMaxPodvNumber($dbh){
-
-    $sql = "SELECT s.silo_id, pbs.silo_name, count(distinct (s.podv_id))
-            FROM sensors AS s INNER JOIN prodtypesbysilo AS pbs ON s.silo_id = pbs.silo_id 
-            GROUP BY s.silo_id
-            ORDER BY count(distinct (s.podv_id)) DESC";
-
-    $sth = $dbh->query($sql);
-
-    if($sth==false){
-        return false;
-    }
-
-    $rows = $sth->fetchAll();
-    
-    return $rows[0]['silo_name'];
-}
-
-if( isset( $_POST['get_silo_number_with_max_podv_number']) ) {
-    echo getSiloNameWithMaxPodvNumber($dbh);
-}
-
 //  Средние температуры в слоях
 function getAvgTemperaturesByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $arrayOfDates){
 
@@ -329,7 +286,6 @@ function getSensorTemperaturesByPodv($dbh, $arrayOfSilos, $arrayOfPodv, $arrayOf
     return;
 }
 
-
 /*
     // HMLT5 Parser
     require_once '../dompdf/lib/html5lib/Parser.php';
@@ -443,7 +399,6 @@ function getSensorTemperaturesByPodv($dbh, $arrayOfSilos, $arrayOfPodv, $arrayOf
     }
 */
 
-
 function getTimeTemperatureTable($dbh,$silo_name, $podv_id, $sens_num, $dateStart, $dateEnd){
     
     $sql = "SELECT d.date, m.temperature
@@ -477,10 +432,5 @@ if( isset($_POST['silo_id']) && isset($_POST['podv_id']) && isset($_POST['sensor
 
     echo json_encode( getTimeTemperatureTable( $dbh, $_POST['silo_id'], $_POST['podv_id'], $_POST['sensor_num'], $dateStart->format('Y-m-d H:i:s'), $dateEnd->format('Y-m-d H:i:s') ) );
 }
-
-/*    if( isset($_POST['get_silo_podv_arr']) ) {
-        echo json_encode( getSiloPodvSensAssocArray());
-    }   
-*/
 
 ?>

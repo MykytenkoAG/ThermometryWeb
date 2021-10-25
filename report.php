@@ -1,7 +1,9 @@
 <?php require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/auth.php'); ?>
 <!doctype html>
+
 <html lang="en">
   <head>
+    
     <?php
       $webSiteTitle="Отчет";
       require_once "blocks/head.php";
@@ -161,10 +163,13 @@
                 </div>
                 <canvas id="myChart"></canvas>
 
-          <script type="text/javascript" src="node_modules/chart.js/dist/chart.js"></script>
-          <script src="node_modules/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.js"></script>
+                <script type="text/javascript" src="node_modules/chart.js/dist/chart.js"></script>
+                <script src="node_modules/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.js"></script>
+                <script type="text/javascript" src="visualisation/visu_report.js"></script>
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
+                <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>-->
+                <script type="text/javascript" src="node_modules/jspdf/dist/jspdf.umd.min.js"></script>
 
-          <script type="text/javascript" src="visualisation/visu_report.js"></script>
               </div>
             </div>
           </div>
@@ -232,6 +237,27 @@
                     Добавить
                   </button>
 
+                    <button type="submit" class="btn btn-primary" onclick="Convert();" style="width: 120px; height: 38px;">
+                      <table>
+                        <tr>
+                          <td>
+                            <svg width="16" height="16" fill="currentColor" class="bi d-block mx-auto mt-1" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M0 0h1v15h15v1H0V0zm10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.9l-3.613 4.417a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61L13.445 4H10.5a.5.5 0 0 1-.5-.5z"/>
+                            </svg>
+                          </td>
+                          <td>
+                            <svg width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                              <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                              <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                            </svg>
+                          </td>
+                          <td>
+                            PDF
+                          </td>
+                        </tr>
+                      </table>
+                    </button>
+
                 </div>
               </div>
             </div>
@@ -241,4 +267,5 @@
       </main>
       
   </body>
+
 </html>
