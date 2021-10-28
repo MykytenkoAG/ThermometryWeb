@@ -643,7 +643,8 @@ function createXLSX(pdfProbObj){
 
                     let cellContent;
                     if(k==0){
-                        cellContent = pdfProbObj.content[i].table.body[0][j].table.body[k][0];
+                        cellContent = pdfProbObj.content[i].table.body[0][j].table.body[k][0]['text'].split("\n");
+                        console.log(cellContent)
                     } else {
                         cellContent = pdfProbObj.content[i].table.body[0][j].table.body[k];
                     }
@@ -669,7 +670,6 @@ function createXLSX(pdfProbObj){
     return;
 }
 
-
 function saveXLSX(wb){
 
     var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
@@ -681,12 +681,6 @@ function saveXLSX(wb){
     }
 
     saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'test.xlsx');
-
-    return;
-}
-
-
-function rprtprfbtnDownloadCSV() {
 
     return;
 }
