@@ -10,8 +10,9 @@
       require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/visualisation/visu_report.php');
     ?>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.2/pdfmake.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.2/vfs_fonts.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.2/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.2/vfs_fonts.min.js"></script>
+    <script src="node_modules/xlsx/dist/xlsx.full.min.js"></script>
 
   </head>
   <body>
@@ -120,7 +121,7 @@
                           <div class="row">
 
                             <div class="col p-1">
-                              <button type="submit" class="btn btn-primary mt-3 w-100" id="rprtprf-btn-download-PDF" onclick="rprtprfbtnDownloadPDF();">
+                              <button type="submit" class="btn btn-primary mt-3 w-100" id="rprtprf-btn-download-PDF" onclick="getJSONForPrintedForms('PDF');">
                                 <svg width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
                                   <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
                                   <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
@@ -130,7 +131,7 @@
                             </div>
 
                             <div class="col p-1">
-                              <button type="submit" class="btn btn-primary mt-3 w-100" id="rprtprf-btn-download-XLS" onclick="rprtprfbtnDownloadXLS();">
+                              <button type="submit" class="btn btn-primary mt-3 w-100" id="rprtprf-btn-download-XLS" onclick="getJSONForPrintedForms('XLSX');">
                                 <svg width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
                                   <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
                                   <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
@@ -140,7 +141,7 @@
                             </div>
 
                             <div class="col p-1">
-                              <button type="submit" class="btn btn-primary mt-3 w-100" id="rprtprf-btn-download-CSV" onclick="rprtprfbtnDownloadCSV();">
+                              <button type="submit" class="btn btn-primary mt-3 w-100" id="rprtprf-btn-download-CSV" onclick="getJSONForPrintedForms('CSV');">
                                 <svg width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
                                   <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
                                   <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>

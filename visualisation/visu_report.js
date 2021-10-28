@@ -538,7 +538,7 @@ function createPDFPropObj_SensorTemperaturesByPodv(JSONObj,headerText){
     return pdfProp;
 }
 
-function rprtprfbtnDownloadPDF() {
+function getJSONForPrintedForms(fileFormat){
 
     const arrayOfDates = rprtprf_getArrayOfDates();
 
@@ -551,12 +551,17 @@ function rprtprfbtnDownloadPDF() {
             url: 'visualisation/visu_report.php',
             type: 'POST',
             cache: false,
-            data: { 'prfrb_avg_t_by_layer_arrayOfSilos': arrayOfSilo, 'prfrb_avg_t_by_layer_arrayOfLayers': arrayOfLayers, 'prfrb_avg_t_by_layer_arrayOfDates': arrayOfDates },
+            data: { 'prfrb_avg_t_by_layer_arrayOfSilos': arrayOfSilo,
+                    'prfrb_avg_t_by_layer_arrayOfLayers': arrayOfLayers,
+                    'prfrb_avg_t_by_layer_arrayOfDates': arrayOfDates },
             dataType: 'html',
             success: function(fromPHP) {
-
-                createPdf( createPDFPropObj_AvgTemperaturesByLayer   (fromPHP, 'Данные о средних температурах по слоям') ).open();
-
+                const pdfProbObj = createPDFPropObj_AvgTemperaturesByLayer   (fromPHP, 'Данные о средних температурах по слоям');
+                if(fileFormat==="PDF"){
+                    createPdf( pdfProbObj ).open();
+                } else if (fileFormat==="XLSX"){
+                    createXLSX(pdfProbObj);
+                }
             }
         });
 
@@ -569,12 +574,17 @@ function rprtprfbtnDownloadPDF() {
             url: 'visualisation/visu_report.php',
             type: 'POST',
             cache: false,
-            data: { 'prfrb_t_by_layer_arrayOfSilos': arrayOfSilo, 'prfrb_t_by_layer_arrayOfLayers': arrayOfLayers, 'prfrb_t_by_layer_arrayOfDates': arrayOfDates },
+            data: { 'prfrb_t_by_layer_arrayOfSilos': arrayOfSilo,
+                    'prfrb_t_by_layer_arrayOfLayers': arrayOfLayers,
+                    'prfrb_t_by_layer_arrayOfDates': arrayOfDates },
             dataType: 'html',
             success: function(fromPHP) {
-
-                createPdf( createPDFPropObj_SensorTemperaturesByLayer(fromPHP, 'Данные о температурах каждого датчика в слоях') ).open();
-
+                const pdfProbObj = createPDFPropObj_SensorTemperaturesByLayer(fromPHP, 'Данные о температурах каждого датчика в слоях');
+                if(fileFormat==="PDF"){
+                    createPdf( pdfProbObj ).open();
+                } else if (fileFormat==="XLSX"){
+                    createXLSX(pdfProbObj);
+                }
             }
         });
 
@@ -594,9 +604,12 @@ function rprtprfbtnDownloadPDF() {
                     'prfrb_t_by_sensor_arrayOfDates': arrayOfDates },
             dataType: 'html',
             success: function(fromPHP) {
-
-                createPdf( createPDFPropObj_SensorTemperaturesByPodv(fromPHP, 'Данные о температурах каждого датчика в подвеске') ).open();
-
+                const pdfProbObj = createPDFPropObj_SensorTemperaturesByPodv(fromPHP, 'Данные о температурах каждого датчика в подвеске');
+                if(fileFormat==="PDF"){
+                    createPdf( pdfProbObj ).open();
+                } else if (fileFormat==="XLSX"){
+                    createXLSX(pdfProbObj);
+                }
             }
         });
 
@@ -605,10 +618,73 @@ function rprtprfbtnDownloadPDF() {
     return;
 }
 
-function rprtprfbtnDownloadXLS() {
+function createXLSX(pdfProbObj){
+    var wb = XLSX.utils.book_new();
+    wb.Props = {
+            Title: "SheetJS Tutorial",
+            Subject: "Test",
+            Author: "NE",
+            CreatedDate: new Date(2017,12,19)
+    };
+
+    wb.SheetNames.push("New");
+
+
+    let currentCol = 0; let currentRow = 1;
+    /* Initial row */
+    var ws = XLSX.utils.json_to_sheet([ { A: pdfProbObj.content[0].text } ], {header: ["A"], skipHeader: true});
+
+    for(let i=0; i<pdfProbObj.content.length; i++ ){
+        
+        if(pdfProbObj.content[i].table){
+            for(let j=0; j<pdfProbObj.content[i].table.body[0].length; j++){
+
+                for(let k=0; k<pdfProbObj.content[i].table.body[0][j].table.body.length; k++){
+
+                    let cellContent;
+                    if(k==0){
+                        cellContent = pdfProbObj.content[i].table.body[0][j].table.body[k][0];
+                    } else {
+                        cellContent = pdfProbObj.content[i].table.body[0][j].table.body[k];
+                    }
+
+                    XLSX.utils.sheet_add_json(ws, [
+                        cellContent
+                    ], {skipHeader: true, origin: {c:currentCol, r:currentRow} });
+
+                    currentRow++;
+
+                }
+
+                currentCol +=3; currentRow = 1;
+
+            }
+        }
+
+    }
+
+    wb.Sheets["New"] = ws;
+
+    saveXLSX(wb);
+    return;
+}
+
+
+function saveXLSX(wb){
+
+    var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+    function s2ab(s) {
+            var buf = new ArrayBuffer(s.length);
+            var view = new Uint8Array(buf);
+            for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+            return buf;
+    }
+
+    saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'test.xlsx');
 
     return;
 }
+
 
 function rprtprfbtnDownloadCSV() {
 
