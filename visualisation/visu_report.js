@@ -409,20 +409,20 @@ function rprtprf_getArrayOfLayers(){
     return arrayOfLayers;
 }
 
-function createTableForPDFMake(JSONObj){
+function createTableForPDFMake(JSONObj, field, tableHeader, col1Header, col2Header){
 
     let outArr=[];
-    outArr[0]=[{text: "Силос " + JSONObj['silo']+"\n"+ "Дата: " + JSONObj['date'].split(" ")[0] + "\n" + JSONObj['date'].split(" ")[1] , style: 'tableHeader', colSpan: 2, alignment: 'center'},{}];
-    outArr.push( ["Слой №", "Средняя\nтемпература"] );
+    outArr[0]=[{text:  tableHeader, style: 'tableHeader', colSpan: 2, alignment: 'center'},{}];
+    outArr.push( [col1Header, col2Header] );
 
-    for(let i=0; i<JSONObj['layerTemperatures'].length; i++){
-        outArr.push( [i+1, JSONObj['layerTemperatures'][i][i+1]] );
+    for(let i=0; i<JSONObj[field].length; i++){
+        outArr.push( [i+1, JSONObj[field][i][i+1]] );
     }
 
     return outArr;
 }
 
-function createPDFPropObj(headerText,JSONObj){
+function createBasicPDFPropStructure(){
 
     let pdfProp = {};
     pdfProp.pageSize = "a4";
@@ -436,8 +436,22 @@ function createPDFPropObj(headerText,JSONObj){
     pdfProp.styles.header.margin = [0,0,0,10];
     pdfProp.content = [];
 
+    return pdfProp;
+}
+
+function createPDFPropObj_AvgTemperaturesByLayer(JSONObj,headerText){
+
+    let pdfProp = createBasicPDFPropStructure();
+
     let j=-1;
     for(let i=0; i<JSON.parse(JSONObj).length; i++){
+
+        const currJSONObj = JSON.parse(JSONObj)[i];
+        const field = 'layerTemperatures';
+        const tableHeader = "Силос " + currJSONObj['silo']+"\n"+ "Дата: " + currJSONObj['date'].split(" ")[0] + "\n" + currJSONObj['date'].split(" ")[1];
+        const col1Header = "Слой №";
+        const col2Header = "Средняя\nтемпература";
+
         if(i==0 || (i%6==0)){
             j++;
             pdfProp.content.push( {text: headerText, style: 'header', alignment: 'center'} );
@@ -445,11 +459,77 @@ function createPDFPropObj(headerText,JSONObj){
             pdfProp.content.push( {pageBreak: 'after', layout: 'noBorders', table: {} } );
             pdfProp.content[j].table = {body:[[  ]]};
 
-            pdfProp.content[j].table.body[0] = [{table:{body:createTableForPDFMake(JSON.parse(JSONObj)[i])}}];
+            pdfProp.content[j].table.body[0] = [ { table:{ body: createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } ];
 
             continue;
         }
-        pdfProp.content[j].table.body[0].push( {table:{body:createTableForPDFMake(JSON.parse(JSONObj)[i])}} );
+        pdfProp.content[j].table.body[0].push(   { table:{ body: createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } );
+        if(i==JSON.parse(JSONObj).length-1){
+            pdfProp.content[j].pageBreak = "";
+        }
+    }
+
+    return pdfProp;
+}
+
+function createPDFPropObj_SensorTemperaturesByLayer(JSONObj,headerText){
+
+    let pdfProp = createBasicPDFPropStructure();
+
+    let j=-1;
+    for(let i=0; i<JSON.parse(JSONObj).length; i++){
+
+        const currJSONObj = JSON.parse(JSONObj)[i];
+        const field = 'sensorTemperatures';
+        const tableHeader = "Силос " + currJSONObj['silo']+"\n"+ "Дата: " + currJSONObj['date'].split(" ")[0] + "\n" + currJSONObj['date'].split(" ")[1] + "\n" + "Слой " + currJSONObj['layer'];
+        const col1Header = "Подв. №";
+        const col2Header = "Температура";
+
+        if(i==0 || (i%6==0)){
+            j++;
+            pdfProp.content.push( {text: headerText, style: 'header', alignment: 'center'} );
+            j++;
+            pdfProp.content.push( {pageBreak: 'after', layout: 'noBorders', table: {} } );
+            pdfProp.content[j].table = {body:[[  ]]};
+
+            pdfProp.content[j].table.body[0] = [ { table:{ body: createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } ];
+
+            continue;
+        }
+        pdfProp.content[j].table.body[0].push(   { table:{ body: createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } );
+        if(i==JSON.parse(JSONObj).length-1){
+            pdfProp.content[j].pageBreak = "";
+        }
+    }
+
+    return pdfProp;
+}
+
+function createPDFPropObj_SensorTemperaturesByPodv(JSONObj,headerText){
+
+    let pdfProp = createBasicPDFPropStructure();
+
+    let j=-1;
+    for(let i=0; i<JSON.parse(JSONObj).length; i++){
+
+        const currJSONObj = JSON.parse(JSONObj)[i];
+        const field = 'sensorTemperatures';
+        const tableHeader = "Силос " + currJSONObj['silo']+"\n"+ "Дата: " + currJSONObj['date'].split(" ")[0] + "\n" + currJSONObj['date'].split(" ")[1] + "\n" + "Подвеска " + currJSONObj['podv'];
+        const col1Header = "Дат. №";
+        const col2Header = "Температура";
+
+        if(i==0 || (i%6==0)){
+            j++;
+            pdfProp.content.push( {text: headerText, style: 'header', alignment: 'center'} );
+            j++;
+            pdfProp.content.push( {pageBreak: 'after', layout: 'noBorders', table: {} } );
+            pdfProp.content[j].table = {body:[[  ]]};
+
+            pdfProp.content[j].table.body[0] = [ { table:{ body: createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } ];
+
+            continue;
+        }
+        pdfProp.content[j].table.body[0].push(   { table:{ body: createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } );
         if(i==JSON.parse(JSONObj).length-1){
             pdfProp.content[j].pageBreak = "";
         }
@@ -475,7 +555,7 @@ function rprtprfbtnDownloadPDF() {
             dataType: 'html',
             success: function(fromPHP) {
 
-                createPdf( createPDFPropObj('Данные о средних температурах по слоям',fromPHP) ).open();
+                createPdf( createPDFPropObj_AvgTemperaturesByLayer   (fromPHP, 'Данные о средних температурах по слоям') ).open();
 
             }
         });
@@ -492,13 +572,11 @@ function rprtprfbtnDownloadPDF() {
             data: { 'prfrb_t_by_layer_arrayOfSilos': arrayOfSilo, 'prfrb_t_by_layer_arrayOfLayers': arrayOfLayers, 'prfrb_t_by_layer_arrayOfDates': arrayOfDates },
             dataType: 'html',
             success: function(fromPHP) {
-                console.log(fromPHP);
+
+                createPdf( createPDFPropObj_SensorTemperaturesByLayer(fromPHP, 'Данные о температурах каждого датчика в слоях') ).open();
+
             }
         });
-
-        /*console.log(arrayOfSilo);
-        console.log(arrayOfLayers);
-        console.log(arrayOfDates);*/
 
     } else if (document.getElementById("prfrb_t-by-sensor").checked) {
 
@@ -516,14 +594,11 @@ function rprtprfbtnDownloadPDF() {
                     'prfrb_t_by_sensor_arrayOfDates': arrayOfDates },
             dataType: 'html',
             success: function(fromPHP) {
-                console.log(fromPHP);
+
+                createPdf( createPDFPropObj_SensorTemperaturesByPodv(fromPHP, 'Данные о температурах каждого датчика в подвеске') ).open();
+
             }
         });
-
-        /*console.log(arrayOfSilo);
-        console.log(arrayOfPodvs);
-        console.log(arrayOfSensors);
-        console.log(arrayOfDates);*/
 
     }
 

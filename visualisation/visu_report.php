@@ -112,7 +112,7 @@ function createMeasurementCheckboxes($measurementArray){
     return $outStr;
 }
 
-//  Средние температуры в слояхprfrb_avg_t_by_layer_arrayOfSilos
+//  Средние температуры в слоях
 function getAvgTemperaturesByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $arrayOfDates){
 
     $outObj=[];
@@ -145,6 +145,10 @@ function getAvgTemperaturesByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $arrayOf
             }
 
             $layersArr = $sth->fetchAll();
+
+            if(count($layersArr)==0){
+                continue;
+            }
             
             $layersObj=[];
             foreach($layersArr as $layer){
@@ -185,17 +189,11 @@ function getSensorTemperaturesByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $arra
 
                 $sth = $dbh->query($sql);
 
-                //return $sql;
-
-                if($sth==false){
-                    return false;
-                }
+                if($sth==false){ return false; }
 
                 $podvArr = $sth->fetchAll();
 
-                if(count($podvArr)==0){
-                    continue;
-                }
+                if(count($podvArr)==0){ continue; }
 
                 $podvObj=[];
                 foreach($podvArr as $podv){
@@ -246,15 +244,11 @@ function getSensorTemperaturesByPodv($dbh, $arrayOfSilos, $arrayOfPodv, $arrayOf
                         
                 $sth = $dbh->query($sql);
                 
-                if($sth==false){
-                    return false;
-                }
+                if($sth==false){ return false; }
 
                 $sensorArr = $sth->fetchAll();
 
-                if(count($sensorArr)==0){
-                    continue;
-                }
+                if(count($sensorArr)==0){ continue; }
 
                 $sensorsObj=[];
                 foreach($sensorArr as $sensor){
