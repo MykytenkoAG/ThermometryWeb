@@ -15,7 +15,9 @@ document.addEventListener("DOMContentLoaded", () => {
     isSoundOn();
     if (current_page === "index.php") {
         init_index();
-    } else if (current_page === "report.php" || current_page === "debug_page.php") {
+    } else if (current_page === "report.php"){
+        getConf_ProjectConfArr();
+    } else if (current_page === "debug_page.php") {
         getConf_ProjectConfArr();
     } else if (current_page === "silo_config.php") {
         init_silo_config();

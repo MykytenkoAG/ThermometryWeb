@@ -54,7 +54,7 @@ function createMeasurementCheckboxes($measurementArray){
                     <tr>
                         <tr>
                             <div class=\"form-check mt-0 mb-0\" style=\"margin-left: 3px; text-align: left\">
-                                <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchballdates\" onchange=\"prfChbAllDates()\">
+                                <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchballdates\" onchange=\"prfChbAllDates();rprtprf_checkDatesAndBlockDownloadButtons();\">
                                 <label class=\"form-check-label\">
                                     Все даты
                                 </label>
@@ -81,7 +81,7 @@ function createMeasurementCheckboxes($measurementArray){
             $outStr.= "<tr>
                             <td>
                                 <div class=\"form-check mt-0 mb-1 collapse multi-collapse prfchbmc_$date\" style=\"margin-left: 3px; text-align: left\">
-                                    <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchball_$date\" onchange=\"prfChbCurrDate('prfchball_$date')\">
+                                    <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchball_$date\" onchange=\"prfChbCurrDate('prfchball_$date');rprtprf_checkDatesAndBlockDownloadButtons();\">
                                     <label class=\"form-check-label\">
                                         Все
                                     </label>
@@ -96,7 +96,7 @@ function createMeasurementCheckboxes($measurementArray){
                         <tr>
                             <td>
                                 <div class=\"form-check mt-0 mb-1 collapse multi-collapse prfchbmc_$date\" style=\"margin-left: 3px; text-align: left\">
-                                    <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchb_".$date."_".$measTime."\">
+                                    <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchb_".$date."_".$measTime."\"  onchange=\"rprtprf_checkDatesAndBlockDownloadButtons();\">
                                     <label class=\"form-check-label\">
                                         $measTime
                                     </label>
@@ -112,28 +112,31 @@ function createMeasurementCheckboxes($measurementArray){
     return $outStr;
 }
 
-//  Средние температуры в слоях
+//  Средние температуры в слояхprfrb_avg_t_by_layer_arrayOfSilos
 function getAvgTemperaturesByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $arrayOfDates){
 
-    $sql = "";  $outStr="";
-    $outStr .= "<style>table, td, th {border: 1px solid black; border-collapse: collapse;}</style>";
-    $strArrayOfLayers="(".implode(",",$arrayOfLayers).")";
+    $outObj=[];
 
-    foreach($arrayOfSilos as $silo){
-        foreach($arrayOfDates as $date){
+    for($i=0; $i<count($arrayOfLayers);$i++){
+        $arrayOfLayers[$i]-=1;                                      //  Приведение номера датчика к id датчика в силосе
+    }
+    $strArrayOfLayers="(".implode(",",$arrayOfLayers).")";          //  Преобразование массива в строку для корректного формирования sql-запроса
 
-            $strDate = "STR_TO_DATE('$date', '%d.%m.%Y %H:%i:%s')";
+    foreach($arrayOfSilos as $currSiloName){
+        foreach($arrayOfDates as $currDate){
 
-            $sql = "SELECT d.date, p.silo_name, s.sensor_num, ROUND(AVG(temperature),2)
-                    FROM measurements m
-                    INNER JOIN dates d ON m.date_id = d.date_id
-                    INNER JOIN sensors s ON m.sensor_id = s.sensor_id 
-                    INNER JOIN prodtypesbysilo p ON s.silo_id = p.silo_id 
-                    GROUP BY sensor_num, s.silo_id, date
-                    HAVING  d.date = $strDate AND
-                            silo_id = $silo AND
+            $strDate = "STR_TO_DATE('$currDate', '%Y-%m-%d %H:%i:%s')";
+    
+            $sql = "SELECT d.date, pbs.silo_name, s.sensor_num, ROUND(AVG(temperature),2)
+                        FROM measurements m
+                        INNER JOIN dates d ON m.date_id = d.date_id
+                        INNER JOIN sensors s ON m.sensor_id = s.sensor_id 
+                        INNER JOIN prodtypesbysilo pbs ON s.silo_id = pbs.silo_id 
+                        GROUP BY sensor_num, s.silo_id, date
+                        HAVING  d.date = $strDate AND
+                            pbs.silo_name = $currSiloName AND
                             s.sensor_num IN $strArrayOfLayers
-                    ORDER BY d.date, p.silo_name, s.sensor_num;";
+                    ORDER BY d.date, pbs.silo_name, s.sensor_num;";
 
             $sth = $dbh->query($sql);
 
@@ -142,54 +145,47 @@ function getAvgTemperaturesByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $arrayOf
             }
 
             $layersArr = $sth->fetchAll();
-
-            $outStr .= "<div style=\"float: left;\">";
             
-            $outStr .= "<table><tr><td colspan=\"2\">Силос ".$layersArr[0]['silo_name']."<br>"
-                        ."Дата ".$date."</td></tr> <tr><td>Слой</td><td>Средняя<br>температура</td></tr>";
-
+            $layersObj=[];
             foreach($layersArr as $layer){
-
-                $outStr .= "<tr>";
-                $outStr .= "<td align=center>";
-                $outStr .= $layer['sensor_num']+1;
-                $outStr .= "</td>";
-                $outStr .= "<td align=center>";
-                $outStr .= $layer['ROUND(AVG(temperature),2)'];
-                $outStr .= "</td>";
-                $outStr .= "</tr>";
-
+                $layersObj[]=array($layer['sensor_num']+1=>$layer['ROUND(AVG(temperature),2)']);
             }
-
-            $outStr .= "</table></div>";
-
+            $outObj[]=array('date'=>$layersArr[0]['date'], 'silo'=>$layersArr[0]['silo_name'], 'layerTemperatures'=>$layersObj);
         }
     }
+    return $outObj;
+}
 
-    return $outStr;
+if( isset($_POST['prfrb_avg_t_by_layer_arrayOfSilos']) && isset($_POST['prfrb_avg_t_by_layer_arrayOfLayers']) && isset($_POST['prfrb_avg_t_by_layer_arrayOfDates']) ) {
+    echo json_encode (getAvgTemperaturesByLayer($dbh, $_POST['prfrb_avg_t_by_layer_arrayOfSilos'], $_POST['prfrb_avg_t_by_layer_arrayOfLayers'], $_POST['prfrb_avg_t_by_layer_arrayOfDates']));
 }
 
 //  Температуры каждого датчика в слоях
 function getSensorTemperaturesByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $arrayOfDates){
 
-    $sql = "";  $outStr="";
-    $outStr .= "<style>table, td, th {border: 1px solid black; border-collapse: collapse;}</style>";
+    $outObj=[];
 
-    foreach($arrayOfDates as $date){
-        foreach($arrayOfSilos as $silo){
-            foreach($arrayOfLayers as $layer){
+    for($i=0; $i<count($arrayOfLayers);$i++){
+        $arrayOfLayers[$i]-=1;                                      //  Приведение номера датчика к id датчика в силосе
+    }
+
+    foreach($arrayOfDates as $currDate){
+        foreach($arrayOfSilos as $currSiloName){
+            foreach($arrayOfLayers as $currLayer){
         
-                $strDate = "STR_TO_DATE('$date', '%d.%m.%Y %H:%i:%s')";
+                $strDate = "STR_TO_DATE('$currDate', '%Y-%m-%d %H:%i:%s')";
 
-                $sql = "SELECT d.date, p.silo_name, s.sensor_num, s.podv_id, temperature
-                        FROM measurements m
-                        INNER JOIN dates d ON m.date_id = d.date_id
-                        INNER JOIN sensors s ON m.sensor_id = s.sensor_id 
-                        INNER JOIN prodtypesbysilo p ON s.silo_id = p.silo_id 
-                        WHERE d.date = $strDate AND s.silo_id = $silo AND s.sensor_num = $layer
-                        ORDER BY d.date, p.silo_name, s.sensor_num, podv_id;";
+                $sql = "SELECT d.date, pbs.silo_name, s.sensor_num, s.podv_id, temperature
+                                FROM measurements m
+                                INNER JOIN dates d ON m.date_id = d.date_id
+                                INNER JOIN sensors s ON m.sensor_id = s.sensor_id 
+                                INNER JOIN prodtypesbysilo pbs ON s.silo_id = pbs.silo_id 
+                                WHERE d.date = $strDate AND pbs.silo_name = $currSiloName AND s.sensor_num = $currLayer
+                                ORDER BY d.date, pbs.silo_name, s.sensor_num, podv_id;";
 
                 $sth = $dbh->query($sql);
+
+                //return $sql;
 
                 if($sth==false){
                     return false;
@@ -197,56 +193,56 @@ function getSensorTemperaturesByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $arra
 
                 $podvArr = $sth->fetchAll();
 
-                $outStr .= "<div style=\"float: left;\">";
-                
-                $outStr .= "<table><tr><td colspan=\"2\">Силос ".$podvArr[0]['silo_name']."<br>"
-                            ."Дата ".$date."<br>Слой ".($layer+1)."</td></tr> <tr><td>Подв.</td><td>Температура</td></tr>";
-
-                foreach($podvArr as $podv){
-
-                    $outStr .= "<tr>";
-                    $outStr .= "<td align=center>";
-                    $outStr .= $podv['podv_id']+1;
-                    $outStr .= "</td>";
-                    $outStr .= "<td align=center>";
-                    $outStr .= $podv['temperature'];
-                    $outStr .= "</td>";
-                    $outStr .= "</tr>";
-
+                if(count($podvArr)==0){
+                    continue;
                 }
 
-                $outStr .= "</table></div>";
+                $podvObj=[];
+                foreach($podvArr as $podv){
+                    $podvObj[]=array($podv['podv_id']+1=>$podv['temperature']);
+                }
+                $outObj[]=array('date'=>$podvArr[0]['date'], 'silo'=>$podvArr[0]['silo_name'], 'layer'=>$podvArr[0]['sensor_num']+1, 'sensorTemperatures'=>$podvObj);
 
             }
         }
     }
 
-    return $outStr;
+    return $outObj;
+}
+
+if( isset($_POST['prfrb_t_by_layer_arrayOfSilos']) && isset($_POST['prfrb_t_by_layer_arrayOfLayers']) && isset($_POST['prfrb_t_by_layer_arrayOfDates']) ) {
+    echo json_encode( getSensorTemperaturesByLayer($dbh, $_POST['prfrb_t_by_layer_arrayOfSilos'], $_POST['prfrb_t_by_layer_arrayOfLayers'], $_POST['prfrb_t_by_layer_arrayOfDates']) );
 }
 
 //  Температуры каждого датчика в подвеске
 function getSensorTemperaturesByPodv($dbh, $arrayOfSilos, $arrayOfPodv, $arrayOfSensors, $arrayOfDates){
 
-    $sql = "";  $outStr="";
-    $outStr .= "<style>table, td, th {border: 1px solid black; border-collapse: collapse;}</style>";
-    $strArrayOfSensors="(".implode(",",$arrayOfSensors).")";
-    
-    foreach($arrayOfDates as $date){
-        foreach($arrayOfSilos as $silo){
-            foreach($arrayOfPodv as $podv){
-        
-                $strDate = "STR_TO_DATE('$date', '%d.%m.%Y %H:%i:%s')";
+    $outObj=[];
 
-                $sql = "SELECT d.date, p.silo_name, s.podv_id, s.sensor_num, temperature
-                        FROM measurements m
-                        INNER JOIN dates d ON m.date_id = d.date_id
-                        INNER JOIN sensors s ON m.sensor_id = s.sensor_id 
-                        INNER JOIN prodtypesbysilo p ON s.silo_id = p.silo_id 
-                        WHERE   d.date = $strDate AND
-                                s.silo_id = $silo AND
-                                s.podv_id = $podv AND
-                                s.sensor_num IN $strArrayOfSensors
-                        ORDER BY d.date, p.silo_name, podv_id, s.sensor_num;";
+    for($i=0; $i<count($arrayOfPodv);$i++){
+        $arrayOfPodv[$i]-=1;                                         //  Приведение номера подвески к id подвески в силосе
+    }
+    for($i=0; $i<count($arrayOfSensors);$i++){
+        $arrayOfSensors[$i]-=1;                                      //  Приведение номера датчика к id датчика в силосе
+    }
+    $strArrayOfSensors="(".implode(",",$arrayOfSensors).")";
+
+    foreach($arrayOfDates as $currDate){
+        foreach($arrayOfSilos as $currSiloName){
+            foreach($arrayOfPodv as $currPodv){
+        
+                $strDate = "STR_TO_DATE('$currDate', '%Y-%m-%d %H:%i:%s')";
+
+                $sql = "SELECT d.date, pbs.silo_name, s.podv_id, s.sensor_num, temperature
+                            FROM measurements m
+                            INNER JOIN dates d ON m.date_id = d.date_id
+                            INNER JOIN sensors s ON m.sensor_id = s.sensor_id 
+                            INNER JOIN prodtypesbysilo pbs ON s.silo_id = pbs.silo_id 
+                            WHERE   d.date = $strDate AND
+                                    pbs.silo_name = $currSiloName AND
+                                    s.podv_id = $currPodv AND
+                                    s.sensor_num IN $strArrayOfSensors
+                            ORDER BY d.date, pbs.silo_name, podv_id, s.sensor_num;";
                         
                 $sth = $dbh->query($sql);
                 
@@ -254,150 +250,28 @@ function getSensorTemperaturesByPodv($dbh, $arrayOfSilos, $arrayOfPodv, $arrayOf
                     return false;
                 }
 
-                $podvArr = $sth->fetchAll();
+                $sensorArr = $sth->fetchAll();
 
-                $outStr .= "<div style=\"float: left; page-break-after: always;\">";
-                
-                $outStr .= "<table><tr><td colspan=\"2\">Силос ".$podvArr[0]['silo_name']."<br>"
-                            ."Дата ".$date."<br>Подвеска ".($podv+1)."</td></tr> <tr><td>Дат.</td><td>Температура</td></tr>";
-
-                foreach($podvArr as $podv){
-
-                    $outStr .= "<tr>";
-                    $outStr .= "<td align=center>";
-                    $outStr .= $podv['sensor_num']+1;
-                    $outStr .= "</td>";
-                    $outStr .= "<td align=center>";
-                    $outStr .= $podv['temperature'];
-                    $outStr .= "</td>";
-                    $outStr .= "</tr>";
-
+                if(count($sensorArr)==0){
+                    continue;
                 }
 
-                $outStr .= "</table></div>";
+                $sensorsObj=[];
+                foreach($sensorArr as $sensor){
+                    $sensorsObj[]=array($sensor['sensor_num']+1=>$sensor['temperature']);
+                }
+                $outObj[]=array('date'=>$sensorArr[0]['date'], 'silo'=>$sensorArr[0]['silo_name'], 'podv'=>$sensorArr[0]['podv_id']+1, 'sensorTemperatures'=>$sensorsObj);
 
             }
         }
     }
 
-    return $outStr;
-
-
-    return;
+    return $outObj;
 }
 
-/*
-    // HMLT5 Parser
-    require_once '../dompdf/lib/html5lib/Parser.php';
-
-    // Sabberworm
-    spl_autoload_register(function($class)
-    {
-        if (strpos($class, 'Sabberworm') !== false) {
-            $file = str_replace('\\', DIRECTORY_SEPARATOR, $class);
-            $file = realpath('../dompdf/lib/php-css-parser/lib/' . (empty($file) ? '' : DIRECTORY_SEPARATOR) . $file . '.php');
-            if (file_exists($file)) {
-                require_once $file;
-                return true;
-            }
-        }
-        return false;
-    });
-
-    // php-font-lib
-    require_once '../dompdf/lib/php-font-lib/src/FontLib/Autoloader.php';
-
-    //php-svg-lib
-    require_once '../dompdf/lib/php-svg-lib/src/autoload.php';
-
-
-    /*
-    * New PHP 5.3.0 namespaced autoloader
-    */
- /*   require_once '../dompdf/src/Autoloader.php';
-
-    Dompdf\Autoloader::register();
-
-    // reference the Dompdf namespace
-    use Dompdf\Dompdf;
-
-    // instantiate and use the dompdf class
-    $dompdf = new Dompdf();
-
-
-    require_once "../php/printedForms.php";
-
-    $arrayOfSilos = array(0,1);
-    $arrayOfLayers = array(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17);
-    $arrayOfDates = array('03.10.2021 09:49:43','03.10.2021 09:50:43');
-
-    $arrayOfPodv=array(0,1,2,3,4,5,6,7,8,9,10,11);
-    $arrayOfSensors=array(0,1,2,3,4,5,6,7);
-    
-    //echo getAvgTemperaturesByLayer($arrayOfSilos, $arrayOfLayers, $arrayOfDates);
-
-    //echo getSensorTemperaturesByLayer($arrayOfSilos, $arrayOfLayers, $arrayOfDates);
-
-    //echo getSensorTemperaturesByPodv($arrayOfSilos, $arrayOfPodv, $arrayOfSensors, $arrayOfDates);
-
-    $htmlText="<html><head><style>body { font-family: DejaVu Sans }</style></head><body>"
-    .getSensorTemperaturesByPodv($arrayOfSilos, $arrayOfPodv, $arrayOfSensors, $arrayOfDates)."</body></html>";
-
-    $dompdf->loadHtml($htmlText);
-
-    // (Optional) Setup the paper size and orientation
-    $dompdf->setPaper('A4', 'landscape');
-
-    // Render the HTML as PDF
-    $dompdf->render();
-
-    // Output the generated PDF to Browser
-    $dompdf->stream();           
-    
-*/
-
-/*
-    function getSiloPodvSensAssocArray($dbh){
-
-        $outArr=array();
-
-        $sql="SELECT max(silo_id) FROM prodtypesbysilo;";
-
-        $sth = $dbh->query($sql);
-
-        if($sth==false){
-            return false;
-        }
-
-        $maxSilo_id = $sth->fetch()['max(silo_id)'];
-
-        for($i=0; $i<=$maxSilo_id; $i++){
-
-            $sql="SELECT pbs.silo_name, s.podv_id, count(s.sensor_num)
-                    FROM zernoib.prodtypesbysilo AS pbs INNER JOIN zernoib.sensors AS s ON pbs.silo_id=s.silo_id
-                    GROUP BY s.silo_id, s.podv_id
-                    HAVING silo_id=$i;";
-
-            $sth = $dbh->query($sql);
-        
-            if($sth==false){
-                return false;
-            }
-
-            $rows = $sth->fetchAll();
-            $currSiloName=$rows[0]['silo_name'];
-            $currSiloArr=array();
-
-            foreach($rows as $row){
-                $currSiloArr[($row['podv_id']+1)]=$row['count(s.sensor_num)'];
-            }
-            
-            $outArr[$currSiloName]=$currSiloArr;
-        }
-
-        return $outArr;
-    }
-*/
+if( isset($_POST['prfrb_t_by_sensor_arrayOfSilos']) && isset($_POST['prfrb_t_by_sensor_arrayOfPodv']) && isset($_POST['prfrb_t_by_sensor_arrayOfSensors']) && isset($_POST['prfrb_t_by_sensor_arrayOfDates']) ) {
+    echo json_encode( getSensorTemperaturesByPodv($dbh, $_POST['prfrb_t_by_sensor_arrayOfSilos'], $_POST['prfrb_t_by_sensor_arrayOfPodv'], $_POST['prfrb_t_by_sensor_arrayOfSensors'], $_POST['prfrb_t_by_sensor_arrayOfDates']) );
+}
 
 function getTimeTemperatureTable($dbh,$silo_name, $podv_id, $sens_num, $dateStart, $dateEnd){
     

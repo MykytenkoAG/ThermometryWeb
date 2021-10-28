@@ -1,5 +1,8 @@
 function init_report() {
 
+
+    rprtprf_checkDatesAndBlockDownloadButtons();
+
     document.getElementById("hdr-href-report.php").setAttribute("class", "nav-link text-primary");
 
     setSelectOptions(document.getElementById("rprtprf_silo_1"), ["all"].concat(Object.keys(project_conf_array)));
@@ -295,11 +298,29 @@ function ConvertPxToMM(pixels) {
     return Math.floor(pixels * 0.264583);
 }
 
-function rprtprfbtnDownloadPDF() {
+//  Печатные формы
+function rprtprf_checkDatesAndBlockDownloadButtons(){
+
+    if(rprtprf_getArrayOfDates().length==0){
+        document.getElementById("rprtprf-btn-download-PDF").disabled = true;
+        document.getElementById("rprtprf-btn-download-XLS").disabled = true;
+        document.getElementById("rprtprf-btn-download-CSV").disabled = true;
+    } else {
+        document.getElementById("rprtprf-btn-download-PDF").disabled = false;
+        document.getElementById("rprtprf-btn-download-XLS").disabled = false;
+        document.getElementById("rprtprf-btn-download-CSV").disabled = false;
+    }
+
+    return;
+}
+
+//  Получение массива дат исходя из того, какие чекбоксы с определенными id нажаты
+function rprtprf_getArrayOfDates(){
+
+    let arrayOfDates = [];
 
     let dateCheckboxes = document.getElementsByTagName("input");
     const re = /\w+_(\d{4}-\d{2}-\d{2}_\d{2}:\d{2}:\d{2})/;
-    let arrayOfDates = [];
 
     for (let i = 0; i < dateCheckboxes.length; i++) {
         if (dateCheckboxes[i].id.match(re)) {
@@ -309,122 +330,200 @@ function rprtprfbtnDownloadPDF() {
         }
     }
 
+    return arrayOfDates;
+}
+
+function rprtprf_getArrayOfSilo(){
+
+    let arrayOfSilo = [];
+    let currSilo = document.getElementById("rprtprf_silo_1");
+
+    if (currSilo.value === "all") {
+        for (let i = 0; i < currSilo.options.length; i++) {
+            if (currSilo.options[i].value === "all") {
+                continue;
+            }
+            arrayOfSilo.push(currSilo.options[i].value);
+        }
+    } else {
+        arrayOfSilo.push(currSilo.value);
+    }
+
+    return arrayOfSilo;
+}
+
+function rprtprf_getArrayOfPodv(){
+
+    let arrayOfPodvs = [];
+    let currPodv = document.getElementById("rprtprf_podv_1");
+
+    if (currPodv.value === "all") {
+        for (let i = 0; i < currPodv.options.length; i++) {
+            if (currPodv.options[i].value === "all") {
+                continue;
+            }
+            arrayOfPodvs.push(currPodv.options[i].value);
+        }
+    } else {
+        arrayOfPodvs.push(currPodv.value);
+    }
+
+    return arrayOfPodvs;
+}
+
+function rprtprf_getArrayOfSensors(){
+
+    let arrayOfSensors = [];
+    let currSensor = document.getElementById("rprtprf_sensor_1");
+
+    if (currSensor.value === "all") {
+        for (let i = 0; i < currSensor.options.length; i++) {
+            if (currSensor.options[i].value === "all") {
+                continue;
+            }
+            arrayOfSensors.push(currSensor.options[i].value);
+        }
+    } else {
+        arrayOfSensors.push(currSensor.value);
+    }
+
+    return arrayOfSensors;
+}
+
+function rprtprf_getArrayOfLayers(){
+    
+    let arrayOfLayers = [];
+    let currLayer = document.getElementById("rprtprf_layer_1");
+
+    if (currLayer.value === "all") {
+        for (let i = 0; i < currLayer.options.length; i++) {
+            if (currLayer.options[i].value === "all") {
+                continue;
+            }
+            arrayOfLayers.push(currLayer.options[i].value);
+        }
+    } else {
+        arrayOfLayers.push(currLayer.value);
+    }
+
+    return arrayOfLayers;
+}
+
+function createTableForPDFMake(JSONObj){
+
+    let outArr=[];
+    outArr[0]=[{text: "Силос " + JSONObj['silo']+"\n"+ "Дата: " + JSONObj['date'].split(" ")[0] + "\n" + JSONObj['date'].split(" ")[1] , style: 'tableHeader', colSpan: 2, alignment: 'center'},{}];
+    outArr.push( ["Слой №", "Средняя\nтемпература"] );
+
+    for(let i=0; i<JSONObj['layerTemperatures'].length; i++){
+        outArr.push( [i+1, JSONObj['layerTemperatures'][i][i+1]] );
+    }
+
+    return outArr;
+}
+
+function createPDFPropObj(headerText,JSONObj){
+
+    let pdfProp = {};
+    pdfProp.pageSize = "a4";
+    pdfProp.pageOrientation = "landscape";
+    pdfProp.pageMargins = [20,30,20,20];
+    pdfProp.styles = {};
+    pdfProp.styles.header = {};
+    pdfProp.styles.header.fontSize = 18;
+    pdfProp.styles.header.bold = true;
+    pdfProp.styles.header.alignment = "center";
+    pdfProp.styles.header.margin = [0,0,0,10];
+    pdfProp.content = [];
+
+    let j=-1;
+    for(let i=0; i<JSON.parse(JSONObj).length; i++){
+        if(i==0 || (i%6==0)){
+            j++;
+            pdfProp.content.push( {text: headerText, style: 'header', alignment: 'center'} );
+            j++;
+            pdfProp.content.push( {pageBreak: 'after', layout: 'noBorders', table: {} } );
+            pdfProp.content[j].table = {body:[[  ]]};
+
+            pdfProp.content[j].table.body[0] = [{table:{body:createTableForPDFMake(JSON.parse(JSONObj)[i])}}];
+
+            continue;
+        }
+        pdfProp.content[j].table.body[0].push( {table:{body:createTableForPDFMake(JSON.parse(JSONObj)[i])}} );
+        if(i==JSON.parse(JSONObj).length-1){
+            pdfProp.content[j].pageBreak = "";
+        }
+    }
+
+    return pdfProp;
+}
+
+function rprtprfbtnDownloadPDF() {
+
+    const arrayOfDates = rprtprf_getArrayOfDates();
+
     if (document.getElementById("prfrb_avg-t-by-layer").checked) {
 
-        let arrayOfSilo = [];
-        let currSilo = document.getElementById("rprtprf_silo_1");
+        const arrayOfSilo = rprtprf_getArrayOfSilo();
+        const arrayOfLayers = rprtprf_getArrayOfLayers();
 
-        if (currSilo.value === "all") {
-            for (let i = 0; i < currSilo.options.length; i++) {
-                if (currSilo.options[i].value === "all") {
-                    continue;
-                }
-                arrayOfSilo.push(currSilo.options[i].value);
+        $.ajax({
+            url: 'visualisation/visu_report.php',
+            type: 'POST',
+            cache: false,
+            data: { 'prfrb_avg_t_by_layer_arrayOfSilos': arrayOfSilo, 'prfrb_avg_t_by_layer_arrayOfLayers': arrayOfLayers, 'prfrb_avg_t_by_layer_arrayOfDates': arrayOfDates },
+            dataType: 'html',
+            success: function(fromPHP) {
+
+                createPdf( createPDFPropObj('Данные о средних температурах по слоям',fromPHP) ).open();
+
             }
-        } else {
-            arrayOfSilo.push(currSilo.value);
-        }
-
-        let arrayOfLayers = [];
-        let currLayer = document.getElementById("rprtprf_layer_1");
-
-        if (currLayer.value === "all") {
-            for (let i = 0; i < currLayer.options.length; i++) {
-                if (currLayer.options[i].value === "all") {
-                    continue;
-                }
-                arrayOfLayers.push(currLayer.options[i].value);
-            }
-        } else {
-            arrayOfLayers.push(currLayer.value);
-        }
-
-        console.log(arrayOfSilo);
-        console.log(arrayOfLayers);
-        console.log(arrayOfDates);
+        });
 
     } else if (document.getElementById("prfrb_t-by-layer").checked) {
 
-        let arrayOfSilo = [];
-        let currSilo = document.getElementById("rprtprf_silo_1");
+        const arrayOfSilo = rprtprf_getArrayOfSilo();
+        const arrayOfLayers = rprtprf_getArrayOfLayers();
 
-        if (currSilo.value === "all") {
-            for (let i = 0; i < currSilo.options.length; i++) {
-                if (currSilo.options[i].value === "all") {
-                    continue;
-                }
-                arrayOfSilo.push(currSilo.options[i].value);
+        $.ajax({
+            url: 'visualisation/visu_report.php',
+            type: 'POST',
+            cache: false,
+            data: { 'prfrb_t_by_layer_arrayOfSilos': arrayOfSilo, 'prfrb_t_by_layer_arrayOfLayers': arrayOfLayers, 'prfrb_t_by_layer_arrayOfDates': arrayOfDates },
+            dataType: 'html',
+            success: function(fromPHP) {
+                console.log(fromPHP);
             }
-        } else {
-            arrayOfSilo.push(currSilo.value);
-        }
+        });
 
-        let arrayOfLayers = [];
-        let currLayer = document.getElementById("rprtprf_layer_1");
-
-        if (currLayer.value === "all") {
-            for (let i = 0; i < currLayer.options.length; i++) {
-                if (currLayer.options[i].value === "all") {
-                    continue;
-                }
-                arrayOfLayers.push(currLayer.options[i].value);
-            }
-        } else {
-            arrayOfLayers.push(currLayer.value);
-        }
-
-        console.log(arrayOfSilo);
+        /*console.log(arrayOfSilo);
         console.log(arrayOfLayers);
-        console.log(arrayOfDates);
+        console.log(arrayOfDates);*/
 
     } else if (document.getElementById("prfrb_t-by-sensor").checked) {
-        let arrayOfSilo = [];
-        let currSilo = document.getElementById("rprtprf_silo_1");
 
-        if (currSilo.value === "all") {
-            for (let i = 0; i < currSilo.options.length; i++) {
-                if (currSilo.options[i].value === "all") {
-                    continue;
-                }
-                arrayOfSilo.push(currSilo.options[i].value);
+        const arrayOfSilo = rprtprf_getArrayOfSilo();
+        const arrayOfPodvs = rprtprf_getArrayOfPodv();
+        const arrayOfSensors = rprtprf_getArrayOfSensors();
+
+        $.ajax({
+            url: 'visualisation/visu_report.php',
+            type: 'POST',
+            cache: false,
+            data: { 'prfrb_t_by_sensor_arrayOfSilos': arrayOfSilo,
+                    'prfrb_t_by_sensor_arrayOfPodv': arrayOfPodvs,
+                    'prfrb_t_by_sensor_arrayOfSensors': arrayOfSensors,
+                    'prfrb_t_by_sensor_arrayOfDates': arrayOfDates },
+            dataType: 'html',
+            success: function(fromPHP) {
+                console.log(fromPHP);
             }
-        } else {
-            arrayOfSilo.push(currSilo.value);
-        }
+        });
 
-        let arrayOfPodvs = [];
-        let currPodv = document.getElementById("rprtprf_podv_1");
-
-        if (currPodv.value === "all") {
-            for (let i = 0; i < currPodv.options.length; i++) {
-                if (currPodv.options[i].value === "all") {
-                    continue;
-                }
-                arrayOfPodvs.push(currPodv.options[i].value);
-            }
-        } else {
-            arrayOfPodvs.push(currPodv.value);
-        }
-
-        let arrayOfSensors = [];
-        let currSensor = document.getElementById("rprtprf_sensor_1");
-
-        if (currSensor.value === "all") {
-            for (let i = 0; i < currSensor.options.length; i++) {
-                if (currSensor.options[i].value === "all") {
-                    continue;
-                }
-                arrayOfSensors.push(currSensor.options[i].value);
-            }
-        } else {
-            arrayOfSensors.push(currSensor.value);
-        }
-
-
-        console.log(arrayOfSilo);
+        /*console.log(arrayOfSilo);
         console.log(arrayOfPodvs);
         console.log(arrayOfSensors);
-        console.log(arrayOfDates);
+        console.log(arrayOfDates);*/
 
     }
 
