@@ -1,3 +1,6 @@
+/*  Функция определения текущего пользователя
+    Вызывается каждый раз при заходе на новую страницу
+*/
 function authGetCurrentUser(){
     $.ajax({
         url: '/webTermometry/scripts/auth.php',
@@ -16,12 +19,16 @@ function authGetCurrentUser(){
         }
     });
 }
-
+/*  Функция для очистки неудачно введенного пароля
+    Вызывается при нажатии на кнопку "Отмена" или "Закрыть" модального окна ввода пароля
+*/
 function modalClearInput(inputPasswordID){
     document.getElementById(inputPasswordID).value = "";
     return;
 }
-
+/*  Функция авторизации
+    В случае правильно введенного пароля, текущий пользователь сохраняется в сессии, которая автоматически очищается при выходе из браузера
+*/
 function authSignIn(user, inputPassID){
     password = document.getElementById(inputPassID).value;
 
@@ -48,7 +55,8 @@ function authSignIn(user, inputPassID){
 
     return;
 }
-
+/*  Функция выхода из текущей учетной записи
+*/
 function authSignOut(){
 
     $.ajax({
@@ -68,7 +76,9 @@ function authSignOut(){
 
     return;
 }
-
+/*  Функция для смены пароля
+    Пароль сохраняется в БД в виде хеша
+*/
 function authPasswordChange(user, inputPassID1, inputPassID2){
 
     pwd1 = document.getElementById(inputPassID1).value;

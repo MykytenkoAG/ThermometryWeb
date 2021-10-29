@@ -537,7 +537,7 @@ function createPDFPropObj_SensorTemperaturesByPodv(JSONObj,headerText){
 
     return pdfProp;
 }
-
+//  Функиця для получение JSON-объекта из PHP
 function getJSONForPrintedForms(fileFormat){
 
     const arrayOfDates = rprtprf_getArrayOfDates();
@@ -617,7 +617,7 @@ function getJSONForPrintedForms(fileFormat){
 
     return;
 }
-
+//  Создание структуры XLSX-документа
 function createXLSX(pdfProbObj){
     var wb = XLSX.utils.book_new();
     wb.Props = {
@@ -669,7 +669,7 @@ function createXLSX(pdfProbObj){
     saveXLSX(wb);
     return;
 }
-
+//  Сохранение документа
 function saveXLSX(wb){
 
     var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});

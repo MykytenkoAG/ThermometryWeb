@@ -3,6 +3,7 @@
 require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/auth.php');
 require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');
 
+//  Отрисовка таблицы "Типы продукта"
 function drawTableProdtypes($dbh, $accessLevel){
 
     $inputsDisabled = $accessLevel<2 ? "disabled" : "";
@@ -104,7 +105,7 @@ function drawTableProdtypes($dbh, $accessLevel){
 if( isset($_POST['draw_table_prodtypes']) ) {
     echo drawTableProdtypes($dbh, $accessLevel);
 }
-
+//  Отрисовка таблицы "Загрузка силосов"
 function drawTableProdtypesbysilo($dbh, $accessLevel){
 
     $inputsDisabled = $accessLevel<1 ? "disabled" : "";
@@ -259,7 +260,8 @@ function prodtypesUpdate($dbh, $product_id, $product_name, $t_min, $t_max, $v_mi
 
     return $sql;
 }
-
+//  Все необходимые изменения из страницы визуализации (удаление, добавление и изменение характеристик продукта) сохраняются в виде очереди
+//  и при нажатии на кнопку "Сохранить" в порядке очереди вызываются функции prodtypesRemove(), prodtypesInsert(), prodtypesUpdate()
 if( isset($_POST['tbl_prodtypes_changes_queue']) ) {
 
     $prodTypesChangesQueue = $_POST['tbl_prodtypes_changes_queue'];
@@ -299,7 +301,8 @@ function prodtypesbysiloUpdate($dbh, $silo_id, $grainLevelFromTS, $grain_level, 
 
     return $sql;
 }
-
+//  В отличии от таблицы "Типы продукта", изменения для таблицы "Загрузка силосов" хранятся в виде массива и при нажатии на кнопку "Сохранить"
+//  за один вызов функции prodtypesbysiloUpdate() все изменения сохраняются в Базе Данных
 if( isset($_POST['tbl_prodtypesbysilo_update_list']) ) {
 
     $prodtypesBySiloUpdateList = $_POST['tbl_prodtypesbysilo_update_list'];

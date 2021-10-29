@@ -1,8 +1,10 @@
 <?php
-session_start();
+
+session_start();    //  сессия необходима для сохранения текущего пользователя
 
 $accessLevel=0;
-
+/*  Авторизация
+*/
 if( isset($_POST['auth_user_name']) && isset($_POST['auth_password']) ) {
 
     require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');
@@ -26,14 +28,16 @@ if( isset($_POST['auth_user_name']) && isset($_POST['auth_password']) ) {
     echo "OK";
 
 }
-
+/*  Выход из текущей учетной записи
+*/
 if( isset($_POST['auth_sign_out']) ) {
 
     $_SESSION["access_level"] = 0;
     echo "OK";
 
 }
-
+/*  Смена пароля
+*/
 if( isset($_POST['auth_pwd_change_user_name']) && isset($_POST['auth_pwd_change_password']) ) {
 
     require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');
@@ -48,11 +52,13 @@ if( isset($_POST['auth_pwd_change_user_name']) && isset($_POST['auth_pwd_change_
 
     echo "OK";
 }
-
+/*  Проверка уровня доступа для текущего пользователя
+*/
 if (isset($_SESSION["access_level"])){
     $accessLevel = $_SESSION["access_level"];
 }
-
+/*  Получение текущего пользователя из сессии
+*/
 if( isset($_POST['get_current_user']) ) {
 
     $current_user = "anonymous";

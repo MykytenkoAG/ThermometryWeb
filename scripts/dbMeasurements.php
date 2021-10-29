@@ -9,6 +9,8 @@ if( ! $simulation_mode ){
 }
 
 //	measurements
+//	Выбор id последней даты
+//	Запись температур из массива $arrayOfTemperatures
 function addNewMeasurement($dbh, $arrayOfTemperatures,$serverDate){
 
 	$query="INSERT INTO dates (date) VALUES (STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'));";

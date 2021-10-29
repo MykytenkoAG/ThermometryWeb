@@ -85,6 +85,7 @@ function debug_create_sensors_table($dbh, $termoServerINI){
 }
 
 //  Получение текущих значений параметров
+//  Запись значений из базы данных в массив $arrayOfTemperatures
 function debug_update_temperature_values($dbh){
 
     $arrayOfTemperatures=array();
@@ -105,7 +106,7 @@ function debug_update_temperature_values($dbh){
 
     return $arrayOfTemperatures;
 }
-
+//  Запись значений из БД в массив $arrayOfTempSpeeds
 function debug_update_temperature_speeds_values($dbh){
 
     $arrayOfTempSpeeds=array();
@@ -126,7 +127,7 @@ function debug_update_temperature_speeds_values($dbh){
 
     return $arrayOfTempSpeeds;
 }
-
+//  Запись значений из БД в массив $arrayOfLevels
 function debug_update_level_values($dbh){
 
     $arrayOfLevels=array();

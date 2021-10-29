@@ -2,6 +2,7 @@
 
 $logFile = $_SERVER['DOCUMENT_ROOT'].'/webTermometry/logs/log.txt';
 
+//	Запись строки в журнал
 function writeToLog($loggingString){
 	global $logFile;
     // Write the contents to the file, 
@@ -16,7 +17,15 @@ function clearLog(){
     file_put_contents($logFile, "");
     return;
 }
-
+/*	Функция для определения появившихся алармов
+	Сначала определяются датчики с неисправностями
+	затем датчики с превышением температуры
+	затем датчики с превышением скорости изменения температуры
+	а затем происходит логирование
+	Вызывается 1 раз в 10 секунд
+*/
+//	! Можно модифицировать, чтобы она возвращала количество новых аларом
+//	Если количество больше нуля, необходимо включать звук
 function setNACK($dbh, $serverDate){
 
 	//	sensors JOIN productsbysilo JOIN products
@@ -194,7 +203,10 @@ function setNACK($dbh, $serverDate){
 
 	return;
 }
-
+/*	Функция квитирования алармов
+	Вызывается пользователем путем нажатия на кнопку
+	Сбрасывает флаг NACK и устанавливает флаг ACK
+*/
 function setACK($dbh, $serverDate){
 	
 	$sql_joinedTable = "SELECT s.sensor_id, s.current_temperature, s.current_speed
@@ -365,7 +377,11 @@ function setACK($dbh, $serverDate){
 
 	return;
 }
-
+/*	Функция для сброса сигналов АПС
+	Сначала происходит сброс АПС о неисправности
+	затем АПС о превышении температуры
+	и затем АПС о превышении скорости ее изменения
+*/
 function resetACK($dbh, $serverDate){
 
 	$loggingString = "";
@@ -520,7 +536,7 @@ function resetACK($dbh, $serverDate){
 
 	return;
 }
-
+//	Функция определения того, есть ли неквитированные алармы
 function isSoundOn($dbh){
 
     $sql = "SELECT sensor_id FROM sensors WHERE NACK_Tmax=1 OR NACK_Vmax=1 OR NACK_err=1;";

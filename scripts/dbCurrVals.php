@@ -1,5 +1,6 @@
 <?php
 
+//	Функция для записи значений из массива $arrayOfLevels в Базу Данных
 function update_lvl($dbh, $arrayOfLevels){
 	//	Определяем, есть ли силоса с автоматическим определением уровня
 	$query = "SELECT count(silo_id) FROM prodtypesbysilo WHERE grain_level_fromTS=1";
@@ -33,7 +34,7 @@ function update_lvl($dbh, $arrayOfLevels){
 	
 	return;
 }
-
+//	Функция для записи значений из массивов $arrayOfTemperatures и $arrayOfTempSpeeds в Базу Данных от времени $serverDate
 function update_t_v($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate){
 
 	/*

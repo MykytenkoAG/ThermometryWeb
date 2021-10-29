@@ -20,6 +20,9 @@ if( count($termoServerINI)==0 ){	$error .= "Файл TermoServer.ini отсут�
 $termoClientINI  =	@parse_ini_string(replaceForbiddenChars(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/webTermometry/settings/TermoClient.ini')), true);
 if( count($termoClientINI)==0 ){	$error .= "Файл TermoClient.ini отсутствует в каталоге webTermometry/settings;";}
 
+/*	Проверка соответствия файлов TermoServer.ini и TermoClient.ini
+	Функция производит проверку наличия всех силосов из TermoServer.ini в TermoClient.ini
+*/
 function doINIFilesMatchEachOther($termoServerINI,$termoClientINI){
 	$termoServerSiloArray=array();$termoClientSiloArray=array();
 	foreach ($termoServerINI as $key => $value) {
@@ -40,6 +43,7 @@ function doINIFilesMatchEachOther($termoServerINI,$termoClientINI){
 	return true;
 }
 
+//	Если обнаружено несоответствие => Выход
 if( ! doINIFilesMatchEachOther($termoServerINI,$termoClientINI) ){
 	$error .= "Файлы TermoServer.ini и TermoClient.exe не соответствуют друг другу;";
 }
@@ -48,7 +52,9 @@ if($error!=""){
 	die(require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/error_page.php'));
 }
 
+//	Функции для работы с программой TermoServer -----------------------------------------------------------------------------------------------------
 //	Функция для получения строки с текущими значениями
+//	В случае, если термосервер не запущен, происходит запись в глобальную переменную $error
 function getInputString($IPAddr, $port){
 	global $error;
 	$error = "Проверьте, запущен ли термосервер";
@@ -100,7 +106,7 @@ function getLevels($inputArray){
 	return $arrayOfLevels;
 }
 
-//	Анализ значений, которые шлет термосервер на соответствие INI-файлу
+//	Функции для создания ассоциативных массивов для выявления соответствия значений, которые шлет Термосервер ini-файлу конфигурации -----------------
 function createTermoServerAssocArray($termoServerINI){
 	$outArr=array();
 	foreach ($termoServerINI as $key => $value) {
@@ -177,6 +183,9 @@ function arrayRecursiveDiff($aArray1, $aArray2) {
 
 $arrayOfTemperatures=array();$arrayOfTempSpeeds=array();$arrayOfLevels=array();$serverDate="";
 
+//	Заполнение массивов $arrayOfTemperatures; $arrayOfTempSpeed; $arrayOfLevels и переменной $serverDate
+//	РАБОЧИЙ РЕЖИМ:	значения шлет Термосервер
+//	РЕЖИМ ОТЛАДКИ:	значения вычитываются из БД (запись значений производится из отладочной страницы визуализации)
 if( ! $simulation_mode) {
 	//	Файлы прошли проверку, можно считывать значения из термосервера
 	$inputValsArr		 = getInputArray ( getInputString($IPAddr, $port) );	//	[температуры][скорости][уровни][дата]
@@ -191,7 +200,7 @@ if( ! $simulation_mode) {
 		die(require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/error_page.php'));
 	}
 
-} else {
+ } else {
 	//	Если включен режим отладки
 	if( ! ( count( arrayRecursiveDiff( createTermoServerAssocArray($termoServerINI) , createdbTableAssocArr($dbh, "zernoib.debug_sensors")   ) )==0 &&
 			count( arrayRecursiveDiff( createdbTableAssocArr($dbh, "zernoib.debug_sensors") , createTermoServerAssocArray($termoServerINI)   ) )==0 ) ){
@@ -213,7 +222,6 @@ if( ! $simulation_mode) {
 if( ! ( count( arrayRecursiveDiff( createTermoServerAssocArray($termoServerINI) , createdbTableAssocArr($dbh, "zernoib.sensors")   ) )==0 &&
 		count( arrayRecursiveDiff( createdbTableAssocArr($dbh, "zernoib.sensors") , createTermoServerAssocArray($termoServerINI)   ) )==0 ) ){
 
-	//	Файл TermoServer.ini был обновлен. Необходимо выполнить автоматическую инициализацию всех таблиц в БД
 	echo "Файл TermoServer.ini был обновлен. Выполняем автоматическую инициализацию всех таблиц в БД";
 
 	deleteAllTables($dbh);
