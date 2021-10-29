@@ -31,10 +31,10 @@ function init_silo_config() {
     tbl_prodtypes_changes_queue.length = 0;
     tbl_prodtypesbysilo_update_list.length = 0;
 }
-
+//  Получение массива с текущими уровнями для установки уровня в автоматическом режиме для таблицы "Загрузка силосов"
 function getArrayOfLevels() {
     $.ajax({
-        url: '/webTermometry/scripts/dataForJS.php',
+        url: '/webTermometry/scripts/currValsFromTS.php',
         type: 'POST',
         cache: false,
         data: { 'get_array_of_levels': 1 },
@@ -46,7 +46,7 @@ function getArrayOfLevels() {
     });
     return;
 }
-
+//  отключение всех входов для таблицы с заданным id
 function tableInputsDisable(table_id) {
     let inputs = document.getElementById(table_id).getElementsByTagName('input');
     let buttons = document.getElementById(table_id).getElementsByTagName('button');
@@ -63,17 +63,17 @@ function tableInputsDisable(table_id) {
 
     return;
 }
-
+//  Отключение кнопки с заданным id
 function buttonDisable(button_id) {
     document.getElementById(button_id).disabled = true;
     return;
 }
-
+//  Включение кнопки с заданным id
 function buttonEnable(button_id) {
     document.getElementById(button_id).disabled = false;
     return;
 }
-
+//  Отрисовка таблицы "Типы продукта"
 function redrawTableProdtypes() {
     $.ajax({
         url: 'visualisation/visu_silo_config.php',
@@ -91,7 +91,7 @@ function redrawTableProdtypes() {
     });
     return;
 }
-
+//  Отрисовка таблицы "Загрузка силосов"
 function redrawTableProdtypesbysilo() {
     $.ajax({
         url: 'visualisation/visu_silo_config.php',
@@ -109,7 +109,7 @@ function redrawTableProdtypesbysilo() {
     });
     return;
 }
-
+//  Сохранение изменений
 function silo_config_save_changes() {
 
     if (tbl_prodtypes_changed == 1) {
@@ -146,7 +146,7 @@ function silo_config_save_changes() {
 
     return;
 }
-
+//  Возвращение значений к текущему состоянию
 function silo_config_discard_changes() {
 
     redrawTableProdtypes();
@@ -156,11 +156,11 @@ function silo_config_discard_changes() {
     }
 
 }
-
+//  Таблица "Типы продукта". Кнопка "Добавить"
 $("#table-prodtypes-btn-add").click(function() {
     tblProdtypesAddRow();
 });
-
+//  Таблица "Типы продукта". Кнопка "Сохранить изменения"
 $("#table-prodtypes-btn-save-changes").click(function() {
     document.getElementById("modal-are-you-sure-text").innerText = "Сохранить изменения?";
     document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
@@ -168,11 +168,11 @@ $("#table-prodtypes-btn-save-changes").click(function() {
     document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "silo_config_save_changes()");
     $("#modal-are-you-sure").modal('show');
 });
-
+//  Таблица "Типы продукта". Кнопка "Отменить изменения"
 $("#table-prodtypes-btn-discard-changes").click(function() {
     silo_config_discard_changes();
 });
-
+//  Таблица "Загрузка силосов". Кнопка "Сохранить изменения"
 $("#table-prodtypesbysilo-btn-save-changes").click(function() {
     document.getElementById("modal-are-you-sure-text").innerText = "Сохранить изменения?";
     document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
@@ -180,12 +180,13 @@ $("#table-prodtypesbysilo-btn-save-changes").click(function() {
     document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "silo_config_save_changes()");
     $("#modal-are-you-sure").modal('show');
 });
-
+//  Таблица "Загрузка силосов". Кнопка "Отменить изменения"
 $("#table-prodtypesbysilo-btn-discard-changes").click(function() {
     silo_config_discard_changes();
 });
 
 //  Таблица "Типы продукта"
+//  Удалить строку
 function tblProdtypesRemoveRow(product_id) {
 
     tbl_prodtypes_changed = 1;
@@ -203,7 +204,7 @@ function tblProdtypesRemoveRow(product_id) {
 
     return;
 }
-
+//  Обновить показания
 function tblProdtypesUpdateRow(tbl_prodtypes_row_id) {
 
     tbl_prodtypes_changed = 1;
@@ -228,7 +229,7 @@ function tblProdtypesUpdateRow(tbl_prodtypes_row_id) {
 
     return;
 }
-
+//  Добавить строку
 function tblProdtypesAddRow() {
 
     tbl_prodtypes_changed = 1;
@@ -369,7 +370,8 @@ function tblProdtypesAddRow() {
 
     return;
 }
-
+//  Валидация форм --------------------------------------------------------------------------------------------------------------------------------------------
+//  Проверка двух и более строк с одинаковыми названиями продукта
 function checkProductNames() {
 
     tbl_prodtypes_changed = 1;
@@ -384,7 +386,7 @@ function checkProductNames() {
     buttonEnable("table-prodtypes-btn-save-changes");
     buttonEnable("table-prodtypes-btn-discard-changes");
     for (let i = 0; i < inputs.length; i++) {
-        if (!isProductNameValid(inputs[i].value)) {
+        if (!isProductNameValid(inputs[i].value) || inputs[i].value==="") {
             checkOK = false;
             inputs[i].setAttribute("style", "width: 300px; color:red");
             buttonDisable("table-prodtypes-btn-save-changes");
@@ -401,7 +403,7 @@ function checkProductNames() {
 
     return checkOK;
 }
-
+//  Проверка имени на запрещенные символы
 function isProductNameValid(value) {
     var pattern = new RegExp(/[~`!#$\^&*+=\\[\]\\';/{}|\\":<>\?]/); //unacceptable chars
     if (pattern.test(value)) {
@@ -452,6 +454,7 @@ function tblProdtypesbysiloUpdate() {
 }
 
 //  Опции
+//  Изменить пароль
 $("#silo-config-btn-change-password").click(function() {
     document.getElementById("modal-sign-in-btn-close").setAttribute("onclick", "modalClearInput('modal-pass-change-pwd1');modalClearInput('modal-pass-change-pwd2')");
     document.getElementById("modal-sign-in-btn-cancel").setAttribute("onclick", "modalClearInput('modal-pass-change-pwd1');modalClearInput('modal-pass-change-pwd2')");

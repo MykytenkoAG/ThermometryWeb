@@ -9,7 +9,7 @@ let project_conf_array = [];
 let silo_name_with_id_0;
 let silo_name_with_max_podv_number;
 
-//  Действия при загрузке каждой страницы
+//  Действия при загрузке каждой страницы -------------------------------------------------------------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", () => {
     authGetCurrentUser();
     isSoundOn();
@@ -46,7 +46,8 @@ function deleteCookie(name) {
     document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 };
 
-//  Получение массивов с конфигурациями для повышения интерактивности
+//  Получение массивов с конфигурациями для повышения интерактивности ---------------------------------------------------------------------------------------
+//  Получение массива с именами силосов для быстрого отображения названия силоса на главной странице
 function getConf_ArrayOfSiloNames() {
     $.ajax({
         url: '/webTermometry/scripts/currValsFromTS.php',
@@ -62,7 +63,7 @@ function getConf_ArrayOfSiloNames() {
     });
     return;
 }
-
+//  Получение главного конфигурационного массива [[массив с именами (при этом индекс элемента - это id силоса)],[массив с подвесками],[массив с датчиками]]
 function getConf_ProjectConfArr() {
     $.ajax({
         url: '/webTermometry/scripts/currValsFromTS.php',
@@ -77,7 +78,7 @@ function getConf_ProjectConfArr() {
         }
     });
 }
-
+//  Получение названия силоса с id==0. Необходимо для страницы "Отчет" в сайтбаре для построения графиков
 function getConf_SiloNameWithID0() {
     $.ajax({
         url: '/webTermometry/visualisation/visu_report.php',
@@ -92,7 +93,7 @@ function getConf_SiloNameWithID0() {
     });
     return;
 }
-
+//  Получение массива с максимальным количеством подвесок. Необходимо для страницы "Отчет" в сайтбаре с печатными формами
 function getConf_SiloNameWithMaxPodvNumber() {
     $.ajax({
         url: '/webTermometry/visualisation/visu_report.php',
@@ -112,6 +113,7 @@ function getConf_SiloNameWithMaxPodvNumber() {
     return;
 }
 
+//  Работа с элементами select -------------------------------------------------------------------------------------------------------------------------------
 //  Функция для установки аттрибутов option элемента select
 function setSelectOptions(dom_element, options_arr) {
     while (dom_element.options.length) {
@@ -180,6 +182,7 @@ function redrawSelectsRow(select_element_id) {
     return;
 }
 
+//  Работа с АПС ---------------------------------------------------------------------------------------------------------------------------------------------
 function isSoundOn() {
 
     $.ajax({
@@ -227,18 +230,8 @@ function acknowledgeAlarms() {
             alarmSound = 0;
             console.log(fromPHP);
             if (current_page === "index.php") {
-
-
-                /*$('#hdr-ack').removeClass("text-black");
-                $('#hdr-ack').addClass("text-primary");
-                $('#hdr-ack').removeClass("text-primary");
-                $('#hdr-ack').addClass("text-black");*/
-
-
                 redrawTableCurrentAlarms();
-
                 redrawSiloStatus();
-
                 onSiloClicked(lastSiloID);
             }
         }

@@ -16,7 +16,7 @@ function init_debug_page(){
 
     return;
 }
-
+//  Отрисовка таблицы со всеми параметрами
 function redrawMainDbgTable(){
 
     $.ajax({
@@ -37,7 +37,7 @@ function redrawMainDbgTable(){
 
     return;
 }
-
+//  Установить температуру для всех датчиков силоса
 function onClick_dbg_button_1(silo_name_id, temperature_id){
     const silo_name = document.getElementById(silo_name_id).value;
     const temperature = document.getElementById(temperature_id).value;
@@ -57,7 +57,7 @@ function onClick_dbg_button_1(silo_name_id, temperature_id){
 
     return;
 }
-
+//  Установить скорость изменения температуры для всех датчиков силоса
 function onClick_dbg_button_2(silo_name_id, temperature_speed_id){
     const silo_name = document.getElementById(silo_name_id).value;
     const temperature_speed = document.getElementById(temperature_speed_id).value;
@@ -77,7 +77,7 @@ function onClick_dbg_button_2(silo_name_id, temperature_speed_id){
 
     return;
 }
-
+//  Установить уровень заполнения силоса
 function onClick_dbg_button_3(silo_name_id, level_id){
     const silo_name = document.getElementById(silo_name_id).value;
     const level = document.getElementById(level_id).value;
@@ -97,7 +97,7 @@ function onClick_dbg_button_3(silo_name_id, level_id){
 
     return;
 }
-
+//  Установить температуру для всех датчиков подвески
 function onClick_dbg_button_4(silo_name_id, podv_num_id, temperature_id){
     const silo_name = document.getElementById(silo_name_id).value;
     const podv_num = document.getElementById(podv_num_id).value;
@@ -119,7 +119,7 @@ function onClick_dbg_button_4(silo_name_id, podv_num_id, temperature_id){
 
     return;
 }
-
+//  Установить скорость изменения температуры для всех датчиков подвески
 function onClick_dbg_button_5(silo_name_id, podv_num_id, temperature_speed_id){
     const silo_name = document.getElementById(silo_name_id).value;
     const podv_num = document.getElementById(podv_num_id).value;
@@ -141,7 +141,7 @@ function onClick_dbg_button_5(silo_name_id, podv_num_id, temperature_speed_id){
 
     return;
 }
-
+//  Установить температуру для одного датчика
 function onClick_dbg_button_6(silo_name_id, podv_num_id, sensor_num_id, temperature_id){
     const silo_name = document.getElementById(silo_name_id).value;
     const podv_num = document.getElementById(podv_num_id).value;
@@ -165,7 +165,7 @@ function onClick_dbg_button_6(silo_name_id, podv_num_id, sensor_num_id, temperat
 
     return;
 }
-
+//  Установить скорость изменения температуры для одного датчика
 function onClick_dbg_button_7(silo_name_id, podv_num_id, sensor_num_id, temperature_speed_id){
     const silo_name = document.getElementById(silo_name_id).value;
     const podv_num = document.getElementById(podv_num_id).value;
@@ -189,7 +189,7 @@ function onClick_dbg_button_7(silo_name_id, podv_num_id, sensor_num_id, temperat
 
     return;
 }
-
+//  Обнулить все показания
 function onClick_dbg_button_8(){
     $.ajax({
         url:    'visualisation/visu_debug_page.php',
@@ -205,7 +205,7 @@ function onClick_dbg_button_8(){
 
     return;
 }
-
+//  Добавить текущие показания в Базу Данных
 function onClick_dbg_button_add_measurements(){
 
     $.ajax({

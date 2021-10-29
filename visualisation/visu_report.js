@@ -236,7 +236,7 @@ function addNewTableRow() {
 
     return;
 }
-
+//  Chart JS
 //  setup
 const data = {
     datasets: []
@@ -261,7 +261,7 @@ const config = {
 };
 //  render / init block
 let myChart = new Chart(document.getElementById('myChart'), config);
-
+//  Функции для сохранения графика в PDF
 function Convert() {
     //По нажатию на кнопку получаем канвас
     var canvas = document.getElementById('myChart');
@@ -275,7 +275,6 @@ function Convert() {
     // теперь из картинки делаем PDF
     createPDF(myImage);
 }
-
 //image - должен иметь свойста height,width и data - хранит картинку в base64
 function createPDF(image) {
     let w = ConvertPxToMM(image.width);
@@ -293,12 +292,11 @@ function createPDF(image) {
     //Возможные значения : dataurl, datauristring, bloburl, blob, arraybuffer, ('save', filename)
     docPDF.output('save', 'График температуры.pdf');
 }
-
 function ConvertPxToMM(pixels) {
     return Math.floor(pixels * 0.264583);
 }
 
-//  Печатные формы
+//  Печатные формы ---------------------------------------------------------------------------------------------------------------------------------------
 function rprtprf_checkDatesAndBlockDownloadButtons(){
 
     if(rprtprf_getArrayOfDates().length==0){
@@ -314,7 +312,8 @@ function rprtprf_checkDatesAndBlockDownloadButtons(){
     return;
 }
 
-//  Получение массива дат исходя из того, какие чекбоксы с определенными id нажаты
+//  Получение массивов входных данных для создания печатных форм ---------------------------
+//  Получение массива дат
 function rprtprf_getArrayOfDates(){
 
     let arrayOfDates = [];
@@ -332,7 +331,7 @@ function rprtprf_getArrayOfDates(){
 
     return arrayOfDates;
 }
-
+//  Получение массива силосов
 function rprtprf_getArrayOfSilo(){
 
     let arrayOfSilo = [];
@@ -351,7 +350,7 @@ function rprtprf_getArrayOfSilo(){
 
     return arrayOfSilo;
 }
-
+//  Получение массива подвесок
 function rprtprf_getArrayOfPodv(){
 
     let arrayOfPodvs = [];
@@ -370,7 +369,7 @@ function rprtprf_getArrayOfPodv(){
 
     return arrayOfPodvs;
 }
-
+//  Получение массива датчиков
 function rprtprf_getArrayOfSensors(){
 
     let arrayOfSensors = [];
@@ -389,7 +388,7 @@ function rprtprf_getArrayOfSensors(){
 
     return arrayOfSensors;
 }
-
+//  Получение массива слоев
 function rprtprf_getArrayOfLayers(){
     
     let arrayOfLayers = [];
@@ -409,6 +408,7 @@ function rprtprf_getArrayOfLayers(){
     return arrayOfLayers;
 }
 
+//  Функции для сохранения печатных форм в формате PDF и XLSX ---------------------------------
 function createTableForPDFMake(JSONObj, field, tableHeader, col1Header, col2Header){
 
     let outArr=[];
@@ -421,7 +421,7 @@ function createTableForPDFMake(JSONObj, field, tableHeader, col1Header, col2Head
 
     return outArr;
 }
-
+//  Создание объекта со свойствами PDF-документа
 function createBasicPDFPropStructure(){
 
     let pdfProp = {};
@@ -438,7 +438,7 @@ function createBasicPDFPropStructure(){
 
     return pdfProp;
 }
-
+//  Печатная форма "Средние температуры по слоям"
 function createPDFPropObj_AvgTemperaturesByLayer(JSONObj,headerText){
 
     let pdfProp = createBasicPDFPropStructure();
@@ -471,7 +471,7 @@ function createPDFPropObj_AvgTemperaturesByLayer(JSONObj,headerText){
 
     return pdfProp;
 }
-
+//  Печатная форма "Температуры каждого датчика по слоям"
 function createPDFPropObj_SensorTemperaturesByLayer(JSONObj,headerText){
 
     let pdfProp = createBasicPDFPropStructure();
@@ -504,7 +504,7 @@ function createPDFPropObj_SensorTemperaturesByLayer(JSONObj,headerText){
 
     return pdfProp;
 }
-
+//  Печатная форма "Температуры каждого датчика в подвеске"
 function createPDFPropObj_SensorTemperaturesByPodv(JSONObj,headerText){
 
     let pdfProp = createBasicPDFPropStructure();

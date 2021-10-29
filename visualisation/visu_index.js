@@ -11,7 +11,7 @@ function init_index() {
     return;
 }
 
-//  Левый сайтбар
+//  Левый сайтбар ------------------------------------------------------------------------------------------------------------------------------
 function redrawTableCurrentAlarms() {
     $.ajax({
         url: 'visualisation/visu_index.php',
@@ -25,7 +25,7 @@ function redrawTableCurrentAlarms() {
     });
     return;
 }
-
+//  Кнопки под таблицей с текущими сигналами АПС. При нажатии вызывают появление модального окна. При этом кнопке "ОК" присваиваются функции ниже
 $('#ind-btn-disable-all-def-sensors').click(function() {
     document.getElementById("modal-are-you-sure-text").innerText = "Отключить все неисправные датчики?";
     document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
@@ -94,7 +94,7 @@ function enable_all_auto_lvl_mode() {
     return;
 }
 
-//  Основная часть
+//  Основная часть ---------------------------------------------------------------------------------------------------------------------------
 const img_arr_silo_status = [
     [
         ["img/silo_round_disabled.png", "img/silo_round_disabled.png"],
@@ -125,6 +125,8 @@ const timer_silo_blink = setInterval(() => {
 
 }, silo_blink_period);
 
+//  Функция отображения текущего состояния силосов
+//  Использует массив с картинками и таймер, определенные выше
 function redrawSiloStatus() {
 
     $.ajax({
@@ -153,7 +155,7 @@ function redrawSiloStatus() {
     return;
 }
 
-//  Правый сайтбар
+//  Правый сайтбар  -------------------------------------------------------------------------------------------------------------------------
 let lastParamSelectButtonID; //  Кнопка для выбора отображаемых параметров (температуры, скорости)
 let lastSiloID;
 
@@ -237,6 +239,7 @@ function redrawTableTemperatureSpeeds(silo_id) {
     return;
 }
 
+//  Включение/Отключение конкретного датчика/подвески путем нажатия на ячейку с измеренным значением температуры или скорости ее изменения
 function selectedSensorDisable(silo_id, podv_num, sensor_num) {
     //    console.log("Disable: ", silo_id, podv_num, sensor_num);
     $.ajax({
@@ -297,6 +300,7 @@ function selectedPodvEnable(silo_id, podv_num) {
     return;
 }
 
+//  Изменение уровня при помощи слайдера
 function change_grain_level_mode(silo_id, lvl_mode) {
     $.ajax({
         url: 'visualisation/visu_index.php',
@@ -336,6 +340,8 @@ function change_grain_level_from_slider(silo_id) {
     return;
 }
 
+//  Построение графика температуры для выбранного силоса
+//  В функции происходит запоминание номера датчика в cookie и переход на страницу "Отчет"
 function selectedSensorDrawChart(silo_id, podv_num, sensor_num, period) {
     document.cookie = "chart_silo_id=" + silo_id + ";";
     document.cookie = "chart_podv_num=" + podv_num + ";";
