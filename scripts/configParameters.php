@@ -15,6 +15,6 @@ $username	= "root";
 $password	= "";
 $dbname		= "zernoib";
 //	Создание объекта PDO для работы с Базой Данных
-$dbh = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);	//[PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+$dbh = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);	//[PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
 
 ?>

@@ -1,9 +1,118 @@
 <?php
 
-//	
-function createDBBackup(){
+/*	Создание резервной копии таблиц dates и measurements
+	Создаем ini-файл для удобства прохода по ключам
+	Формат: [configuration]sensorsnumber=количество датчиков;[dates]date_id=дата;[date_id]sensor_id=temperature;
+	Возвращаемое значение: строка с названием файла
+*/ 
+function createDBBackup($dbh){
 
-	//exec('c:\wamp64\bin\mysql\mysql5.7.31\bin\mysqldump --user=root --password=newpassword --host=localhost --fields-terminated-by="," zernoib > c:/wamp64/www/webTermometry/backup3.sql');
+	$dbBackupFile = $_SERVER['DOCUMENT_ROOT'].'/webTermometry/dbBackups/dbbackup '.date('d.m.Y H.i.s', time()).'.ini';
+	$backupString = "";
+
+	$query = "SELECT COUNT(sensor_id) FROM zernoib.sensors";
+    $sth = $dbh->query($query);
+
+	$rows=$sth->fetchAll();
+	$backupString .= "[configuration]\nsensorsnumber=".$rows[0]['COUNT(sensor_id)']."\n";		//	Запись в файл количества датчиков в проекте
+
+    $query = "SELECT date_id, date FROM zernoib.dates ORDER BY date_id";
+    $sth = $dbh->query($query);
+
+	$rows=$sth->fetchAll();
+	$backupString .= "[dates]\n";
+
+	foreach($rows as $row){
+		$backupString .= $row['date_id']."=".$row['date']."\n";									//	Запись таблицы dates
+	}
+
+	$query = "SELECT date_id, sensor_id, temperature FROM zernoib.measurements ORDER BY date_id";
+    $sth = $dbh->query($query);
+
+	$rows=$sth->fetchAll();
+	
+	$currentDateID="";
+
+	foreach($rows as $row){
+		if($currentDateID != $row['date_id']){
+			$currentDateID = $row['date_id'];
+			$backupString .= "[date_id_".$currentDateID."]\n";
+		}
+		$backupString .= $row['sensor_id']."=".$row['temperature']."\n";									//	Запись таблицы dates
+	}
+
+	file_put_contents($dbBackupFile, $backupString, FILE_APPEND | LOCK_EX);
+
+	return $dbBackupFile;
+}
+
+function restoreFromBackup($dbh, $dbBackupFile){
+
+	//	Проверяем количество датчиков в файле и таблице dbSensors
+	//	Если не равно => Выход
+	$query = "SELECT COUNT(sensor_id) FROM zernoib.sensors";
+    $sth = $dbh->query($query);
+	$rows=$sth->fetchAll();
+	if( $rows[0]['COUNT(sensor_id)'] != $dbBackupFile['configuration']['sensorsnumber'] ){
+		return "Sensor number in dbSensors is not equal to sensor number in backup file!";
+	}
+	
+	//	Удалить таблицы measurements и dates
+	$query =   "DROP TABLE IF EXISTS zernoib.measurements;
+				DROP TABLE IF EXISTS zernoib.dates;";
+	$stmt = $dbh->prepare($query);
+	$stmt->execute();
+
+	//	Создать таблицу dates и заполнить ее значениями
+	$query = "CREATE TABLE IF NOT EXISTS zernoib.dates
+		(date_id INT NOT NULL AUTO_INCREMENT,
+		date TIMESTAMP NOT NULL,
+		PRIMARY KEY (date_id))
+		ENGINE = InnoDB;";
+
+	$stmt = $dbh->prepare($query);
+	$stmt->execute();
+	
+	$query = "INSERT INTO dates (date_id, date) VALUES ";
+
+	foreach($dbBackupFile['dates'] as $key => $value){
+		$query .= "(".$key.","."'".$value."'"."),";
+	}
+
+	$query = substr($query,0,-1).";";
+
+	$stmt = $dbh->prepare($query);
+	$stmt->execute();
+
+	//	Создать таблицу measurements и заполнить ее значениями
+	$query = "CREATE TABLE IF NOT EXISTS zernoib.measurements
+		(date_id INT NOT NULL,
+		sensor_id INT NOT NULL,
+		temperature FLOAT NOT NULL,
+		INDEX (date_id),
+		CONSTRAINT measurements_fk_date_id FOREIGN KEY (date_id) REFERENCES dates(date_id) ON DELETE RESTRICT ON UPDATE RESTRICT,
+		CONSTRAINT measurements_fk_sensor_id FOREIGN KEY (sensor_id) REFERENCES sensors(sensor_id) ON DELETE RESTRICT ON UPDATE RESTRICT)
+		ENGINE = InnoDB;";
+
+	$stmt = $dbh->prepare($query);
+	$stmt->execute();
+
+
+	$query = "INSERT INTO measurements (date_id, sensor_id, temperature) VALUES ";
+
+
+	foreach ($dbBackupFile as $key => $value) {
+		if( preg_match('/date_id_([0-9]+)/',$key,$matches) ){
+			foreach($dbBackupFile[$matches[0]] as $key1 => $value1){
+				$query.="(".$matches[1].",".$key1.","."'".$value1."'"."),";
+			}			
+		}
+	}
+
+	$query = substr($query,0,-1).";";
+
+	$stmt = $dbh->prepare($query);
+	$stmt->execute();
 
 	return;
 }

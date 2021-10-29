@@ -24,7 +24,7 @@ function clearLog(){
 	а затем происходит логирование
 	Вызывается 1 раз в 10 секунд
 */
-//	! Можно модифицировать, чтобы она возвращала количество новых аларом
+//	! Можно модифицировать, чтобы она возвращала количество новых алармов
 //	Если количество больше нуля, необходимо включать звук
 function setNACK($dbh, $serverDate){
 
@@ -173,7 +173,7 @@ function setNACK($dbh, $serverDate){
 					JOIN prodtypesbysilo AS pbs
 						ON s.silo_id=pbs.silo_id
 					LEFT JOIN errors AS e ON s.error_id = e.error_id
-				WHERE ((s.NACK_err=1 OR s.NACK_Tmax=1 OR s.NACK_Vmax=1) AND s.server_date=$serverDate)";
+				WHERE ((s.NACK_err=1 OR s.NACK_Tmax=1 OR s.NACK_Vmax=1) AND s.server_date='$serverDate')";
 	$sth = $dbh->query($sql);
 
 	if($sth!=false){

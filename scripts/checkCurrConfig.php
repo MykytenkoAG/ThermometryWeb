@@ -48,9 +48,7 @@ if( ! doINIFilesMatchEachOther($termoServerINI,$termoClientINI) ){
 	$error .= "Файлы TermoServer.ini и TermoClient.exe не соответствуют друг другу;";
 }
 
-if($error!=""){
-	die(require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/error_page.php'));
-}
+if($error!=""){	die(require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/error_page.php'));}
 
 //	Функции для работы с программой TermoServer -----------------------------------------------------------------------------------------------------
 //	Функция для получения строки с текущими значениями

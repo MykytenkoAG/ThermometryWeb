@@ -18,7 +18,12 @@ if( isset($_POST['read_vals']) ) {
 }
 
 if( isset($_POST['is_sound_on']) ) {
-    echo isSoundOn($dbh);
+
+    $dbBackupFile = @parse_ini_string(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/webTermometry/dbBackups/dbbackup 29.10.2021 21.24.58.ini'), true);
+
+    //echo restoreFromBackup($dbh, $dbBackupFile);
+
+    //echo isSoundOn($dbh);
 }
 
 if( isset($_POST['acknowledge']) ) {
