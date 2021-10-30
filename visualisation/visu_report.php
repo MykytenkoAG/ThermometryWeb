@@ -5,7 +5,7 @@ require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.p
 //  Печатные формы -------------------------------------------------------------------------------------------------------------------------------------------------------
 //  Получить все даты измерений
 //  out = [дата => массив времен измерений]
-function getAllMeasurementDates($dbh){
+function vRep_getAllMeasDates($dbh){
 
     $sql = "SELECT DISTINCT (d.date)
                 FROM measurements m
@@ -46,7 +46,7 @@ function getAllMeasurementDates($dbh){
     return $outArr;
 }
 //  Отрисовка кнопок с датами и чекбоксов с конкретным временем измерения
-function createMeasurementCheckboxes($measurementArray){
+function vRep_drawMeasCheckboxes($measurementArray){
 
     $outStr = "<table>";
 
@@ -115,7 +115,7 @@ function createMeasurementCheckboxes($measurementArray){
 
 //  Получение параметров для печатных форм -------------------------------------------------------------------------------------------------------------------------------
 //  Средние температуры в слоях
-function getAvgTemperaturesByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $arrayOfDates){
+function vRep_getAvgTemperByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $arrayOfDates){
 
     $outObj=[];
 
@@ -162,12 +162,12 @@ function getAvgTemperaturesByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $arrayOf
     return $outObj;
 }
 
-if( isset($_POST['prfrb_avg_t_by_layer_arrayOfSilos']) && isset($_POST['prfrb_avg_t_by_layer_arrayOfLayers']) && isset($_POST['prfrb_avg_t_by_layer_arrayOfDates']) ) {
-    echo json_encode (getAvgTemperaturesByLayer($dbh, $_POST['prfrb_avg_t_by_layer_arrayOfSilos'], $_POST['prfrb_avg_t_by_layer_arrayOfLayers'], $_POST['prfrb_avg_t_by_layer_arrayOfDates']));
+if( isset($_POST['POST_vRep_getAvgTemperByLayer_arrayOfSilos']) && isset($_POST['POST_vRep_getAvgTemperByLayer_arrayOfLayers']) && isset($_POST['POST_vRep_getAvgTemperByLayer_arrayOfDates']) ) {
+    echo json_encode (vRep_getAvgTemperByLayer($dbh, $_POST['POST_vRep_getAvgTemperByLayer_arrayOfSilos'], $_POST['POST_vRep_getAvgTemperByLayer_arrayOfLayers'], $_POST['POST_vRep_getAvgTemperByLayer_arrayOfDates']));
 }
 
 //  Температуры каждого датчика в слоях
-function getSensorTemperaturesByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $arrayOfDates){
+function vRep_getSensorTemperByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $arrayOfDates){
 
     $outObj=[];
 
@@ -210,12 +210,12 @@ function getSensorTemperaturesByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $arra
     return $outObj;
 }
 
-if( isset($_POST['prfrb_t_by_layer_arrayOfSilos']) && isset($_POST['prfrb_t_by_layer_arrayOfLayers']) && isset($_POST['prfrb_t_by_layer_arrayOfDates']) ) {
-    echo json_encode( getSensorTemperaturesByLayer($dbh, $_POST['prfrb_t_by_layer_arrayOfSilos'], $_POST['prfrb_t_by_layer_arrayOfLayers'], $_POST['prfrb_t_by_layer_arrayOfDates']) );
+if( isset($_POST['POST_vRep_getSensorTemperByLayer_arrayOfSilos']) && isset($_POST['POST_vRep_getSensorTemperByLayer_arrayOfLayers']) && isset($_POST['POST_vRep_getSensorTemperByLayer_arrayOfDates']) ) {
+    echo json_encode( vRep_getSensorTemperByLayer($dbh, $_POST['POST_vRep_getSensorTemperByLayer_arrayOfSilos'], $_POST['POST_vRep_getSensorTemperByLayer_arrayOfLayers'], $_POST['POST_vRep_getSensorTemperByLayer_arrayOfDates']) );
 }
 
 //  Температуры каждого датчика в подвеске
-function getSensorTemperaturesByPodv($dbh, $arrayOfSilos, $arrayOfPodv, $arrayOfSensors, $arrayOfDates){
+function vRep_getSensorTemperByPodv($dbh, $arrayOfSilos, $arrayOfPodv, $arrayOfSensors, $arrayOfDates){
 
     $outObj=[];
 
@@ -265,12 +265,12 @@ function getSensorTemperaturesByPodv($dbh, $arrayOfSilos, $arrayOfPodv, $arrayOf
     return $outObj;
 }
 
-if( isset($_POST['prfrb_t_by_sensor_arrayOfSilos']) && isset($_POST['prfrb_t_by_sensor_arrayOfPodv']) && isset($_POST['prfrb_t_by_sensor_arrayOfSensors']) && isset($_POST['prfrb_t_by_sensor_arrayOfDates']) ) {
-    echo json_encode( getSensorTemperaturesByPodv($dbh, $_POST['prfrb_t_by_sensor_arrayOfSilos'], $_POST['prfrb_t_by_sensor_arrayOfPodv'], $_POST['prfrb_t_by_sensor_arrayOfSensors'], $_POST['prfrb_t_by_sensor_arrayOfDates']) );
+if( isset($_POST['POST_vRep_getSensorTemperByPodv_arrayOfSilos']) && isset($_POST['POST_vRep_getSensorTemperByPodv_arrayOfPodv']) && isset($_POST['POST_vRep_getSensorTemperByPodv_arrayOfSensors']) && isset($_POST['POST_vRep_getSensorTemperByPodv_arrayOfDates']) ) {
+    echo json_encode( vRep_getSensorTemperByPodv($dbh, $_POST['POST_vRep_getSensorTemperByPodv_arrayOfSilos'], $_POST['POST_vRep_getSensorTemperByPodv_arrayOfPodv'], $_POST['POST_vRep_getSensorTemperByPodv_arrayOfSensors'], $_POST['POST_vRep_getSensorTemperByPodv_arrayOfDates']) );
 }
 
 //  Получение таблицы температур для графика -----------------------------------------------------------------------------------------------------------------------------
-function getTimeTemperatureTable($dbh,$silo_name, $podv_id, $sens_num, $dateStart, $dateEnd){
+function vRep_getTableForChart($dbh,$silo_name, $podv_id, $sens_num, $dateStart, $dateEnd){
     
     $sql = "SELECT d.date, m.temperature
             FROM sensors AS s INNER JOIN measurements AS m ON s.sensor_id=m.sensor_id
@@ -295,13 +295,13 @@ function getTimeTemperatureTable($dbh,$silo_name, $podv_id, $sens_num, $dateStar
    return $outArr;
 }
 
-if( isset($_POST['get_t_chart_silo_id']) && isset($_POST['get_t_chart_podv_id']) && isset($_POST['get_t_chart_sensor_num']) && isset($_POST['get_t_chart_period']) ) {
+if( isset($_POST['POST_vRep_getTableForChart_silo_name']) && isset($_POST['POST_vRep_getTableForChart_podv_id']) && isset($_POST['POST_vRep_getTableForChart_sensor_num']) && isset($_POST['POST_vRep_getTableForChart_period']) ) {
 
     $dateEnd = DateTime::createFromFormat('d.m.Y H:i:s', $serverDate);
     $dateStart = DateTime::createFromFormat('d.m.Y H:i:s', $serverDate);
-    $dateStart->modify("-1 ".$_POST['get_t_chart_period']);
+    $dateStart->modify("-1 ".$_POST['POST_vRep_getTableForChart_period']);
 
-    echo json_encode( getTimeTemperatureTable( $dbh, $_POST['get_t_chart_silo_id'], $_POST['get_t_chart_podv_id'], $_POST['get_t_chart_sensor_num'], $dateStart->format('Y-m-d H:i:s'), $dateEnd->format('Y-m-d H:i:s') ) );
+    echo json_encode( vRep_getTableForChart( $dbh, $_POST['POST_vRep_getTableForChart_silo_name'], $_POST['POST_vRep_getTableForChart_podv_id'], $_POST['POST_vRep_getTableForChart_sensor_num'], $dateStart->format('Y-m-d H:i:s'), $dateEnd->format('Y-m-d H:i:s') ) );
 }
 
 ?>

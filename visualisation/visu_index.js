@@ -17,7 +17,7 @@ function redrawTableCurrentAlarms() {
         url: 'visualisation/visu_index.php',
         type: 'POST',
         cache: false,
-        data: { 'get_current_alarms': 1 },
+        data: { 'POST_vInd_get_current_alarms': 1 },
         dataType: 'html',
         success: function(fromPHP) {
             document.getElementById("ind-table-alarms").innerHTML = fromPHP;
@@ -30,7 +30,7 @@ $('#ind-btn-disable-all-def-sensors').click(function() {
     document.getElementById("modal-are-you-sure-text").innerText = "Отключить все неисправные датчики?";
     document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
     document.getElementById("modal-are-you-sure-btn-cancel").innerText = "Отмена";
-    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "disable_all_defective_sensors()");
+    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "POST_vInd_dis_all_defective_sensors()");
     $("#modal-are-you-sure").modal('show');
 });
 
@@ -38,7 +38,7 @@ $('#ind-btn-enable-all-sensors').click(function() {
     document.getElementById("modal-are-you-sure-text").innerText = "Включить все отключенные датчики?";
     document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
     document.getElementById("modal-are-you-sure-btn-cancel").innerText = "Отмена";
-    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "enable_all_sensors()");
+    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "POST_vInd_enable_all_sensors()");
     $("#modal-are-you-sure").modal('show');
 });
 
@@ -50,12 +50,12 @@ $('#btn-enable-all-auto-lvl-mode').click(function() {
     $("#modal-are-you-sure").modal('show');
 });
 
-function disable_all_defective_sensors() {
+function POST_vInd_dis_all_defective_sensors() {
     $.ajax({
         url: 'visualisation/visu_index.php',
         type: 'POST',
         cache: false,
-        data: { 'disable_all_defective_sensors': 1 },
+        data: { 'POST_vInd_dis_all_defective_sensors': 1 },
         dataType: 'html',
         success: function(fromPHP) {
             console.log(fromPHP);
@@ -65,12 +65,12 @@ function disable_all_defective_sensors() {
     return;
 }
 
-function enable_all_sensors() {
+function POST_vInd_enable_all_sensors() {
     $.ajax({
         url: 'visualisation/visu_index.php',
         type: 'POST',
         cache: false,
-        data: { 'enable_all_sensors': 1 },
+        data: { 'POST_vInd_enable_all_sensors': 1 },
         dataType: 'html',
         success: function(fromPHP) {
             console.log(fromPHP);
@@ -85,7 +85,7 @@ function enable_all_auto_lvl_mode() {
         url: 'visualisation/visu_index.php',
         type: 'POST',
         cache: false,
-        data: { 'enable_auto_lvl_mode': 1 },
+        data: { 'POST_vInd_enable_auto_lvl_mode_on_all_silo': 1 },
         dataType: 'html',
         success: function(fromPHP) {
             onSiloClicked(lastSiloID);
@@ -133,7 +133,7 @@ function redrawSiloStatus() {
         url: 'visualisation/visu_index.php',
         type: 'POST',
         cache: false,
-        data: { 'get_silo_current_status': 1 },
+        data: { 'POST_vInd_get_curr_silo_status': 1 },
         dataType: 'html',
         success: function(fromPHP) {
 
@@ -187,7 +187,7 @@ function redrawProductParametersTable(silo_id) {
         url: 'visualisation/visu_index.php',
         type: 'POST',
         cache: false,
-        data: { 'silo_id_for_silo_parameters': silo_id },
+        data: { 'POST_vInd_silo_id_for_product_parameters': silo_id },
         dataType: 'html',
         success: function(fromPHP) {
 
@@ -215,7 +215,7 @@ function redrawTableTemperatures(silo_id) {
         url: 'visualisation/visu_index.php',
         type: 'POST',
         cache: false,
-        data: { 'silo_id_for_temperature_table': silo_id },
+        data: { 'POST_vInd_temperature_table_silo_id': silo_id },
         dataType: 'html',
         success: function(fromPHP) {
             //console.log(fromPHP);
@@ -230,7 +230,7 @@ function redrawTableTemperatureSpeeds(silo_id) {
         url: 'visualisation/visu_index.php',
         type: 'POST',
         cache: false,
-        data: { 'silo_id_for_speeds_table': silo_id },
+        data: { 'POST_vInd_speeds_table_silo_id': silo_id },
         dataType: 'html',
         success: function(fromPHP) {
             document.getElementById("silo-param-table").innerHTML = fromPHP;
@@ -246,7 +246,7 @@ function selectedSensorDisable(silo_id, podv_num, sensor_num) {
         url: 'visualisation/visu_index.php',
         type: 'POST',
         cache: false,
-        data: { 'sensor_disable_silo_id': silo_id, 'sensor_disable_podv_num': podv_num, 'sensor_disable_sensor_num': sensor_num },
+        data: { 'POST_vInd_sensorDisable_silo_id': silo_id, 'POST_vInd_sensorDisable_podv_id': podv_num, 'POST_vInd_sensorDisable_sensor_num': sensor_num },
         dataType: 'html',
         success: function(fromPHP) {
             console.log(fromPHP);
@@ -262,7 +262,7 @@ function selectedSensorEnable(silo_id, podv_num, sensor_num) {
         url: 'visualisation/visu_index.php',
         type: 'POST',
         cache: false,
-        data: { 'sensor_enable_silo_id': silo_id, 'sensor_enable_podv_num': podv_num, 'sensor_enable_sensor_num': sensor_num },
+        data: { 'POST_vInd_sensorEnable_silo_id': silo_id, 'POST_vInd_sensorEnable_podv_id': podv_num, 'POST_vInd_sensorEnable_sensor_num': sensor_num },
         dataType: 'html',
         success: function(fromPHP) {
             console.log(fromPHP);
@@ -277,7 +277,7 @@ function selectedPodvDisable(silo_id, podv_num) {
         url: 'visualisation/visu_index.php',
         type: 'POST',
         cache: false,
-        data: { 'podv_disable_silo_id': silo_id, 'podv_disable_podv_num': podv_num },
+        data: { 'POST_vInd_podvDisable_silo_id': silo_id, 'POST_vInd_podvDisable_podv_id': podv_num },
         dataType: 'html',
         success: function(fromPHP) {
             onSiloClicked(lastSiloID);
@@ -291,7 +291,7 @@ function selectedPodvEnable(silo_id, podv_num) {
         url: 'visualisation/visu_index.php',
         type: 'POST',
         cache: false,
-        data: { 'podv_enable_silo_id': silo_id, 'podv_enable_podv_num': podv_num },
+        data: { 'POST_vInd_podvEnable_silo_id': silo_id, 'POST_vInd_podvEnable_podv_id': podv_num },
         dataType: 'html',
         success: function(fromPHP) {
             onSiloClicked(lastSiloID);
@@ -306,7 +306,7 @@ function change_grain_level_mode(silo_id, lvl_mode) {
         url: 'visualisation/visu_index.php',
         type: 'POST',
         cache: false,
-        data: { 'change_level_mode_silo_id': silo_id, 'change_level_mode_level_mode': lvl_mode },
+        data: { 'POST_vInd_change_source_of_level_mode_silo_id': silo_id, 'POST_vInd_change_level_mode_desired_level_mode': lvl_mode },
         dataType: 'html',
         success: function(fromPHP) {
             onSiloClicked(lastSiloID);
@@ -329,7 +329,7 @@ function change_grain_level_from_slider(silo_id) {
         url: 'visualisation/visu_index.php',
         type: 'POST',
         cache: false,
-        data: { 'change_level_from_slider_silo_id': silo_id, 'change_level_from_slider_grain_level': lvl_slider.value },
+        data: { 'POST_vInd_writeLevelFromSliderForCurrSilo_silo_id': silo_id, 'POST_vInd_writeLevelFromSliderForCurrSilo_grainLevel': lvl_slider.value },
         dataType: 'html',
         success: function(fromPHP) {
             console.log(fromPHP);

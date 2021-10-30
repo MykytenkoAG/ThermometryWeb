@@ -157,7 +157,7 @@ function ddl_create_Users($dbh){
 			 (user_id INT NOT NULL AUTO_INCREMENT,
 			  user_name VARCHAR(20) NOT NULL,
 			  password VARCHAR(32) NOT NULL,
-			  access_level INT NOT NULL DEFAULT 0,
+			  SESSION_curr_access_level INT NOT NULL DEFAULT 0,
 			  PRIMARY KEY (user_id))
 			  ENGINE = InnoDB;";
 
@@ -287,12 +287,12 @@ function ddl_create_Measurements($dbh){
 //	Инициализация таблиц
 function ddl_init_Users($dbh, $initUsersINI){
 	
-	$query="INSERT INTO users (user_name, password, access_level) VALUES ";
+	$query="INSERT INTO users (user_name, password, SESSION_curr_access_level) VALUES ";
 
 	foreach ($initUsersINI as $key => $value) {
 		$query.="('".$initUsersINI[$key]['user_name']."',"
 				."'".$initUsersINI[$key]['password']."'".","
-				    .$initUsersINI[$key]['access_level']."),";
+				    .$initUsersINI[$key]['SESSION_curr_access_level']."),";
 	}
 
 	$query = substr($query,0,-1).";";

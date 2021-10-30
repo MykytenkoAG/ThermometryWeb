@@ -72,7 +72,7 @@
                                                       border-width: 1px;">
                     <div class="" id="ind-table-alarms">
                       <?php
-                        echo getCurrentAlarms($dbh);
+                        echo vInd_getCurrAlarms($dbh);
                       ?>
                     </div>
                   </div>
@@ -123,7 +123,7 @@
 
                   <div class="col-10 col-sm-10 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
                     <?php
-                      echo drawSiloPlan($dbh);
+                      echo vInd_drawSiloPlan($dbh);
                     ?>
                   </div>
 
@@ -253,7 +253,7 @@
                   <div class="align-bottom" id="silo-param-table"
                       style="position:relative; min-width:300px; margin-top: auto; margin-bottom: 0px; margin-left:auto; margin-right: auto; overflow: auto;">
                       <?php
-                        echo drawTemperaturesTable($dbh, 0);
+                        echo vInd_drawTemperaturesTable($dbh, 0);
                       ?>
                   </div>
 

@@ -20,16 +20,16 @@ let arrayOfLevels = [];
 let tbl_prodtypes_changed;
 let tbl_prodtypesbysilo_changed;
 
-let tbl_prodtypes_changes_queue = [];
-let tbl_prodtypesbysilo_update_list = [];
+let POST_vSConf_prodtypes_changes_queue = [];
+let POST_vSConf_prodtypesbysilo_update_list = [];
 
 function init_silo_config() {
     document.getElementById("hdr-href-silo_config.php").setAttribute("class", "nav-link text-primary");
     getArrayOfLevels();
     tbl_prodtypes_changed = 0;
     tbl_prodtypesbysilo_changed = 0;
-    tbl_prodtypes_changes_queue.length = 0;
-    tbl_prodtypesbysilo_update_list.length = 0;
+    POST_vSConf_prodtypes_changes_queue.length = 0;
+    POST_vSConf_prodtypesbysilo_update_list.length = 0;
 }
 //  Получение массива с текущими уровнями для установки уровня в автоматическом режиме для таблицы "Загрузка силосов"
 function getArrayOfLevels() {
@@ -37,7 +37,7 @@ function getArrayOfLevels() {
         url: '/webTermometry/scripts/currValsFromTS.php',
         type: 'POST',
         cache: false,
-        data: { 'get_array_of_levels': 1 },
+        data: { 'POST_currValsFromTS_get_array_of_levels': 1 },
         dataType: 'html',
         success: function(fromPHP) {
             arrayOfLevels = (JSON.parse(fromPHP));
@@ -79,11 +79,11 @@ function redrawTableProdtypes() {
         url: 'visualisation/visu_silo_config.php',
         type: 'POST',
         cache: false,
-        data: { 'draw_table_prodtypes': 1 },
+        data: { 'POST_vSConf_draw_Prodtypes': 1 },
         dataType: 'html',
         success: function(fromPHP) {
             document.getElementById("table-product-types").innerHTML = fromPHP;
-            tbl_prodtypes_changes_queue.length = 0;
+            POST_vSConf_prodtypes_changes_queue.length = 0;
             tbl_prodtypes_changed = 0;
             buttonDisable("table-prodtypes-btn-save-changes");
             buttonDisable("table-prodtypes-btn-discard-changes");
@@ -97,11 +97,11 @@ function redrawTableProdtypesbysilo() {
         url: 'visualisation/visu_silo_config.php',
         type: 'POST',
         cache: false,
-        data: { 'draw_table_prodtypes_by_silo': 1 },
+        data: { 'POST_vSConf_draw_Prodtypesbysilo': 1 },
         dataType: 'html',
         success: function(fromPHP) {
             document.getElementById("table-product-types-by-silo").innerHTML = fromPHP;
-            tbl_prodtypesbysilo_update_list.length = 0;
+            POST_vSConf_prodtypesbysilo_update_list.length = 0;
             tbl_prodtypesbysilo_changed = 0;
             buttonDisable("table-prodtypesbysilo-btn-save-changes");
             buttonDisable("table-prodtypesbysilo-btn-discard-changes");
@@ -117,7 +117,7 @@ function silo_config_save_changes() {
             url: 'visualisation/visu_silo_config.php',
             type: 'POST',
             cache: false,
-            data: { 'tbl_prodtypes_changes_queue': tbl_prodtypes_changes_queue },
+            data: { 'POST_vSConf_prodtypes_changes_queue': POST_vSConf_prodtypes_changes_queue },
             dataType: 'html',
             success: function(fromPHP) {
                 redrawTableProdtypes();
@@ -133,7 +133,7 @@ function silo_config_save_changes() {
             url: 'visualisation/visu_silo_config.php',
             type: 'POST',
             cache: false,
-            data: { 'tbl_prodtypesbysilo_update_list': tbl_prodtypesbysilo_update_list },
+            data: { 'POST_vSConf_prodtypesbysilo_update_list': POST_vSConf_prodtypesbysilo_update_list },
             dataType: 'html',
             success: function(fromPHP) {
                 redrawTableProdtypes();
@@ -198,7 +198,7 @@ function tblProdtypesRemoveRow(product_id) {
 
     document.getElementById("prodtypes-remove-btn-" + product_id).parentElement.parentElement.remove();
 
-    tbl_prodtypes_changes_queue.push({
+    POST_vSConf_prodtypes_changes_queue.push({
         remove_row: { product_id: product_id }
     });
 
@@ -216,7 +216,7 @@ function tblProdtypesUpdateRow(tbl_prodtypes_row_id) {
     }
     buttonEnable("table-prodtypes-btn-discard-changes");
 
-    tbl_prodtypes_changes_queue.push({
+    POST_vSConf_prodtypes_changes_queue.push({
         update_row: {
             product_id: tbl_prodtypes_row_id,
             product_name: document.getElementById("prodtypes-product-name-" + tbl_prodtypes_row_id).value,
@@ -357,7 +357,7 @@ function tblProdtypesAddRow() {
     tbody.appendChild(table_row);
 
     //  Добавляем действие по добавлению в очередь
-    tbl_prodtypes_changes_queue.push({
+    POST_vSConf_prodtypes_changes_queue.push({
         insert_row: {
             product_id: new_id,
             product_name: document.getElementById("prodtypes-product-name-" + new_id).value,
@@ -424,7 +424,7 @@ function tblProdtypesbysiloUpdate() {
 
     let selects = document.getElementById("table-prodtypesbysilo").getElementsByTagName("select");
 
-    tbl_prodtypesbysilo_update_list.length = 0;
+    POST_vSConf_prodtypesbysilo_update_list.length = 0;
 
     let i = 0;
     while (i < selects.length) {
@@ -439,7 +439,7 @@ function tblProdtypesbysiloUpdate() {
         i++;
         const product_id = selects[i].value;
         i++;
-        tbl_prodtypesbysilo_update_list.push({
+        POST_vSConf_prodtypesbysilo_update_list.push({
             silo_id: silo_id,
             grain_level_from_TS: grain_level_from_TS,
             grain_level: grain_level,

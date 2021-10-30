@@ -343,11 +343,11 @@ function getConfForVisu_SiloNameWithMaxPodvNumber($dbh){
 }
 
 //  AJAX --------------------------------------------------------------------------------------------------------------------------------------------------------
-if( isset($_POST['read_vals']) ) {
+if( isset($_POST['POST_currValsFromTS_read_vals']) ) {
 	echo "Данные успешно прочитаны" ;
 }
 
-if( isset($_POST['is_sound_on']) ) {
+if( isset($_POST['POST_currValsFromTS_is_sound_on']) ) {
 
     $dbBackupFile = @parse_ini_string(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/webTermometry/dbBackups/dbbackup 29.10.2021 21.24.58.ini'), true);
 
@@ -356,34 +356,34 @@ if( isset($_POST['is_sound_on']) ) {
     echo isSoundOn($dbh);
 }
 
-if( isset($_POST['acknowledge']) ) {
+if( isset($_POST['POST_currValsFromTS_acknowledge_alarms']) ) {
 	alarms_ack($dbh,$serverDate);
     echo "Произведено подтверждение сигналов АПС" ;
 }
 
-if( isset($_POST['get_server_date']) ) {
+//	Получение текущих значений
+if( isset($_POST['POST_currValsFromTS_get_server_date']) ) {
     echo $serverDate;
 }
 
-if( isset($_POST['get_array_of_levels']) ) {
+if( isset($_POST['POST_currValsFromTS_get_array_of_levels']) ) {
     echo json_encode( $arrayOfLevels ) ;
 }
 
-if( isset($_POST['get_project_conf_array']) ) {
+//	Получение конфигурационных массивов
+if( isset($_POST['POST_currValsFromTS_get_project_conf_array']) ) {
     echo json_encode( getConfForVisu_ProjectConfig($dbh) ) ;
 }
 
-if( isset($_POST['get_silo_names_array']) ) {
+if( isset($_POST['POST_currValsFromTS_get_silo_names_array']) ) {
     echo json_encode( getConfForVisu_SiloNames($dbh) ) ;
 }
 
-
-if( isset( $_POST['get_silo_name_with_id_0']) ) {
+if( isset($_POST['POST_currValsFromTS_get_silo_name_with_id_0']) ) {
     echo getConfForVisu_SiloNameWith_id_0($dbh);
 }
 
-
-if( isset( $_POST['get_silo_number_with_max_podv_number']) ) {
+if( isset($_POST['POST_currValsFromTS_get_silo_number_with_max_podv_number']) ) {
     echo getConfForVisu_SiloNameWithMaxPodvNumber($dbh);
 }
 

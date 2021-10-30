@@ -13,7 +13,7 @@ function auth_signIn($dbh, $userName, $password){
     $hash = "jasdghlkjsdh";
     $password = md5($hash.$password);
 
-    $query = "SELECT access_level FROM users WHERE user_name = '$userName' AND password = '$password';" ;
+    $query = "SELECT SESSION_curr_access_level FROM users WHERE user_name = '$userName' AND password = '$password';" ;
 	$sth = $dbh->query($query);
 
     $user = $sth->fetchAll();
@@ -22,12 +22,12 @@ function auth_signIn($dbh, $userName, $password){
 		return "WRONG";
 	}
 
-    return $user[0]['access_level'];
+    return $user[0]['SESSION_curr_access_level'];
 }
 
-if( isset($_POST['auth_user_name']) && isset($_POST['auth_password']) ) {
-    if( auth_signIn($dbh, $_POST['auth_user_name'], $_POST['auth_password']) != "WRONG"){
-        $_SESSION["access_level"] = auth_signIn($dbh, $_POST['auth_user_name'], $_POST['auth_password']);
+if( isset($_POST['POST_auth_signIn_user_name']) && isset($_POST['POST_auth_signIn_password']) ) {
+    if( auth_signIn($dbh, $_POST['POST_auth_signIn_user_name'], $_POST['POST_auth_signIn_password']) != "WRONG"){
+        $_SESSION["SESSION_curr_access_level"] = auth_signIn($dbh, $_POST['POST_auth_signIn_user_name'], $_POST['POST_auth_signIn_password']);
         echo "OK";
     } else {
         echo "WRONG";
@@ -35,8 +35,8 @@ if( isset($_POST['auth_user_name']) && isset($_POST['auth_password']) ) {
 }
 
 //  Выход из текущей учетной записи
-if( isset($_POST['auth_sign_out']) ) {
-    $_SESSION["access_level"] = 0;
+if( isset($_POST['POST_auth_signOut']) ) {
+    $_SESSION["SESSION_curr_access_level"] = 0;
     echo "OK";
 }
 
@@ -53,22 +53,22 @@ function auth_changePassword($dbh, $userName, $password){
     return "OK";
 }
 
-if( isset($_POST['auth_pwd_change_user_name']) && isset($_POST['auth_pwd_change_password']) ) {
-    echo auth_changePassword($dbh, $_POST['auth_pwd_change_user_name'], $_POST['auth_pwd_change_password']);
+if( isset($_POST['POST_auth_changePassword_userName']) && isset($_POST['POST_auth_changePassword_password']) ) {
+    echo auth_changePassword($dbh, $_POST['POST_auth_changePassword_userName'], $_POST['POST_auth_changePassword_password']);
 }
 
 //  Проверка уровня доступа для текущего пользователя
-if (isset($_SESSION["access_level"])){
-    $accessLevel = $_SESSION["access_level"];
+if (isset($_SESSION["SESSION_curr_access_level"])){
+    $accessLevel = $_SESSION["SESSION_curr_access_level"];
 }
 
 //  Получение текущего пользователя из сессии
 function auth_getCurrentUser(){
         $current_user = "anonymous";
 
-    if ( isset($_SESSION["access_level"]) ){
+    if ( isset($_SESSION["SESSION_curr_access_level"]) ){
 
-        switch($_SESSION["access_level"]){
+        switch($_SESSION["SESSION_curr_access_level"]){
         case 1:
             $current_user =  "oper";
             break;
@@ -81,7 +81,7 @@ function auth_getCurrentUser(){
     return $current_user;
 }
 
-if( isset($_POST['get_current_user']) ) {
+if( isset($_POST['POST_auth_getCurrentUser']) ) {
     echo auth_getCurrentUser();
 }
 

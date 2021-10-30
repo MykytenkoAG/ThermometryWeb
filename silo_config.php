@@ -24,7 +24,7 @@
                 <div class="card-body mb-0">
                   <div id="table-product-types">
                     <?php
-                      echo drawTableProdtypes($dbh, $accessLevel);
+                      echo vSConf_draw_Prodtypes($dbh, $accessLevel);
                     ?>
                   </div>
 
@@ -60,7 +60,7 @@
                 <div class="card-body mb-0">
                   <div id="table-product-types-by-silo" class="">
                     <?php
-                        echo drawTableProdtypesbysilo($dbh, $accessLevel);
+                        echo vSConf_draw_Prodtypesbysilo($dbh, $accessLevel);
                     ?>
                   </div>
 

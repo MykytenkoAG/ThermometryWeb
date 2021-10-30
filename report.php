@@ -39,7 +39,7 @@
 
                     <div class="mt-3">
                       <?php
-                        echo createMeasurementCheckboxes(getAllMeasurementDates($dbh));
+                        echo vRep_drawMeasCheckboxes(vRep_getAllMeasDates($dbh));
                       ?>
                     </div>
 

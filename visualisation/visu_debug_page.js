@@ -23,7 +23,7 @@ function redrawMainDbgTable(){
         url: 'visualisation/visu_debug_page.php',
         type: 'POST',
         cache: false,
-        data: { 'dbg_refresh': 1 },
+        data: { 'POST_vDbgPage_dbg_refresh': 1 },
         dataType: 'html',
         success: function(fromPHP) {
             document.getElementById("debug_parameters_table").innerHTML = fromPHP;
@@ -46,8 +46,8 @@ function onClick_dbg_button_1(silo_name_id, temperature_id){
         url:    'visualisation/visu_debug_page.php',
         type:   'POST',
         cache: false,
-        data: { 'dbg_1_silo_name':   silo_name,
-                'dbg_1_temperature': temperature },
+        data: { 'POST_vDbgPage_dbg_1_silo_name':   silo_name,
+                'POST_vDbgPage_dbg_1_temperature': temperature },
         dataType: 'html',
         success: function(fromPHP) {
             dbg_message=fromPHP;
@@ -66,8 +66,8 @@ function onClick_dbg_button_2(silo_name_id, temperature_speed_id){
         url:    'visualisation/visu_debug_page.php',
         type:   'POST',
         cache:  false,
-        data: { 'dbg_2_silo_name': silo_name,
-                'dbg_2_t_speed':   temperature_speed },
+        data: { 'POST_vDbgPage_dbg_2_silo_name': silo_name,
+                'POST_vDbgPage_dbg_2_t_speed':   temperature_speed },
         dataType: 'html',
         success: function(fromPHP) {
             dbg_message=fromPHP;
@@ -86,8 +86,8 @@ function onClick_dbg_button_3(silo_name_id, level_id){
         url:    'visualisation/visu_debug_page.php',
         type:   'POST',
         cache:  false,
-        data: { 'dbg_3_silo_name':      silo_name,
-                'dbg_3_grain_level':    level },
+        data: { 'POST_vDbgPage_dbg_3_silo_name':      silo_name,
+                'POST_vDbgPage_dbg_3_grain_level':    level },
         dataType: 'html',
         success: function(fromPHP) {
             dbg_message=fromPHP;
@@ -107,9 +107,9 @@ function onClick_dbg_button_4(silo_name_id, podv_num_id, temperature_id){
         url:    'visualisation/visu_debug_page.php',
         type:   'POST',
         cache:  false,
-        data: { 'dbg_4_silo_name':      silo_name,
-                'dbg_4_podv_num':       podv_num,
-                'dbg_4_temperature':    temperature },
+        data: { 'POST_vDbgPage_dbg_4_silo_name':      silo_name,
+                'POST_vDbgPage_dbg_4_podv_num':       podv_num,
+                'POST_vDbgPage_dbg_4_temperature':    temperature },
         dataType: 'html',
         success: function(fromPHP) {
             dbg_message=fromPHP;
@@ -129,9 +129,9 @@ function onClick_dbg_button_5(silo_name_id, podv_num_id, temperature_speed_id){
         url:    'visualisation/visu_debug_page.php',
         type:   'POST',
         cache:  false,
-        data: { 'dbg_5_silo_name':  silo_name,
-                'dbg_5_podv_num':   podv_num,
-                'dbg_5_t_speed':    temperature_speed },
+        data: { 'POST_vDbgPage_dbg_5_silo_name':  silo_name,
+                'POST_vDbgPage_dbg_5_podv_num':   podv_num,
+                'POST_vDbgPage_dbg_5_t_speed':    temperature_speed },
         dataType: 'html',
         success: function(fromPHP) {
             dbg_message=fromPHP;
@@ -152,10 +152,10 @@ function onClick_dbg_button_6(silo_name_id, podv_num_id, sensor_num_id, temperat
         url:    'visualisation/visu_debug_page.php',
         type:   'POST',
         cache:  false,
-        data: { 'dbg_6_silo_name':      silo_name ,
-                'dbg_6_podv_num':       podv_num,
-                'dbg_6_sensor_num':     sensor_num,
-                'dbg_6_temperature':    temperature },
+        data: { 'POST_vDbgPage_dbg_6_silo_name':      silo_name ,
+                'POST_vDbgPage_dbg_6_podv_num':       podv_num,
+                'POST_vDbgPage_dbg_6_sensor_num':     sensor_num,
+                'POST_vDbgPage_dbg_6_temperature':    temperature },
         dataType: 'html',
         success: function(fromPHP) {
             dbg_message=fromPHP;
@@ -176,10 +176,10 @@ function onClick_dbg_button_7(silo_name_id, podv_num_id, sensor_num_id, temperat
         url:    'visualisation/visu_debug_page.php',
         type:   'POST',
         cache:  false,
-        data: { 'dbg_7_silo_name':  silo_name,
-                'dbg_7_podv_num':   podv_num,
-                'dbg_7_sensor_num': sensor_num,
-                'dbg_7_t_speed':    temperature_speed },
+        data: { 'POST_vDbgPage_dbg_7_silo_name':  silo_name,
+                'POST_vDbgPage_dbg_7_podv_num':   podv_num,
+                'POST_vDbgPage_dbg_7_sensor_num': sensor_num,
+                'POST_vDbgPage_dbg_7_t_speed':    temperature_speed },
         dataType: 'html',
         success: function(fromPHP) {
             dbg_message=fromPHP;
@@ -195,7 +195,7 @@ function onClick_dbg_button_8(){
         url:    'visualisation/visu_debug_page.php',
         type:   'POST',
         cache:  false,
-        data: { 'dbg_8_set_all_params_to_0':  1 },
+        data: { 'POST_vDbgPage_dbg_8_set_all_params_to_0':  1 },
         dataType: 'html',
         success: function(fromPHP) {
             dbg_message = fromPHP;
@@ -212,7 +212,7 @@ function onClick_dbg_button_add_measurements(){
         url:    'visualisation/visu_debug_page.php',
         type:   'POST',
         cache:  false,
-        data: { 'write_measurements_to_db': 1 },
+        data: { 'POST_vDbgPage_write_measurements_to_db': 1 },
         dataType: 'html',
         success: function(fromPHP) {
             dbg_message=fromPHP;

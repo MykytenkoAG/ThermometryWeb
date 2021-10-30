@@ -6,7 +6,7 @@ function authGetCurrentUser(){
         url: '/webTermometry/scripts/auth.php',
         type: 'POST',
         cache: false,
-        data: { 'get_current_user': 1 },
+        data: { 'POST_auth_getCurrentUser': 1 },
         dataType: 'html',
         success: function(fromPHP) {
             curr_user = fromPHP;
@@ -36,7 +36,7 @@ function authSignIn(user, inputPassID){
         url: '/webTermometry/scripts/auth.php',
         type: 'POST',
         cache: false,
-        data: { 'auth_user_name': user , 'auth_password': password },
+        data: { 'POST_auth_signIn_user_name': user , 'POST_auth_signIn_password': password },
         dataType: 'html',
         success: function(fromPHP) {
             if(fromPHP=="WRONG"){
@@ -63,7 +63,7 @@ function authSignOut(){
         url: '/webTermometry/scripts/auth.php',
         type: 'POST',
         cache: false,
-        data: { 'auth_sign_out': 1 },
+        data: { 'POST_auth_signOut': 1 },
         dataType: 'html',
         success: function(fromPHP) {
             if(current_page === "silo_config.php"){
@@ -97,7 +97,7 @@ function authPasswordChange(user, inputPassID1, inputPassID2){
             url: '/webTermometry/scripts/auth.php',
             type: 'POST',
             cache: false,
-            data: { 'auth_pwd_change_user_name': user , 'auth_pwd_change_password': pwd1 },
+            data: { 'POST_auth_changePassword_userName': user , 'POST_auth_changePassword_password': pwd1 },
             dataType: 'html',
             success: function(fromPHP) {
                 document.getElementById("modal-info-header").setAttribute("style","background-color: #4046ff;");

@@ -4,7 +4,7 @@ require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.p
 
 // Левый сайтбар ------------------------------------------------------------------------------------------------------------------------------------------------------
 //  OUT = html table < NACK, time, silo_name, podv_num, sensor_num, reason >
-function getCurrentAlarms($dbh){
+function vInd_getCurrAlarms($dbh){
 
     $outArr = array();
 
@@ -101,11 +101,11 @@ function getCurrentAlarms($dbh){
     return $outStr;
 }
 
-if( isset($_POST['get_current_alarms']) ) {
-    echo getCurrentAlarms($dbh);
+if( isset($_POST['POST_vInd_get_current_alarms']) ) {
+    echo vInd_getCurrAlarms($dbh);
 }
-
-function disableAllDefectiveSensors($dbh){
+//  Выключить все неисправные датчики
+function vInd_disAllDefectiveSensors($dbh){
 	
 	$query="UPDATE sensors SET is_enabled=0 WHERE current_temperature > 84";
 	$stmt = $dbh->prepare($query);
@@ -114,12 +114,12 @@ function disableAllDefectiveSensors($dbh){
 	return;
 }
 
-if( isset($_POST['disable_all_defective_sensors']) ) {
-	disableAllDefectiveSensors($dbh);
+if( isset($_POST['POST_vInd_dis_all_defective_sensors']) ) {
+	vInd_disAllDefectiveSensors($dbh);
     echo "Датчики включены";
 }
-
-function enableAllSensors($dbh){
+//  Включить все отключенные датчики
+function vInd_enAllSensors($dbh){
 	
 	$query="UPDATE sensors SET is_enabled=1";
 	$stmt = $dbh->prepare($query);
@@ -128,12 +128,12 @@ function enableAllSensors($dbh){
 	return;
 }
 
-if( isset($_POST['enable_all_sensors']) ) {
-	enableAllSensors($dbh);
+if( isset($_POST['POST_vInd_enable_all_sensors']) ) {
+	vInd_enAllSensors($dbh);
     echo "датчики отключены";
 }
-
-function enableAutoLvlOnAllSilo($dbh){
+//  Включить автоопределение уровня на всех силосах
+function vInd_enAutoLvlOnAllSilo($dbh){
     $query="UPDATE prodtypesbysilo SET grain_level_fromTS = 1;";
 
 	$stmt = $dbh->prepare($query);
@@ -142,13 +142,13 @@ function enableAutoLvlOnAllSilo($dbh){
     return;
 }
 
-if( isset($_POST['enable_auto_lvl_mode']) ) {
-    enableAutoLvlOnAllSilo($dbh);
+if( isset($_POST['POST_vInd_enable_auto_lvl_mode_on_all_silo']) ) {
+    vInd_enAutoLvlOnAllSilo($dbh);
 }
 
 //  Основная часть ----------------------------------------------------------------------------------------------------------------------------------------------------
 //  Функция отрисовки главного плана расположения силосов
-function drawSiloPlan($dbh){ 
+function vInd_drawSiloPlan($dbh){ 
 
     $sql = "SELECT  pbs.silo_id, pbs.silo_name, pbs.grain_level_fromTS, pbs.grain_level,
                     pbs.is_square, pbs.size, pbs.position_col, pbs.position_row,
@@ -248,7 +248,7 @@ function drawSiloPlan($dbh){
 }
 
 //  out: = [silo_id=>[{round,square},img_index]]
-function getSiloCurrentStatus($dbh){
+function vInd_getSiloCurrStatus($dbh){
 
     $outArr = array();    
     
@@ -315,14 +315,14 @@ function getSiloCurrentStatus($dbh){
     return $outArr;
 }
 
-if( isset($_POST['get_silo_current_status']) ) {
-    echo json_encode(getSiloCurrentStatus($dbh));
+if( isset($_POST['POST_vInd_get_curr_silo_status']) ) {
+    echo json_encode(vInd_getSiloCurrStatus($dbh));
 }
 
 //  Правый сайтбар -----------------------------------------------------------------------------------------------------------------------------------------------------
 //  Получение текущих параметров продукта для текущего силоса
 //  out: [название продукта, Tmax, Vmax, ProdTmin, ProdTavg, ProdTmax, ProdVmin, ProdVavg, ProdVmax, RngTmin, RngTmax, RngVmax]
-function getSiloParameters($dbh, $silo_id){
+function vInd_getSiloProductParams($dbh, $silo_id){
 
     $silo_id = preg_split('/-/',$silo_id,-1,PREG_SPLIT_NO_EMPTY)[count(preg_split('/-/',$silo_id,-1,PREG_SPLIT_NO_EMPTY))-1];
 
@@ -355,12 +355,12 @@ function getSiloParameters($dbh, $silo_id){
 }
 
 //  Отрисовка текущих значений параметров силоса
-if( isset($_POST['silo_id_for_silo_parameters']) ) {
-    echo json_encode(getSiloParameters($dbh, $_POST['silo_id_for_silo_parameters']));
+if( isset($_POST['POST_vInd_silo_id_for_product_parameters']) ) {
+    echo json_encode(vInd_getSiloProductParams($dbh, $_POST['POST_vInd_silo_id_for_product_parameters']));
 }
 
-//  Функции для отрисовки таблиц параметров
-function getRowsNumberForSiloTables($dbh, $siloNum){
+//  Функции для отрисовки таблиц с измеренными значениями
+function vInd_getRowsNumberForSiloCurrValuesTable($dbh, $siloNum){
 
     $sql = "SELECT MAX(csn) FROM
             (SELECT COUNT(sensor_num) AS csn
@@ -377,7 +377,7 @@ function getRowsNumberForSiloTables($dbh, $siloNum){
     return $rows[0]['MAX(csn)'];
 }
 
-function getColsNumberForSiloTables($dbh, $siloNum){
+function vInd_getColsNumberForSiloCurrValuesTable($dbh, $siloNum){
 
     $sql = "SELECT COUNT(DISTINCT(podv_id))
     FROM sensors s
@@ -396,7 +396,7 @@ function getColsNumberForSiloTables($dbh, $siloNum){
     return $rows[0]['COUNT(DISTINCT(podv_id))'];
 }
 
-function getShiftArrayForSiloTables($dbh, $siloNum){
+function vInd_getShiftArrayForSiloCurrValuesTable($dbh, $siloNum){
     $sql = "SELECT COUNT(sensor_num) AS csn
                 FROM sensors s 
                 GROUP BY silo_id, podv_id 
@@ -409,12 +409,12 @@ function getShiftArrayForSiloTables($dbh, $siloNum){
     return $sth->fetchAll();
 }
 
-function drawTemperaturesTable($dbh, $siloID){
+function vInd_drawTemperaturesTable($dbh, $siloID){
 
     global $accessLevel;
-    $rows_number  = getRowsNumberForSiloTables($dbh, $siloID);
-    $cols_number  = getColsNumberForSiloTables($dbh, $siloID);
-    $shifts_array = getShiftArrayForSiloTables($dbh, $siloID);
+    $rows_number  = vInd_getRowsNumberForSiloCurrValuesTable($dbh, $siloID);
+    $cols_number  = vInd_getColsNumberForSiloCurrValuesTable($dbh, $siloID);
+    $shifts_array = vInd_getShiftArrayForSiloCurrValuesTable($dbh, $siloID);
 
     //  Находим главный массив
     $sql = "SELECT curr_t_text, curr_t_colour, s.is_enabled, pbs.grain_level_fromTS, pbs.grain_level
@@ -428,16 +428,16 @@ function drawTemperaturesTable($dbh, $siloID){
     }
     $dbRowsArr = $sth->fetchAll();
 
-    return drawParametersTable($accessLevel, $rows_number, $cols_number, $shifts_array, $dbRowsArr, 't', $siloID);
+    return vInd_drawCurrValuesTable($accessLevel, $rows_number, $cols_number, $shifts_array, $dbRowsArr, 't', $siloID);
 
 }
 
-function drawTemperatureSpeedsTable($dbh, $siloID){
+function vInd_drawTemperatureSpeedsTable($dbh, $siloID){
 
     global $accessLevel;
-    $rows_number  = getRowsNumberForSiloTables($dbh, $siloID);
-    $cols_number  = getColsNumberForSiloTables($dbh, $siloID);
-    $shifts_array = getShiftArrayForSiloTables($dbh, $siloID);
+    $rows_number  = vInd_getRowsNumberForSiloCurrValuesTable($dbh, $siloID);
+    $cols_number  = vInd_getColsNumberForSiloCurrValuesTable($dbh, $siloID);
+    $shifts_array = vInd_getShiftArrayForSiloCurrValuesTable($dbh, $siloID);
 
     //  Находим главный массив
     $sql = "SELECT curr_v_text, curr_v_colour, s.is_enabled, pbs.grain_level_fromTS, pbs.grain_level
@@ -450,14 +450,14 @@ function drawTemperatureSpeedsTable($dbh, $siloID){
     }
     $dbRowsArr = $sth->fetchAll();
 
-    return drawParametersTable($accessLevel, $rows_number, $cols_number, $shifts_array, $dbRowsArr, 'v', $siloID);
+    return vInd_drawCurrValuesTable($accessLevel, $rows_number, $cols_number, $shifts_array, $dbRowsArr, 'v', $siloID);
 
 }
 
 /*  Вспомогательная функция для построения таблицы с параметрами
     (количество строк, количество столбцов, массив сдвигов(таблица с параметрами практически всегда не полная), массив из БД, параметр(t,v), id силоса)
 */
-function drawParametersTable($accessLevel, $rowsNumber, $colsNumber, $shiftsArr, $dbRowsArr, $parameter, $siloID){
+function vInd_drawCurrValuesTable($accessLevel, $rowsNumber, $colsNumber, $shiftsArr, $dbRowsArr, $parameter, $siloID){
 
     $btnDisabled = $accessLevel<1 ? "disabled" : "";
 
@@ -570,16 +570,16 @@ function drawParametersTable($accessLevel, $rowsNumber, $colsNumber, $shiftsArr,
 }
 
 //  Отрисовка текущих значений температур
-if(isset($_POST['silo_id_for_temperature_table']) && !empty($_POST['silo_id_for_temperature_table'])) {
-    echo drawTemperaturesTable($dbh, preg_split('/-/', $_POST['silo_id_for_temperature_table'], -1, PREG_SPLIT_NO_EMPTY)[1]);
+if(isset($_POST['POST_vInd_temperature_table_silo_id']) && !empty($_POST['POST_vInd_temperature_table_silo_id'])) {
+    echo vInd_drawTemperaturesTable($dbh, preg_split('/-/', $_POST['POST_vInd_temperature_table_silo_id'], -1, PREG_SPLIT_NO_EMPTY)[1]);
 }
 
 //  Отрисовка текущих значений скоростей
-if(isset($_POST['silo_id_for_speeds_table']) && !empty($_POST['silo_id_for_speeds_table'])) {
-    echo drawTemperatureSpeedsTable($dbh, preg_split('/-/', $_POST['silo_id_for_speeds_table'], -1, PREG_SPLIT_NO_EMPTY)[1]);
+if(isset($_POST['POST_vInd_speeds_table_silo_id']) && !empty($_POST['POST_vInd_speeds_table_silo_id'])) {
+    echo vInd_drawTemperatureSpeedsTable($dbh, preg_split('/-/', $_POST['POST_vInd_speeds_table_silo_id'], -1, PREG_SPLIT_NO_EMPTY)[1]);
 }
 
-function changeLevelMode($dbh, $silo_id, $levelMode){
+function vInd_changeSourceOfLvlForCurrSilo($dbh, $silo_id, $levelMode){
     $query="UPDATE prodtypesbysilo SET grain_level_fromTS = $levelMode WHERE silo_id=$silo_id;";
 
 	$stmt = $dbh->prepare($query);
@@ -588,11 +588,12 @@ function changeLevelMode($dbh, $silo_id, $levelMode){
     return;
 }
 
-if( isset($_POST['change_level_mode_silo_id']) && isset($_POST['change_level_mode_level_mode']) ) {
-    changeLevelMode($dbh, $_POST['change_level_mode_silo_id'], $_POST['change_level_mode_level_mode']);
+if( isset($_POST['POST_vInd_change_source_of_level_mode_silo_id']) && isset($_POST['POST_vInd_change_level_mode_desired_level_mode']) ) {
+    vInd_changeSourceOfLvlForCurrSilo($dbh, $_POST['POST_vInd_change_source_of_level_mode_silo_id'], $_POST['POST_vInd_change_level_mode_desired_level_mode']);
 }
 
-function changeLevelFromSlider($dbh, $silo_id, $grainLevel){
+//  Изменение уровня из главной страницы
+function vInd_writeLevelFromSliderForCurrSilo($dbh, $silo_id, $grainLevel){
     $query="UPDATE prodtypesbysilo SET grain_level = $grainLevel WHERE silo_id=$silo_id;";
 
 	$stmt = $dbh->prepare($query);
@@ -602,12 +603,11 @@ function changeLevelFromSlider($dbh, $silo_id, $grainLevel){
 
 }
 
-//  Изменение уровня из главной страницы
-if( isset($_POST['change_level_from_slider_silo_id']) && isset($_POST['change_level_from_slider_grain_level']) ) {
-    changeLevelFromSlider($dbh, $_POST['change_level_from_slider_silo_id'], $_POST['change_level_from_slider_grain_level']);
+if( isset($_POST['POST_vInd_writeLevelFromSliderForCurrSilo_silo_id']) && isset($_POST['POST_vInd_writeLevelFromSliderForCurrSilo_grainLevel']) ) {
+    vInd_writeLevelFromSliderForCurrSilo($dbh, $_POST['POST_vInd_writeLevelFromSliderForCurrSilo_silo_id'], $_POST['POST_vInd_writeLevelFromSliderForCurrSilo_grainLevel']);
 }
 
-function sensorDisable($dbh, $silo_id, $podv_id, $sensor_num){
+function vInd_sensorDisable($dbh, $silo_id, $podv_id, $sensor_num){
 	
 	$query="UPDATE sensors SET is_enabled=0 WHERE silo_id=$silo_id AND podv_id=$podv_id AND sensor_num=$sensor_num";
 	$stmt = $dbh->prepare($query);
@@ -616,12 +616,12 @@ function sensorDisable($dbh, $silo_id, $podv_id, $sensor_num){
 	return;
 }
 
-if( isset($_POST['sensor_disable_silo_id']) && isset($_POST['sensor_disable_podv_num']) && isset($_POST['sensor_disable_sensor_num']) ) {
-	sensorDisable($dbh, $_POST['sensor_disable_silo_id'], $_POST['sensor_disable_podv_num'], $_POST['sensor_disable_sensor_num']);
+if( isset($_POST['POST_vInd_sensorDisable_silo_id']) && isset($_POST['POST_vInd_sensorDisable_podv_id']) && isset($_POST['POST_vInd_sensorDisable_sensor_num']) ) {
+	vInd_sensorDisable($dbh, $_POST['POST_vInd_sensorDisable_silo_id'], $_POST['POST_vInd_sensorDisable_podv_id'], $_POST['POST_vInd_sensorDisable_sensor_num']);
     echo "Выбранный датчик отключен";
 }
 
-function sensorEnable($dbh, $silo_id, $podv_id, $sensor_num){
+function vInd_sensorEnable($dbh, $silo_id, $podv_id, $sensor_num){
 	
 	$query="UPDATE sensors SET is_enabled=1 WHERE silo_id=$silo_id AND podv_id=$podv_id AND sensor_num=$sensor_num";
 	$stmt = $dbh->prepare($query);
@@ -630,12 +630,12 @@ function sensorEnable($dbh, $silo_id, $podv_id, $sensor_num){
 	return;
 }
 
-if( isset($_POST['sensor_enable_silo_id']) && isset($_POST['sensor_enable_podv_num']) && isset($_POST['sensor_enable_sensor_num']) ) {
-	sensorEnable($dbh, $_POST['sensor_enable_silo_id'], $_POST['sensor_enable_podv_num'], $_POST['sensor_enable_sensor_num']);
+if( isset($_POST['POST_vInd_sensorEnable_silo_id']) && isset($_POST['POST_vInd_sensorEnable_podv_id']) && isset($_POST['POST_vInd_sensorEnable_sensor_num']) ) {
+	vInd_sensorEnable($dbh, $_POST['POST_vInd_sensorEnable_silo_id'], $_POST['POST_vInd_sensorEnable_podv_id'], $_POST['POST_vInd_sensorEnable_sensor_num']);
     echo "Выбранный датчик включен";
 }
 
-function podvDisable($dbh, $silo_id, $podv_id){
+function vInd_podvDisable($dbh, $silo_id, $podv_id){
 	
 	$query="UPDATE sensors SET is_enabled=0 WHERE silo_id=$silo_id AND podv_id=$podv_id";
 	$stmt = $dbh->prepare($query);
@@ -644,11 +644,11 @@ function podvDisable($dbh, $silo_id, $podv_id){
 	return;
 }
 
-if( isset($_POST['podv_disable_silo_id']) && isset($_POST['podv_disable_podv_num']) ) {
-	podvDisable($dbh, $_POST['podv_disable_silo_id'], $_POST['podv_disable_podv_num']);
+if( isset($_POST['POST_vInd_podvDisable_silo_id']) && isset($_POST['POST_vInd_podvDisable_podv_id']) ) {
+	vInd_podvDisable($dbh, $_POST['POST_vInd_podvDisable_silo_id'], $_POST['POST_vInd_podvDisable_podv_id']);
 }
 
-function podvEnable($dbh, $silo_id, $podv_id){
+function vInd_podvEnable($dbh, $silo_id, $podv_id){
 	
 	$query="UPDATE sensors SET is_enabled=1 WHERE silo_id=$silo_id AND podv_id=$podv_id";
 	$stmt = $dbh->prepare($query);
@@ -657,8 +657,8 @@ function podvEnable($dbh, $silo_id, $podv_id){
 	return;
 }
 
-if( isset($_POST['podv_enable_silo_id']) && isset($_POST['podv_enable_podv_num']) ) {
-	podvEnable($dbh, $_POST['podv_enable_silo_id'], $_POST['podv_enable_podv_num']);
+if( isset($_POST['POST_vInd_podvEnable_silo_id']) && isset($_POST['POST_vInd_podvEnable_podv_id']) ) {
+	vInd_podvEnable($dbh, $_POST['POST_vInd_podvEnable_silo_id'], $_POST['POST_vInd_podvEnable_podv_id']);
 }
 
 ?>

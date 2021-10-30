@@ -53,7 +53,7 @@ function getConf_ArrayOfSiloNames() {
         url: '/webTermometry/scripts/currValsFromTS.php',
         type: 'POST',
         cache: false,
-        data: { 'get_silo_names_array': 1 },
+        data: { 'POST_currValsFromTS_get_silo_names_array': 1 },
         dataType: 'html',
         success: function(fromPHP) {
             console.log(fromPHP);
@@ -69,7 +69,7 @@ function getConf_ProjectConfArr() {
         url: '/webTermometry/scripts/currValsFromTS.php',
         type: 'POST',
         cache: false,
-        data: { 'get_project_conf_array': 1 },
+        data: { 'POST_currValsFromTS_get_project_conf_array': 1 },
         dataType: 'html',
         success: function(fromPHP) {
             project_conf_array = (JSON.parse(fromPHP));
@@ -84,7 +84,7 @@ function getConf_SiloNameWithID0() {
         url: '/webTermometry/visualisation/visu_report.php',
         type: 'POST',
         cache: false,
-        data: { 'get_silo_name_with_id_0': 1 },
+        data: { 'POST_currValsFromTS_get_silo_name_with_id_0': 1 },
         dataType: 'html',
         success: function(fromPHP) {
             silo_name_with_id_0 = (JSON.parse(fromPHP));
@@ -99,7 +99,7 @@ function getConf_SiloNameWithMaxPodvNumber() {
         url: '/webTermometry/visualisation/visu_report.php',
         type: 'POST',
         cache: false,
-        data: { 'get_silo_number_with_max_podv_number': 1 },
+        data: { 'POST_currValsFromTS_get_silo_number_with_max_podv_number': 1 },
         dataType: 'html',
         success: function(fromPHP) {
             silo_name_with_max_podv_number = (JSON.parse(fromPHP));
@@ -189,7 +189,7 @@ function isSoundOn() {
         url: '/webTermometry/scripts/currValsFromTS.php',
         type: 'POST',
         cache: false,
-        data: { 'is_sound_on': 1 },
+        data: { 'POST_currValsFromTS_is_sound_on': 1 },
         dataType: 'html',
         success: function(fromPHP) {
 
@@ -224,7 +224,7 @@ function acknowledgeAlarms() {
         url: '/webTermometry/scripts/currValsFromTS.php',
         type: 'POST',
         cache: false,
-        data: { 'acknowledge': 1 },
+        data: { 'POST_currValsFromTS_acknowledge_alarms': 1 },
         dataType: 'html',
         success: function(fromPHP) {
             alarmSound = 0;

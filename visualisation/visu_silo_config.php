@@ -4,7 +4,7 @@ require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/auth.php');
 require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');
 
 //  Отрисовка таблицы "Типы продукта"
-function drawTableProdtypes($dbh, $accessLevel){
+function vSConf_draw_Prodtypes($dbh, $accessLevel){
 
     $inputsDisabled = $accessLevel<2 ? "disabled" : "";
 
@@ -102,11 +102,11 @@ function drawTableProdtypes($dbh, $accessLevel){
     return $outStr;
 }
 
-if( isset($_POST['draw_table_prodtypes']) ) {
-    echo drawTableProdtypes($dbh, $accessLevel);
+if( isset($_POST['POST_vSConf_draw_Prodtypes']) ) {
+    echo vSConf_draw_Prodtypes($dbh, $accessLevel);
 }
 //  Отрисовка таблицы "Загрузка силосов"
-function drawTableProdtypesbysilo($dbh, $accessLevel){
+function vSConf_draw_Prodtypesbysilo($dbh, $accessLevel){
 
     $inputsDisabled = $accessLevel<1 ? "disabled" : "";
 
@@ -231,11 +231,11 @@ function drawTableProdtypesbysilo($dbh, $accessLevel){
     return $outStr;
 }
 
-if( isset($_POST['draw_table_prodtypes_by_silo']) ) {
-    echo drawTableProdtypesbysilo($dbh, $accessLevel);
+if( isset($_POST['POST_vSConf_draw_Prodtypesbysilo']) ) {
+    echo vSConf_draw_Prodtypesbysilo($dbh, $accessLevel);
 }
 //  Формирование очереди с перечнем изменений для таблицы "Типы продукта"
-function prodtypesRemove($dbh, $product_id){
+function vSConf_prodtypes_remove($dbh, $product_id){
 
     $sql = "DELETE FROM prodtypes WHERE product_id=$product_id";
     $sth = $dbh->query($sql);
@@ -243,7 +243,7 @@ function prodtypesRemove($dbh, $product_id){
     return;
 }
 
-function prodtypesInsert($dbh, $product_id, $product_name, $t_min, $t_max, $v_min, $v_max){
+function vSConf_prodtypes_insert($dbh, $product_id, $product_name, $t_min, $t_max, $v_min, $v_max){
 
     $query="INSERT INTO prodtypes (product_id, product_name, t_min, t_max, v_min, v_max) VALUES ($product_id, \"$product_name\", $t_min, $t_max, $v_min, $v_max);";
     $stmt = $dbh->prepare($query);
@@ -252,7 +252,7 @@ function prodtypesInsert($dbh, $product_id, $product_name, $t_min, $t_max, $v_mi
     return $query;
 }
 
-function prodtypesUpdate($dbh, $product_id, $product_name, $t_min, $t_max, $v_min, $v_max){
+function vSConf_prodtypes_update($dbh, $product_id, $product_name, $t_min, $t_max, $v_min, $v_max){
 
     $sql = "UPDATE prodtypes SET product_name='$product_name', t_min='$t_min', t_max='$t_max', v_min ='$v_min', v_max='$v_max' WHERE product_id=$product_id";
     $stmt = $dbh->prepare($sql);
@@ -261,17 +261,17 @@ function prodtypesUpdate($dbh, $product_id, $product_name, $t_min, $t_max, $v_mi
     return $sql;
 }
 //  Все необходимые изменения из страницы визуализации (удаление, добавление и изменение характеристик продукта) сохраняются в виде очереди
-//  и при нажатии на кнопку "Сохранить" в порядке очереди вызываются функции prodtypesRemove(), prodtypesInsert(), prodtypesUpdate()
-if( isset($_POST['tbl_prodtypes_changes_queue']) ) {
+//  и при нажатии на кнопку "Сохранить" в порядке очереди вызываются функции vSConf_prodtypes_remove(), vSConf_prodtypes_insert(), vSConf_prodtypes_update()
+if( isset($_POST['POST_vSConf_prodtypes_changes_queue']) ) {
 
-    $prodTypesChangesQueue = $_POST['tbl_prodtypes_changes_queue'];
+    $prodTypesChangesQueue = $_POST['POST_vSConf_prodtypes_changes_queue'];
 
     foreach($prodTypesChangesQueue as $currChange){
 
         if (key($currChange)=="remove_row"){
-            prodtypesRemove( $dbh, $currChange[key($currChange)]['product_id'] );
+            vSConf_prodtypes_remove( $dbh, $currChange[key($currChange)]['product_id'] );
         } elseif(key($currChange)=="update_row"){
-            prodtypesUpdate(    $dbh,
+            vSConf_prodtypes_update(    $dbh,
                                 $currChange[key($currChange)]['product_id'],
                                 $currChange[key($currChange)]['product_name'],
                                 $currChange[key($currChange)]['t_min'],
@@ -279,7 +279,7 @@ if( isset($_POST['tbl_prodtypes_changes_queue']) ) {
                                 $currChange[key($currChange)]['v_min'],
                                 $currChange[key($currChange)]['v_max']);
         } elseif(key($currChange)=="insert_row"){
-            prodtypesInsert(    $dbh,
+            vSConf_prodtypes_insert(    $dbh,
                                 $currChange[key($currChange)]['product_id'],
                                 $currChange[key($currChange)]['product_name'],
                                 $currChange[key($currChange)]['t_min'],
@@ -293,7 +293,7 @@ if( isset($_POST['tbl_prodtypes_changes_queue']) ) {
     echo "Изменения успешно внесены в Базу Данных";
 }
 //  Формирование массива с перечнем изменений для таблицы "Загрузка силосов"
-function prodtypesbysiloUpdate($dbh, $silo_id, $grainLevelFromTS, $grain_level, $product_id){
+function vSConf_prodtypesbysilo_update($dbh, $silo_id, $grainLevelFromTS, $grain_level, $product_id){
 
     $sql = "UPDATE prodtypesbysilo SET grain_level_FromTS='$grainLevelFromTS', grain_level='$grain_level', product_id='$product_id' WHERE silo_id=$silo_id";
     $stmt = $dbh->prepare($sql);
@@ -302,14 +302,14 @@ function prodtypesbysiloUpdate($dbh, $silo_id, $grainLevelFromTS, $grain_level, 
     return $sql;
 }
 //  В отличии от таблицы "Типы продукта", изменения для таблицы "Загрузка силосов" хранятся в виде массива и при нажатии на кнопку "Сохранить"
-//  за один вызов функции prodtypesbysiloUpdate() все изменения сохраняются в Базе Данных
-if( isset($_POST['tbl_prodtypesbysilo_update_list']) ) {
+//  за один вызов функции vSConf_prodtypesbysilo_update() все изменения сохраняются в Базе Данных
+if( isset($_POST['POST_vSConf_prodtypesbysilo_update_list']) ) {
 
-    $prodtypesBySiloUpdateList = $_POST['tbl_prodtypesbysilo_update_list'];
+    $prodtypesBySiloUpdateList = $_POST['POST_vSConf_prodtypesbysilo_update_list'];
 
     foreach($prodtypesBySiloUpdateList as $currUpdate){
 
-        prodtypesbysiloUpdate(  $dbh,
+        vSConf_prodtypesbysilo_update(  $dbh,
                                 $currUpdate['silo_id'],
                                 $currUpdate['grain_level_from_TS'],
                                 $currUpdate['grain_level'],

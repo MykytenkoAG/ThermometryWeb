@@ -112,7 +112,7 @@ function addNewLineOnChart() {
         url: 'visualisation/visu_report.php',
         type: 'POST',
         cache: false,
-        data: { 'get_t_chart_silo_id': silo_id, 'get_t_chart_podv_id': podv_id - 1, 'get_t_chart_sensor_num': sensor_num - 1, 'get_t_chart_period': period },
+        data: { 'POST_vRep_getTableForChart_silo_name': silo_id, 'POST_vRep_getTableForChart_podv_id': podv_id - 1, 'POST_vRep_getTableForChart_sensor_num': sensor_num - 1, 'POST_vRep_getTableForChart_period': period },
         dataType: 'html',
         success: function(fromPHP) {
 
@@ -551,9 +551,9 @@ function getJSONForPrintedForms(fileFormat){
             url: 'visualisation/visu_report.php',
             type: 'POST',
             cache: false,
-            data: { 'prfrb_avg_t_by_layer_arrayOfSilos': arrayOfSilo,
-                    'prfrb_avg_t_by_layer_arrayOfLayers': arrayOfLayers,
-                    'prfrb_avg_t_by_layer_arrayOfDates': arrayOfDates },
+            data: { 'POST_vRep_getAvgTemperByLayer_arrayOfSilos': arrayOfSilo,
+                    'POST_vRep_getAvgTemperByLayer_arrayOfLayers': arrayOfLayers,
+                    'POST_vRep_getAvgTemperByLayer_arrayOfDates': arrayOfDates },
             dataType: 'html',
             success: function(fromPHP) {
                 const pdfProbObj = createPDFPropObj_AvgTemperaturesByLayer   (fromPHP, 'Данные о средних температурах по слоям');
@@ -574,9 +574,9 @@ function getJSONForPrintedForms(fileFormat){
             url: 'visualisation/visu_report.php',
             type: 'POST',
             cache: false,
-            data: { 'prfrb_t_by_layer_arrayOfSilos': arrayOfSilo,
-                    'prfrb_t_by_layer_arrayOfLayers': arrayOfLayers,
-                    'prfrb_t_by_layer_arrayOfDates': arrayOfDates },
+            data: { 'POST_vRep_getSensorTemperByLayer_arrayOfSilos': arrayOfSilo,
+                    'POST_vRep_getSensorTemperByLayer_arrayOfLayers': arrayOfLayers,
+                    'POST_vRep_getSensorTemperByLayer_arrayOfDates': arrayOfDates },
             dataType: 'html',
             success: function(fromPHP) {
                 const pdfProbObj = createPDFPropObj_SensorTemperaturesByLayer(fromPHP, 'Данные о температурах каждого датчика в слоях');
@@ -598,10 +598,10 @@ function getJSONForPrintedForms(fileFormat){
             url: 'visualisation/visu_report.php',
             type: 'POST',
             cache: false,
-            data: { 'prfrb_t_by_sensor_arrayOfSilos': arrayOfSilo,
-                    'prfrb_t_by_sensor_arrayOfPodv': arrayOfPodvs,
-                    'prfrb_t_by_sensor_arrayOfSensors': arrayOfSensors,
-                    'prfrb_t_by_sensor_arrayOfDates': arrayOfDates },
+            data: { 'POST_vRep_getSensorTemperByPodv_arrayOfSilos': arrayOfSilo,
+                    'POST_vRep_getSensorTemperByPodv_arrayOfPodv': arrayOfPodvs,
+                    'POST_vRep_getSensorTemperByPodv_arrayOfSensors': arrayOfSensors,
+                    'POST_vRep_getSensorTemperByPodv_arrayOfDates': arrayOfDates },
             dataType: 'html',
             success: function(fromPHP) {
                 const pdfProbObj = createPDFPropObj_SensorTemperaturesByPodv(fromPHP, 'Данные о температурах каждого датчика в подвеске');

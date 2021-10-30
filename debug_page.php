@@ -46,7 +46,7 @@
                     </td>
                     <td>
                       <?php
-                        echo "<input type=\"number\" class=\"form-control\" id=\"dbg_t_1\" name=\"dbg_1_temperature\" value=\"0\" style=\"width: 100px;\" $debugPageDisableElements>";
+                        echo "<input type=\"number\" class=\"form-control\" id=\"dbg_t_1\" name=\"POST_vDbgPage_dbg_1_temperature\" value=\"0\" style=\"width: 100px;\" $debugPageDisableElements>";
                       ?>
                     </td>
                     <td>
@@ -77,7 +77,7 @@
                     </td>
                     <td>
                       <?php
-                        echo "<input type=\"number\" class=\"form-control\" id=\"dbg_v_2\" name=\"dbg_2_t_speed\" value=\"0\" style=\"width: 100px;\" $debugPageDisableElements>";
+                        echo "<input type=\"number\" class=\"form-control\" id=\"dbg_v_2\" name=\"POST_vDbgPage_dbg_2_t_speed\" value=\"0\" style=\"width: 100px;\" $debugPageDisableElements>";
                       ?>
                     </td>
                     <td>
@@ -192,7 +192,7 @@
                   </td>
                   <td>
                     <?php
-                      echo "<input type=\"number\" class=\"form-control\" id=\"dbg_v_5\" name=\"dbg_5_t_speed\" value=\"0\" style=\"width: 100px;\" $debugPageDisableElements>";
+                      echo "<input type=\"number\" class=\"form-control\" id=\"dbg_v_5\" name=\"POST_vDbgPage_dbg_5_t_speed\" value=\"0\" style=\"width: 100px;\" $debugPageDisableElements>";
                     ?>
                   </td>
                   <td>
@@ -240,7 +240,7 @@
                   </td>
                   <td>
                     <?php
-                      echo "<input type=\"number\" class=\"form-control\" id=\"dbg_t_6\" name=\"dbg_6_temperature\" value=\"0\" style=\"width: 100px;\" $debugPageDisableElements>";
+                      echo "<input type=\"number\" class=\"form-control\" id=\"dbg_t_6\" name=\"POST_vDbgPage_dbg_6_temperature\" value=\"0\" style=\"width: 100px;\" $debugPageDisableElements>";
                     ?>
                   </td>
                   <td>
@@ -288,7 +288,7 @@
                     </td>
                     <td>
                       <?php
-                        echo "<input type=\"number\" class=\"form-control\" id=\"dbg_v_7\" name=\"dbg_7_t_speed\" value=\"0\" style=\"width: 100px;\" $debugPageDisableElements>";
+                        echo "<input type=\"number\" class=\"form-control\" id=\"dbg_v_7\" name=\"POST_vDbgPage_dbg_7_t_speed\" value=\"0\" style=\"width: 100px;\" $debugPageDisableElements>";
                       ?>
                     </td>
                     <td>
@@ -322,7 +322,7 @@
               </div>  
               <div class="card-body d-flex justify-content-center" style="height:750px; overflow: auto;" id="debug_parameters_table">
                 <?php
-                  echo debug_get_debug_table($dbh);
+                  echo vDbg_draw_debugParamsTable($dbh);
                 ?>
               </div>
             </div>
