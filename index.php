@@ -147,7 +147,7 @@
                   <div class="row">
 
                     <div class="col-4" style="padding-left: 5px; padding-right: 5px;">
-                      <button type="button" id="btn-temperatures" onClick="onBtnClicked(event.target.id)" class="btn btn-light"
+                      <button type="button" id="btn-temperatures" onClick="vIndOnClickOnValsSelectBtn(event.target.id)" class="btn btn-light"
                         data-bs-toggle="tooltip" data-bs-placement="right" title="Отображение текущих температур каждого датчика" style="width: 100%;">
                         <svg width="16" height="16" fill="currentColor" class="bi bi-thermometer-half" viewBox="0 0 16 16">
                           <path d="M9.5 12.5a1.5 1.5 0 1 1-2-1.415V6.5a.5.5 0 0 1 1 0v4.585a1.5 1.5 0 0 1 1 1.415z"/>
@@ -158,7 +158,7 @@
                     </div>
 
                     <div class="col-4" style="padding-left: 5px; padding-right: 5px;">
-                      <button type="button"  id="btn-speeds" onClick="onBtnClicked(event.target.id)"  class="btn btn-light"
+                      <button type="button"  id="btn-speeds" onClick="vIndOnClickOnValsSelectBtn(event.target.id)"  class="btn btn-light"
                         data-bs-toggle="tooltip" data-bs-placement="right" title="Отображение скоростей изменения температуры каждого датчика" style="width: 100%;">
                         <svg width="16" height="16" fill="currentColor" class="bi bi-thermometer-half" viewBox="0 0 16 16">
                           <path d="M9.5 12.5a1.5 1.5 0 1 1-2-1.415V6.5a.5.5 0 0 1 1 0v4.585a1.5 1.5 0 0 1 1 1.415z"/>

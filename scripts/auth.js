@@ -14,7 +14,7 @@ function authGetCurrentUser(){
                 document.location.href = "index.php";
             }
             if((current_page==="silo_config.php") && curr_user==="tehn"){
-                buttonEnable("table-prodtypes-btn-add");
+                vSConf_buttonEnable("sconf-table-prodtypes-btn-add");
             }
         }
     });
@@ -22,11 +22,11 @@ function authGetCurrentUser(){
 /*  Функция для очистки неудачно введенного пароля
     Вызывается при нажатии на кнопку "Отмена" или "Закрыть" модального окна ввода пароля
 */
-function modalClearInput(inputPasswordID){
+function modalPasswordInputClear(inputPasswordID){
     document.getElementById(inputPasswordID).value = "";
     return;
 }
-/*  Функция авторизации
+/*  Аутентификация
     В случае правильно введенного пароля, текущий пользователь сохраняется в сессии, которая автоматически очищается при выходе из браузера
 */
 function authSignIn(user, inputPassID){
@@ -43,9 +43,9 @@ function authSignIn(user, inputPassID){
                 document.getElementById("modal-info-header").setAttribute("style","background-color: #520007;");
                 document.getElementById("modal-info-title").innerText = "Ошибка";
                 document.getElementById("modal-info-body-message").innerText = "Пароль не верный!";
-                modalClearInput('modal-sign-in-password');
-                modalClearInput('modal-pass-change-pwd1');
-                modalClearInput('modal-pass-change-pwd2');
+                modalPasswordInputClear('modal-sign-in-password');
+                modalPasswordInputClear('modal-pass-change-pwd1');
+                modalPasswordInputClear('modal-pass-change-pwd2');
                 $("#modal-info").modal('show');
             } else {
                 document.location.href = current_page;
@@ -88,9 +88,9 @@ function authPasswordChange(user, inputPassID1, inputPassID2){
         document.getElementById("modal-info-header").setAttribute("style","background-color: #520007;");
         document.getElementById("modal-info-title").innerText = "Ошибка";
         document.getElementById("modal-info-body-message").innerText = "Введенные пароли не совпадают!";
-        modalClearInput('modal-sign-in-password');
-        modalClearInput('modal-pass-change-pwd1');
-        modalClearInput('modal-pass-change-pwd2');
+        modalPasswordInputClear('modal-sign-in-password');
+        modalPasswordInputClear('modal-pass-change-pwd1');
+        modalPasswordInputClear('modal-pass-change-pwd2');
         $("#modal-info").modal('show');
     } else {
         $.ajax({

@@ -48,22 +48,22 @@ $("a").click(
             }
         } else if (lastIDSymbols.substr(-4)==="oper"){
             if(curr_user !== "oper"){
-                document.getElementById("modal-sign-in-btn-close").setAttribute("onclick","modalClearInput('modal-sign-in-password')");
-                document.getElementById("modal-sign-in-btn-cancel").setAttribute("onclick","modalClearInput('modal-sign-in-password')");
+                document.getElementById("modal-sign-in-btn-close").setAttribute("onclick","modalPasswordInputClear('modal-sign-in-password')");
+                document.getElementById("modal-sign-in-btn-cancel").setAttribute("onclick","modalPasswordInputClear('modal-sign-in-password')");
                 document.getElementById("modal-sign-in-user-name").innerText = "Оператор";
                 document.getElementById("modal-sign-in-btn-ok").setAttribute("onclick","authSignIn('oper', 'modal-sign-in-password')");
                 $("#modal-sign-in").modal('show');
             }
         } else if (lastIDSymbols.substr(-4)==="tehn"){
             if(curr_user !== "tehn"){
-                document.getElementById("modal-sign-in-btn-close").setAttribute("onclick","modalClearInput('modal-sign-in-password')");
-                document.getElementById("modal-sign-in-btn-cancel").setAttribute("onclick","modalClearInput('modal-sign-in-password')");
+                document.getElementById("modal-sign-in-btn-close").setAttribute("onclick","modalPasswordInputClear('modal-sign-in-password')");
+                document.getElementById("modal-sign-in-btn-cancel").setAttribute("onclick","modalPasswordInputClear('modal-sign-in-password')");
                 document.getElementById("modal-sign-in-user-name").innerText = "Технолог";
                 document.getElementById("modal-sign-in-btn-ok").setAttribute("onclick","authSignIn('tehn', 'modal-sign-in-password')");
                 $("#modal-sign-in").modal('show');
             }
         } else if (lastIDSymbols==="ack"){
-            acknowledgeAlarms();
+            alarmsAck();
         } else if (lastIDSymbols==="out"){
             authSignOut();
         }

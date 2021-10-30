@@ -1,12 +1,6 @@
 //  TODO
 /*
     При наличии активных АПС обе таблицы должны блокироваться
-    
-    Добавить обработку кнопки "Сменить пароль"
-
-    Добавить обработку кнопки "Скачать протокол работы программы"
-
-    Добавить обработку кнопки "Скачать протокол работы АПС"
 
     Добавить возможность очищать БД
 
@@ -20,19 +14,19 @@ let arrayOfLevels = [];
 let tbl_prodtypes_changed;
 let tbl_prodtypesbysilo_changed;
 
-let POST_vSConf_prodtypes_changes_queue = [];
-let POST_vSConf_prodtypesbysilo_update_list = [];
+let SConf_prodtypes_changes_queue = [];
+let SConf_prodtypesbysilo_update_list = [];
 
 function init_silo_config() {
     document.getElementById("hdr-href-silo_config.php").setAttribute("class", "nav-link text-primary");
-    getArrayOfLevels();
+    vSConf_getArrayOfLevels();
     tbl_prodtypes_changed = 0;
     tbl_prodtypesbysilo_changed = 0;
-    POST_vSConf_prodtypes_changes_queue.length = 0;
-    POST_vSConf_prodtypesbysilo_update_list.length = 0;
+    SConf_prodtypes_changes_queue.length = 0;
+    SConf_prodtypesbysilo_update_list.length = 0;
 }
 //  Получение массива с текущими уровнями для установки уровня в автоматическом режиме для таблицы "Загрузка силосов"
-function getArrayOfLevels() {
+function vSConf_getArrayOfLevels() {
     $.ajax({
         url: '/webTermometry/scripts/currValsFromTS.php',
         type: 'POST',
@@ -47,7 +41,7 @@ function getArrayOfLevels() {
     return;
 }
 //  отключение всех входов для таблицы с заданным id
-function tableInputsDisable(table_id) {
+function vSConf_tableInputsDisable(table_id) {
     let inputs = document.getElementById(table_id).getElementsByTagName('input');
     let buttons = document.getElementById(table_id).getElementsByTagName('button');
     let selects = document.getElementById(table_id).getElementsByTagName('select');
@@ -64,17 +58,17 @@ function tableInputsDisable(table_id) {
     return;
 }
 //  Отключение кнопки с заданным id
-function buttonDisable(button_id) {
+function vSConf_buttonDisable(button_id) {
     document.getElementById(button_id).disabled = true;
     return;
 }
 //  Включение кнопки с заданным id
-function buttonEnable(button_id) {
+function vSConf_buttonEnable(button_id) {
     document.getElementById(button_id).disabled = false;
     return;
 }
 //  Отрисовка таблицы "Типы продукта"
-function redrawTableProdtypes() {
+function vSConf_redrawTableProdtypes() {
     $.ajax({
         url: 'visualisation/visu_silo_config.php',
         type: 'POST',
@@ -83,16 +77,16 @@ function redrawTableProdtypes() {
         dataType: 'html',
         success: function(fromPHP) {
             document.getElementById("table-product-types").innerHTML = fromPHP;
-            POST_vSConf_prodtypes_changes_queue.length = 0;
+            SConf_prodtypes_changes_queue.length = 0;
             tbl_prodtypes_changed = 0;
-            buttonDisable("table-prodtypes-btn-save-changes");
-            buttonDisable("table-prodtypes-btn-discard-changes");
+            vSConf_buttonDisable("sconf-table-prodtypes-btn-save-changes");
+            vSConf_buttonDisable("sconf-table-prodtypes-btn-discard-changes");
         }
     });
     return;
 }
 //  Отрисовка таблицы "Загрузка силосов"
-function redrawTableProdtypesbysilo() {
+function vSConf_redrawTableProdtypesbysilo() {
     $.ajax({
         url: 'visualisation/visu_silo_config.php',
         type: 'POST',
@@ -101,27 +95,27 @@ function redrawTableProdtypesbysilo() {
         dataType: 'html',
         success: function(fromPHP) {
             document.getElementById("table-product-types-by-silo").innerHTML = fromPHP;
-            POST_vSConf_prodtypesbysilo_update_list.length = 0;
+            SConf_prodtypesbysilo_update_list.length = 0;
             tbl_prodtypesbysilo_changed = 0;
-            buttonDisable("table-prodtypesbysilo-btn-save-changes");
-            buttonDisable("table-prodtypesbysilo-btn-discard-changes");
+            vSConf_buttonDisable("sconf-table-prodtypesbysilo-btn-save-changes");
+            vSConf_buttonDisable("sconf-table-prodtypesbysilo-btn-discard-changes");
         }
     });
     return;
 }
 //  Сохранение изменений
-function silo_config_save_changes() {
+function vSConf_siloConfigSaveChanges() {
 
     if (tbl_prodtypes_changed == 1) {
         $.ajax({
             url: 'visualisation/visu_silo_config.php',
             type: 'POST',
             cache: false,
-            data: { 'POST_vSConf_prodtypes_changes_queue': POST_vSConf_prodtypes_changes_queue },
+            data: { 'POST_vSConf_prodtypes_changes_queue': SConf_prodtypes_changes_queue },
             dataType: 'html',
             success: function(fromPHP) {
-                redrawTableProdtypes();
-                redrawTableProdtypesbysilo();
+                vSConf_redrawTableProdtypes();
+                vSConf_redrawTableProdtypesbysilo();
                 document.getElementById("modal-info-body-message").innerText = "Изменения успешно внесены в Базу Данных";
                 $("#modal-info").modal('show');
             }
@@ -133,11 +127,11 @@ function silo_config_save_changes() {
             url: 'visualisation/visu_silo_config.php',
             type: 'POST',
             cache: false,
-            data: { 'POST_vSConf_prodtypesbysilo_update_list': POST_vSConf_prodtypesbysilo_update_list },
+            data: { 'POST_vSConf_prodtypesbysilo_update_list': SConf_prodtypesbysilo_update_list },
             dataType: 'html',
             success: function(fromPHP) {
-                redrawTableProdtypes();
-                redrawTableProdtypesbysilo();
+                vSConf_redrawTableProdtypes();
+                vSConf_redrawTableProdtypesbysilo();
                 document.getElementById("modal-info-body-message").innerText = "Изменения успешно внесены в Базу Данных";
                 $("#modal-info").modal('show');
             }
@@ -147,76 +141,76 @@ function silo_config_save_changes() {
     return;
 }
 //  Возвращение значений к текущему состоянию
-function silo_config_discard_changes() {
+function vSConf_siloConfigDiscardChanges() {
 
-    redrawTableProdtypes();
-    redrawTableProdtypesbysilo();
+    vSConf_redrawTableProdtypes();
+    vSConf_redrawTableProdtypesbysilo();
     if (curr_user == "tehn") {
-        buttonEnable("table-prodtypes-btn-add");
+        vSConf_buttonEnable("sconf-table-prodtypes-btn-add");
     }
 
 }
 //  Таблица "Типы продукта". Кнопка "Добавить"
-$("#table-prodtypes-btn-add").click(function() {
-    tblProdtypesAddRow();
+$("#sconf-table-prodtypes-btn-add").click(function() {
+    vSConf_tblProdtypesAddRow();
 });
 //  Таблица "Типы продукта". Кнопка "Сохранить изменения"
-$("#table-prodtypes-btn-save-changes").click(function() {
+$("#sconf-table-prodtypes-btn-save-changes").click(function() {
     document.getElementById("modal-are-you-sure-text").innerText = "Сохранить изменения?";
     document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
     document.getElementById("modal-are-you-sure-btn-cancel").innerText = "Отмена";
-    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "silo_config_save_changes()");
+    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "vSConf_siloConfigSaveChanges()");
     $("#modal-are-you-sure").modal('show');
 });
 //  Таблица "Типы продукта". Кнопка "Отменить изменения"
-$("#table-prodtypes-btn-discard-changes").click(function() {
-    silo_config_discard_changes();
+$("#sconf-table-prodtypes-btn-discard-changes").click(function() {
+    vSConf_siloConfigDiscardChanges();
 });
 //  Таблица "Загрузка силосов". Кнопка "Сохранить изменения"
-$("#table-prodtypesbysilo-btn-save-changes").click(function() {
+$("#sconf-table-prodtypesbysilo-btn-save-changes").click(function() {
     document.getElementById("modal-are-you-sure-text").innerText = "Сохранить изменения?";
     document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
     document.getElementById("modal-are-you-sure-btn-cancel").innerText = "Отмена";
-    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "silo_config_save_changes()");
+    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "vSConf_siloConfigSaveChanges()");
     $("#modal-are-you-sure").modal('show');
 });
 //  Таблица "Загрузка силосов". Кнопка "Отменить изменения"
-$("#table-prodtypesbysilo-btn-discard-changes").click(function() {
-    silo_config_discard_changes();
+$("#sconf-table-prodtypesbysilo-btn-discard-changes").click(function() {
+    vSConf_siloConfigDiscardChanges();
 });
 
 //  Таблица "Типы продукта"
 //  Удалить строку
-function tblProdtypesRemoveRow(product_id) {
+function vSConf_tblProdtypesRemoveRow(product_id) {
 
     tbl_prodtypes_changed = 1;
 
-    tableInputsDisable("table-prodtypesbysilo");
+    vSConf_tableInputsDisable("table-prodtypesbysilo");
 
-    buttonEnable("table-prodtypes-btn-save-changes");
-    buttonEnable("table-prodtypes-btn-discard-changes");
+    vSConf_buttonEnable("sconf-table-prodtypes-btn-save-changes");
+    vSConf_buttonEnable("sconf-table-prodtypes-btn-discard-changes");
 
     document.getElementById("prodtypes-remove-btn-" + product_id).parentElement.parentElement.remove();
 
-    POST_vSConf_prodtypes_changes_queue.push({
+    SConf_prodtypes_changes_queue.push({
         remove_row: { product_id: product_id }
     });
 
     return;
 }
 //  Обновить показания
-function tblProdtypesUpdateRow(tbl_prodtypes_row_id) {
+function vSConf_tblProdtypesUpdateRow(tbl_prodtypes_row_id) {
 
     tbl_prodtypes_changed = 1;
 
-    tableInputsDisable("table-prodtypesbysilo");
+    vSConf_tableInputsDisable("table-prodtypesbysilo");
 
-    if (checkProductNames()) {
-        buttonEnable("table-prodtypes-btn-save-changes");
+    if (vSConf_checkProductNames()) {
+        vSConf_buttonEnable("sconf-table-prodtypes-btn-save-changes");
     }
-    buttonEnable("table-prodtypes-btn-discard-changes");
+    vSConf_buttonEnable("sconf-table-prodtypes-btn-discard-changes");
 
-    POST_vSConf_prodtypes_changes_queue.push({
+    SConf_prodtypes_changes_queue.push({
         update_row: {
             product_id: tbl_prodtypes_row_id,
             product_name: document.getElementById("prodtypes-product-name-" + tbl_prodtypes_row_id).value,
@@ -230,17 +224,17 @@ function tblProdtypesUpdateRow(tbl_prodtypes_row_id) {
     return;
 }
 //  Добавить строку
-function tblProdtypesAddRow() {
+function vSConf_tblProdtypesAddRow() {
 
     tbl_prodtypes_changed = 1;
 
     //  Отключаем другую таблицу
-    tableInputsDisable("table-prodtypesbysilo");
+    vSConf_tableInputsDisable("table-prodtypesbysilo");
     //  Включаем кнопки "сохранить" и "отменить изменения"
-    if (checkProductNames()) {
-        buttonEnable("table-prodtypes-btn-save-changes");
+    if (vSConf_checkProductNames()) {
+        vSConf_buttonEnable("sconf-table-prodtypes-btn-save-changes");
     }
-    buttonEnable("table-prodtypes-btn-discard-changes");
+    vSConf_buttonEnable("sconf-table-prodtypes-btn-discard-changes");
 
     //  Создаем новую строку, отображаем ее на странице
     //  Находим новый id
@@ -259,8 +253,8 @@ function tblProdtypesAddRow() {
 
     input_product_name.setAttribute("type", "text");
     input_product_name.setAttribute("id", "prodtypes-product-name-" + new_id);
-    input_product_name.setAttribute("onchange", "tblProdtypesUpdateRow(" + new_id + ")");
-    input_product_name.setAttribute("oninput", "checkProductNames()");
+    input_product_name.setAttribute("onchange", "vSConf_tblProdtypesUpdateRow(" + new_id + ")");
+    input_product_name.setAttribute("oninput", "vSConf_checkProductNames()");
     input_product_name.setAttribute("class", "form-control mx-auto productname");
     input_product_name.setAttribute("style", "width: 300px;");
 
@@ -285,7 +279,7 @@ function tblProdtypesAddRow() {
 
     input_t_min.setAttribute("type", "number");
     input_t_min.setAttribute("id", "prodtypes-t-min-" + new_id);
-    input_t_min.setAttribute("onchange", "tblProdtypesUpdateRow(" + new_id + ")");
+    input_t_min.setAttribute("onchange", "vSConf_tblProdtypesUpdateRow(" + new_id + ")");
     input_t_min.setAttribute("class", "form-control mx-auto");
     input_t_min.setAttribute("style", "width: 80px;");
     input_t_min.value = 20.0;
@@ -296,7 +290,7 @@ function tblProdtypesAddRow() {
 
     input_t_max.setAttribute("type", "number");
     input_t_max.setAttribute("id", "prodtypes-t-max-" + new_id);
-    input_t_max.setAttribute("onchange", "tblProdtypesUpdateRow(" + new_id + ")");
+    input_t_max.setAttribute("onchange", "vSConf_tblProdtypesUpdateRow(" + new_id + ")");
     input_t_max.setAttribute("class", "form-control mx-auto");
     input_t_max.setAttribute("style", "width: 80px;");
     input_t_max.value = 30.0;
@@ -307,7 +301,7 @@ function tblProdtypesAddRow() {
 
     input_v_min.setAttribute("type", "number");
     input_v_min.setAttribute("id", "prodtypes-v-min-" + new_id);
-    input_v_min.setAttribute("onchange", "tblProdtypesUpdateRow(" + new_id + ")");
+    input_v_min.setAttribute("onchange", "vSConf_tblProdtypesUpdateRow(" + new_id + ")");
     input_v_min.setAttribute("class", "form-control mx-auto");
     input_v_min.setAttribute("style", "width: 60px;");
     input_v_min.value = 0.0;
@@ -318,7 +312,7 @@ function tblProdtypesAddRow() {
 
     input_v_max.setAttribute("type", "number");
     input_v_max.setAttribute("id", "prodtypes-v-max-" + new_id);
-    input_v_max.setAttribute("onchange", "tblProdtypesUpdateRow(" + new_id + ")");
+    input_v_max.setAttribute("onchange", "vSConf_tblProdtypesUpdateRow(" + new_id + ")");
     input_v_max.setAttribute("class", "form-control mx-auto");
     input_v_max.setAttribute("style", "width: 60px;");
     input_v_max.value = 3.0;
@@ -330,7 +324,7 @@ function tblProdtypesAddRow() {
     button_remove.setAttribute("type", "submit");
     button_remove.setAttribute("class", "btn btn-danger mx-auto");
     button_remove.setAttribute("id", "prodtypes-remove-btn-" + new_id);
-    button_remove.setAttribute("onclick", "tblProdtypesRemoveRow(" + new_id + ")");
+    button_remove.setAttribute("onclick", "vSConf_tblProdtypesRemoveRow(" + new_id + ")");
 
     var button_remove_img = document.createElement("img");
 
@@ -357,7 +351,7 @@ function tblProdtypesAddRow() {
     tbody.appendChild(table_row);
 
     //  Добавляем действие по добавлению в очередь
-    POST_vSConf_prodtypes_changes_queue.push({
+    SConf_prodtypes_changes_queue.push({
         insert_row: {
             product_id: new_id,
             product_name: document.getElementById("prodtypes-product-name-" + new_id).value,
@@ -372,10 +366,10 @@ function tblProdtypesAddRow() {
 }
 //  Валидация форм --------------------------------------------------------------------------------------------------------------------------------------------
 //  Проверка двух и более строк с одинаковыми названиями продукта
-function checkProductNames() {
+function vSConf_checkProductNames() {
 
     tbl_prodtypes_changed = 1;
-    tableInputsDisable("table-prodtypesbysilo");
+    vSConf_tableInputsDisable("table-prodtypesbysilo");
 
     let inputs = document.getElementById("table-prodtypes").getElementsByClassName("productname");
     let checkOK = true;
@@ -383,20 +377,20 @@ function checkProductNames() {
     for (let i = 0; i < inputs.length; i++) {
         inputs[i].setAttribute("style", "width: 300px;");
     }
-    buttonEnable("table-prodtypes-btn-save-changes");
-    buttonEnable("table-prodtypes-btn-discard-changes");
+    vSConf_buttonEnable("sconf-table-prodtypes-btn-save-changes");
+    vSConf_buttonEnable("sconf-table-prodtypes-btn-discard-changes");
     for (let i = 0; i < inputs.length; i++) {
-        if (!isProductNameValid(inputs[i].value) || inputs[i].value==="") {
+        if (!vSConf_isProductNameValid(inputs[i].value) || inputs[i].value==="") {
             checkOK = false;
             inputs[i].setAttribute("style", "width: 300px; color:red");
-            buttonDisable("table-prodtypes-btn-save-changes");
+            vSConf_buttonDisable("sconf-table-prodtypes-btn-save-changes");
         }
         for (let j = i + 1; j < inputs.length; j++) {
             if (inputs[i].value == inputs[j].value) {
                 checkOK = false;
                 inputs[i].setAttribute("style", "width: 300px; color:red");
                 inputs[j].setAttribute("style", "width: 300px; color:red");
-                buttonDisable("table-prodtypes-btn-save-changes");
+                vSConf_buttonDisable("sconf-table-prodtypes-btn-save-changes");
             }
         }
     }
@@ -404,7 +398,7 @@ function checkProductNames() {
     return checkOK;
 }
 //  Проверка имени на запрещенные символы
-function isProductNameValid(value) {
+function vSConf_isProductNameValid(value) {
     var pattern = new RegExp(/[~`!#$\^&*+=\\[\]\\';/{}|\\":<>\?]/); //unacceptable chars
     if (pattern.test(value)) {
         return false;
@@ -413,18 +407,18 @@ function isProductNameValid(value) {
 }
 
 //  Таблица "Загрузка силосов"
-function tblProdtypesbysiloUpdate() {
+function vSConf_tblProdtypesbysiloUpdate() {
 
     tbl_prodtypesbysilo_changed = 1;
 
-    tableInputsDisable("table-prodtypes");
-    buttonDisable("table-prodtypes-btn-add");
-    buttonDisable("table-prodtypes-btn-save-changes");
-    buttonDisable("table-prodtypes-btn-discard-changes");
+    vSConf_tableInputsDisable("table-prodtypes");
+    vSConf_buttonDisable("sconf-table-prodtypes-btn-add");
+    vSConf_buttonDisable("sconf-table-prodtypes-btn-save-changes");
+    vSConf_buttonDisable("sconf-table-prodtypes-btn-discard-changes");
 
     let selects = document.getElementById("table-prodtypesbysilo").getElementsByTagName("select");
 
-    POST_vSConf_prodtypesbysilo_update_list.length = 0;
+    SConf_prodtypesbysilo_update_list.length = 0;
 
     let i = 0;
     while (i < selects.length) {
@@ -439,7 +433,7 @@ function tblProdtypesbysiloUpdate() {
         i++;
         const product_id = selects[i].value;
         i++;
-        POST_vSConf_prodtypesbysilo_update_list.push({
+        SConf_prodtypesbysilo_update_list.push({
             silo_id: silo_id,
             grain_level_from_TS: grain_level_from_TS,
             grain_level: grain_level,
@@ -447,17 +441,17 @@ function tblProdtypesbysiloUpdate() {
         });
     }
 
-    buttonEnable("table-prodtypesbysilo-btn-save-changes");
-    buttonEnable("table-prodtypesbysilo-btn-discard-changes");
+    vSConf_buttonEnable("sconf-table-prodtypesbysilo-btn-save-changes");
+    vSConf_buttonEnable("sconf-table-prodtypesbysilo-btn-discard-changes");
 
     return;
 }
 
 //  Опции
 //  Изменить пароль
-$("#silo-config-btn-change-password").click(function() {
-    document.getElementById("modal-sign-in-btn-close").setAttribute("onclick", "modalClearInput('modal-pass-change-pwd1');modalClearInput('modal-pass-change-pwd2')");
-    document.getElementById("modal-sign-in-btn-cancel").setAttribute("onclick", "modalClearInput('modal-pass-change-pwd1');modalClearInput('modal-pass-change-pwd2')");
+$("#sconf-silo-config-btn-change-password").click(function() {
+    document.getElementById("modal-sign-in-btn-close").setAttribute("onclick", "modalPasswordInputClear('modal-pass-change-pwd1');modalPasswordInputClear('modal-pass-change-pwd2')");
+    document.getElementById("modal-sign-in-btn-cancel").setAttribute("onclick", "modalPasswordInputClear('modal-pass-change-pwd1');modalPasswordInputClear('modal-pass-change-pwd2')");
     document.getElementById("modal-pass-change-btn-ok").setAttribute("onclick", "authPasswordChange('" + curr_user + "', 'modal-pass-change-pwd1', 'modal-pass-change-pwd2')");
     $("#modal-pass-change").modal('show');
 });

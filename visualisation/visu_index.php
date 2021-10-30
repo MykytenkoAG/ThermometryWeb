@@ -217,7 +217,7 @@ function vInd_drawSiloPlan($dbh){
                     if($siloConfigRow['is_square']){
                         //  Если силос круглый
                         $outStr .= "<img src=\"/webTermometry/img/silo_square_OK.png\"
-                        id=\"silo-".$siloConfigRow['silo_id']."\" onclick=\"onSiloClicked(event.target.id)\"
+                        id=\"silo-".$siloConfigRow['silo_id']."\" onclick=\"vIndOnClickOnSilo(event.target.id)\"
 
                         data-bs-toggle=\"tooltip\" data-bs-placement=\"right\" title=\"$siloTooltip\"
 
@@ -225,7 +225,7 @@ function vInd_drawSiloPlan($dbh){
                     } else{
                         //  Если силос квадратный
                         $outStr .= "<img src=\"/webTermometry/img/silo_round_OK.png\"
-                        id=\"silo-".$siloConfigRow['silo_id']."\" onclick=\"onSiloClicked(event.target.id)\"
+                        id=\"silo-".$siloConfigRow['silo_id']."\" onclick=\"vIndOnClickOnSilo(event.target.id)\"
 
                         data-bs-toggle=\"tooltip\" data-bs-placement=\"right\" title=\"$siloTooltip\"
 
@@ -474,11 +474,11 @@ function vInd_drawCurrValuesTable($accessLevel, $rowsNumber, $colsNumber, $shift
             if($dbRowsArr[0]['grain_level_fromTS']){
                 $lvlModeText="A";
                 $lvlModeColour="green";
-                $lvlModeButton="<li><button class=\"dropdown-item\" type=\"button\" onclick=\"change_grain_level_mode($siloID, '0')\">Переключить в ручной режим</button></li>";
+                $lvlModeButton="<li><button class=\"dropdown-item\" type=\"button\" onclick=\"vIndChangeSourceOfLvl($siloID, '0')\">Переключить в ручной режим</button></li>";
             } else {
                 $lvlModeText="M";
                 $lvlModeColour="orange";
-                $lvlModeButton="<li><button class=\"dropdown-item\" type=\"button\" onclick=\"change_grain_level_mode($siloID, '1')\">Переключить в автоматический режим</button></li>";
+                $lvlModeButton="<li><button class=\"dropdown-item\" type=\"button\" onclick=\"vIndChangeSourceOfLvl($siloID, '1')\">Переключить в автоматический режим</button></li>";
             }
 
             $lvlSliderDisabled = $dbRowsArr[0]['grain_level_fromTS']==1 || $accessLevel<1 ? "disabled" : "";
@@ -510,7 +510,7 @@ function vInd_drawCurrValuesTable($accessLevel, $rowsNumber, $colsNumber, $shift
             $outStr .= "<td rowspan=\"$lvlSlider_rowspan\">
                     <input type=\"range\" id=\"lvl-slider-$parameter-$siloID\"
                     name=\"\" min=\"0\" max=\"$lvlSlider_max\" value=\"$lvlSlider_value\" step=\"1\"
-                    onchange=\"change_grain_level_from_slider($siloID)\" style=\"$lvlSlider_style\" $lvlSliderDisabled>
+                    onchange=\"vIndWriteGrainLvlFromSlider($siloID)\" style=\"$lvlSlider_style\" $lvlSliderDisabled>
             </td>";
         }
 
@@ -539,14 +539,14 @@ function vInd_drawCurrValuesTable($accessLevel, $rowsNumber, $colsNumber, $shift
                         <ul class=\"dropdown-menu\" aria-labelledby=\"dropdownMenu2\">";
 
                 if($dbRowsArr[$curr_ind]['is_enabled']){
-                    $outStr .= "<li><button class=\"btn dropdown-item\" type=\"button\" onclick=\"selectedSensorDisable($siloID,$j,$i)\" $btnDisabled>Отключить выбранный датчик</button></li>";
-                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedPodvDisable($siloID,$j)\" $btnDisabled>Отключить выбранную подвеску</button></li>";
+                    $outStr .= "<li><button class=\"btn dropdown-item\" type=\"button\" onclick=\"vIndSelectedSensorDisable($siloID,$j,$i)\" $btnDisabled>Отключить выбранный датчик</button></li>";
+                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"vIndSelectedPodvDisable($siloID,$j)\" $btnDisabled>Отключить выбранную подвеску</button></li>";
                 } else {
-                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorEnable($siloID,$j,$i)\" $btnDisabled>Включить выбранный датчик</button></li>";
-                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedPodvEnable($siloID,$j)\" $btnDisabled>Включить выбранную подвеску</button></li>";
+                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"vIndSelectedSensorEnable($siloID,$j,$i)\" $btnDisabled>Включить выбранный датчик</button></li>";
+                    $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"vIndSelectedPodvEnable($siloID,$j)\" $btnDisabled>Включить выбранную подвеску</button></li>";
                 }
-                $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorDrawChart($siloID,$j,$i,'month')\">Отобразить график температуры за месяц</button></li>";
-                $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"selectedSensorDrawChart($siloID,$j,$i,'day')\">Отобразить график температуры за сутки</button></li>";
+                $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"vIndDrawChartForSelectedSensor($siloID,$j,$i,'month')\">Отобразить график температуры за месяц</button></li>";
+                $outStr .= "<li><button class=\"dropdown-item\" type=\"button\" onclick=\"vIndDrawChartForSelectedSensor($siloID,$j,$i,'day')\">Отобразить график температуры за сутки</button></li>";
                     
                 $outStr .= "</ul></div>";
 
@@ -588,8 +588,8 @@ function vInd_changeSourceOfLvlForCurrSilo($dbh, $silo_id, $levelMode){
     return;
 }
 
-if( isset($_POST['POST_vInd_change_source_of_level_mode_silo_id']) && isset($_POST['POST_vInd_change_level_mode_desired_level_mode']) ) {
-    vInd_changeSourceOfLvlForCurrSilo($dbh, $_POST['POST_vInd_change_source_of_level_mode_silo_id'], $_POST['POST_vInd_change_level_mode_desired_level_mode']);
+if( isset($_POST['POST_vInd_change_source_of_grain_level_silo_id']) && isset($_POST['POST_vInd_change_source_of_grain_level_source']) ) {
+    vInd_changeSourceOfLvlForCurrSilo($dbh, $_POST['POST_vInd_change_source_of_grain_level_silo_id'], $_POST['POST_vInd_change_source_of_grain_level_source']);
 }
 
 //  Изменение уровня из главной страницы

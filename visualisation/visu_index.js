@@ -1,12 +1,12 @@
 function init_index() {
     document.getElementById("hdr-href-index.php").setAttribute("class", "nav-link text-primary");
     getConf_ArrayOfSiloNames();
-    redrawSiloStatus();
+    vIndRedrawSiloStatus();
 
     lastParamSelectButtonID = "btn-temperatures";
     document.getElementById("btn-temperatures").className = "btn btn-success";
     lastSiloID = "silo-0";
-    onSiloClicked(lastSiloID);
+    vIndOnClickOnSilo(lastSiloID);
 
     return;
 }
@@ -30,7 +30,7 @@ $('#ind-btn-disable-all-def-sensors').click(function() {
     document.getElementById("modal-are-you-sure-text").innerText = "Отключить все неисправные датчики?";
     document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
     document.getElementById("modal-are-you-sure-btn-cancel").innerText = "Отмена";
-    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "POST_vInd_dis_all_defective_sensors()");
+    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "vIndDisAllDefectiveSensors()");
     $("#modal-are-you-sure").modal('show');
 });
 
@@ -38,7 +38,7 @@ $('#ind-btn-enable-all-sensors').click(function() {
     document.getElementById("modal-are-you-sure-text").innerText = "Включить все отключенные датчики?";
     document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
     document.getElementById("modal-are-you-sure-btn-cancel").innerText = "Отмена";
-    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "POST_vInd_enable_all_sensors()");
+    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "vIndEnAllSensors()");
     $("#modal-are-you-sure").modal('show');
 });
 
@@ -46,11 +46,11 @@ $('#btn-enable-all-auto-lvl-mode').click(function() {
     document.getElementById("modal-are-you-sure-text").innerText = "Включить автоопределение уровня на всех силосах?";
     document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
     document.getElementById("modal-are-you-sure-btn-cancel").innerText = "Отмена";
-    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "enable_all_auto_lvl_mode()");
+    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "vIndEnAutoLvlOnAllSilo()");
     $("#modal-are-you-sure").modal('show');
 });
 
-function POST_vInd_dis_all_defective_sensors() {
+function vIndDisAllDefectiveSensors() {
     $.ajax({
         url: 'visualisation/visu_index.php',
         type: 'POST',
@@ -59,13 +59,13 @@ function POST_vInd_dis_all_defective_sensors() {
         dataType: 'html',
         success: function(fromPHP) {
             console.log(fromPHP);
-            onSiloClicked(lastSiloID);
+            vIndOnClickOnSilo(lastSiloID);
         }
     });
     return;
 }
 
-function POST_vInd_enable_all_sensors() {
+function vIndEnAllSensors() {
     $.ajax({
         url: 'visualisation/visu_index.php',
         type: 'POST',
@@ -74,13 +74,13 @@ function POST_vInd_enable_all_sensors() {
         dataType: 'html',
         success: function(fromPHP) {
             console.log(fromPHP);
-            onSiloClicked(lastSiloID);
+            vIndOnClickOnSilo(lastSiloID);
         }
     });
     return;
 }
 
-function enable_all_auto_lvl_mode() {
+function vIndEnAutoLvlOnAllSilo() {
     $.ajax({
         url: 'visualisation/visu_index.php',
         type: 'POST',
@@ -88,7 +88,7 @@ function enable_all_auto_lvl_mode() {
         data: { 'POST_vInd_enable_auto_lvl_mode_on_all_silo': 1 },
         dataType: 'html',
         success: function(fromPHP) {
-            onSiloClicked(lastSiloID);
+            vIndOnClickOnSilo(lastSiloID);
         }
     });
     return;
@@ -127,7 +127,7 @@ const timer_silo_blink = setInterval(() => {
 
 //  Функция отображения текущего состояния силосов
 //  Использует массив с картинками и таймер, определенные выше
-function redrawSiloStatus() {
+function vIndRedrawSiloStatus() {
 
     $.ajax({
         url: 'visualisation/visu_index.php',
@@ -159,30 +159,30 @@ function redrawSiloStatus() {
 let lastParamSelectButtonID; //  Кнопка для выбора отображаемых параметров (температуры, скорости)
 let lastSiloID;
 
-function onSiloClicked(silo_id) {
+function vIndOnClickOnSilo(silo_id) {
 
     if (lastParamSelectButtonID === "btn-temperatures") {
-        redrawTableTemperatures(silo_id); //  таблица температур
+        vIndredrawTblTemperatures(silo_id); //  таблица температур
     } else if (lastParamSelectButtonID === "btn-speeds") {
-        redrawTableTemperatureSpeeds(silo_id); //  таблица скоростей
+        vIndredrawTblTemperatureSpeeds(silo_id); //  таблица скоростей
     }
 
-    redrawProductParametersTable(silo_id); //  Параметры продукта
+    vIndredrawTblProdParameters(silo_id); //  Параметры продукта
 
     lastSiloID = silo_id;
 
 }
-
-function onBtnClicked(btn_id) {
+//  Кнопка выбора отображаемых параметров для силоса (температуры или скорости изменения температур)
+function vIndOnClickOnValsSelectBtn(btn_id) {
     lastParamSelectButtonID = btn_id;
-    onSiloClicked(lastSiloID);
+    vIndOnClickOnSilo(lastSiloID);
     document.getElementById("btn-temperatures").className = "btn btn-light";
     document.getElementById("btn-speeds").className = "btn btn-light";
     document.getElementById(btn_id).className = "btn btn-success"; //  Подсвечиваем выбранную кнопку
     return;
 }
 
-function redrawProductParametersTable(silo_id) {
+function vIndredrawTblProdParameters(silo_id) {
     $.ajax({
         url: 'visualisation/visu_index.php',
         type: 'POST',
@@ -210,7 +210,7 @@ function redrawProductParametersTable(silo_id) {
     return;
 }
 
-function redrawTableTemperatures(silo_id) {
+function vIndredrawTblTemperatures(silo_id) {
     $.ajax({
         url: 'visualisation/visu_index.php',
         type: 'POST',
@@ -225,7 +225,7 @@ function redrawTableTemperatures(silo_id) {
     return;
 }
 
-function redrawTableTemperatureSpeeds(silo_id) {
+function vIndredrawTblTemperatureSpeeds(silo_id) {
     $.ajax({
         url: 'visualisation/visu_index.php',
         type: 'POST',
@@ -240,7 +240,7 @@ function redrawTableTemperatureSpeeds(silo_id) {
 }
 
 //  Включение/Отключение конкретного датчика/подвески путем нажатия на ячейку с измеренным значением температуры или скорости ее изменения
-function selectedSensorDisable(silo_id, podv_num, sensor_num) {
+function vIndSelectedSensorDisable(silo_id, podv_num, sensor_num) {
     //    console.log("Disable: ", silo_id, podv_num, sensor_num);
     $.ajax({
         url: 'visualisation/visu_index.php',
@@ -250,13 +250,13 @@ function selectedSensorDisable(silo_id, podv_num, sensor_num) {
         dataType: 'html',
         success: function(fromPHP) {
             console.log(fromPHP);
-            onSiloClicked(lastSiloID);
+            vIndOnClickOnSilo(lastSiloID);
         }
     });
     return;
 }
 
-function selectedSensorEnable(silo_id, podv_num, sensor_num) {
+function vIndSelectedSensorEnable(silo_id, podv_num, sensor_num) {
     //    console.log("Enable: ", silo_id, podv_num, sensor_num);
     $.ajax({
         url: 'visualisation/visu_index.php',
@@ -266,13 +266,13 @@ function selectedSensorEnable(silo_id, podv_num, sensor_num) {
         dataType: 'html',
         success: function(fromPHP) {
             console.log(fromPHP);
-            onSiloClicked(lastSiloID);
+            vIndOnClickOnSilo(lastSiloID);
         }
     });
     return;
 }
 
-function selectedPodvDisable(silo_id, podv_num) {
+function vIndSelectedPodvDisable(silo_id, podv_num) {
     $.ajax({
         url: 'visualisation/visu_index.php',
         type: 'POST',
@@ -280,13 +280,13 @@ function selectedPodvDisable(silo_id, podv_num) {
         data: { 'POST_vInd_podvDisable_silo_id': silo_id, 'POST_vInd_podvDisable_podv_id': podv_num },
         dataType: 'html',
         success: function(fromPHP) {
-            onSiloClicked(lastSiloID);
+            vIndOnClickOnSilo(lastSiloID);
         }
     });
     return;
 }
 
-function selectedPodvEnable(silo_id, podv_num) {
+function vIndSelectedPodvEnable(silo_id, podv_num) {
     $.ajax({
         url: 'visualisation/visu_index.php',
         type: 'POST',
@@ -294,28 +294,28 @@ function selectedPodvEnable(silo_id, podv_num) {
         data: { 'POST_vInd_podvEnable_silo_id': silo_id, 'POST_vInd_podvEnable_podv_id': podv_num },
         dataType: 'html',
         success: function(fromPHP) {
-            onSiloClicked(lastSiloID);
+            vIndOnClickOnSilo(lastSiloID);
         }
     });
     return;
 }
 
 //  Изменение уровня при помощи слайдера
-function change_grain_level_mode(silo_id, lvl_mode) {
+function vIndChangeSourceOfLvl(silo_id, lvl_mode) {
     $.ajax({
         url: 'visualisation/visu_index.php',
         type: 'POST',
         cache: false,
-        data: { 'POST_vInd_change_source_of_level_mode_silo_id': silo_id, 'POST_vInd_change_level_mode_desired_level_mode': lvl_mode },
+        data: { 'POST_vInd_change_source_of_grain_level_silo_id': silo_id, 'POST_vInd_change_source_of_grain_level_source': lvl_mode },
         dataType: 'html',
         success: function(fromPHP) {
-            onSiloClicked(lastSiloID);
+            vIndOnClickOnSilo(lastSiloID);
         }
     });
     return;
 }
 
-function change_grain_level_from_slider(silo_id) {
+function vIndWriteGrainLvlFromSlider(silo_id) {
 
     let lvl_slider;
 
@@ -333,7 +333,7 @@ function change_grain_level_from_slider(silo_id) {
         dataType: 'html',
         success: function(fromPHP) {
             console.log(fromPHP);
-            onSiloClicked(lastSiloID);
+            vIndOnClickOnSilo(lastSiloID);
         }
     });
 
@@ -342,7 +342,7 @@ function change_grain_level_from_slider(silo_id) {
 
 //  Построение графика температуры для выбранного силоса
 //  В функции происходит запоминание номера датчика в cookie и переход на страницу "Отчет"
-function selectedSensorDrawChart(silo_id, podv_num, sensor_num, period) {
+function vIndDrawChartForSelectedSensor(silo_id, podv_num, sensor_num, period) {
     document.cookie = "chart_silo_id=" + silo_id + ";";
     document.cookie = "chart_podv_num=" + podv_num + ";";
     document.cookie = "chart_sensor_num=" + sensor_num + ";";

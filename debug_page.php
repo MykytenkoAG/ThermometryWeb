@@ -34,7 +34,7 @@
                     <form>
                     <td>
                       <select class="form-control"
-                        id="dbg_silo_1" onchange="redrawSelectsRow(event.target.id)"
+                        id="dbg_silo_1" onchange="redrawRowOfSelects(event.target.id)"
                         style="width: 50px; text-align: right;">
                         <option value="1">1</option>
                       </select>
@@ -51,7 +51,7 @@
                     </td>
                     <td>
                       <button type="button" class="form-control" id="dbg_1_button"
-                      onclick="onClick_dbg_button_1('dbg_silo_1','dbg_t_1')">
+                      onclick="onClickDbgBtn_1('dbg_silo_1','dbg_t_1')">
                       Установить</button>
                     </td>
                     </form>
@@ -65,7 +65,7 @@
                     </td>
                     <td>
                       <select class="form-control"
-                        id="dbg_silo_2" onchange="redrawSelectsRow(event.target.id)"
+                        id="dbg_silo_2" onchange="redrawRowOfSelects(event.target.id)"
                         style="width: 50px; text-align: right;">
                         <option value="1">1</option>
                       </select>
@@ -82,7 +82,7 @@
                     </td>
                     <td>
                       <button type="button" class="form-control" id="dbg_2_button"
-                      onclick="onClick_dbg_button_2('dbg_silo_2','dbg_v_2')">
+                      onclick="onClickDbgBtn_2('dbg_silo_2','dbg_v_2')">
                       Установить</button>
                     </td>
                   </tr>
@@ -95,7 +95,7 @@
                     </td>
                     <td>
                       <select class="form-control"
-                        id="dbg_silo_3" onchange="redrawSelectsRow(event.target.id)"
+                        id="dbg_silo_3" onchange="redrawRowOfSelects(event.target.id)"
                         style="width: 50px; text-align: right;">
                         <option value="1">1</option>
                       </select>
@@ -108,7 +108,7 @@
                     <td>
                       <?php
                         echo "<select class=\"form-control\"
-                        id=\"dbg_level_3\" onchange=\"redrawSelectsRow(event.target.id)\"
+                        id=\"dbg_level_3\" onchange=\"redrawRowOfSelects(event.target.id)\"
                         style=\"width: 100px;\" $debugPageDisableElements>
                         <option value=\"1\">1</option>
                       </select>";
@@ -117,7 +117,7 @@
                     </td>
                     <td>
                       <button class="form-control" type="button" id="dbg_3_button"
-                      onclick="onClick_dbg_button_3('dbg_silo_3','dbg_level_3')">
+                      onclick="onClickDbgBtn_3('dbg_silo_3','dbg_level_3')">
                       Установить</button>
                     </td>
                   </tr>
@@ -130,7 +130,7 @@
                     </td>
                     <td>
                       <select class="form-control"
-                        id="dbg_silo_4" onchange="redrawSelectsRow(event.target.id)"
+                        id="dbg_silo_4" onchange="redrawRowOfSelects(event.target.id)"
                         style="width: 50px; text-align: right;">
                         <option value="1">1</option>
                       </select>
@@ -140,7 +140,7 @@
                     </td>
                     <td>
                       <select class="form-control"
-                        id="dbg_podv_4" onchange="redrawSelectsRow(event.target.id)"
+                        id="dbg_podv_4" onchange="redrawRowOfSelects(event.target.id)"
                         style="width: 50px; text-align: right;">
                         <option value="1">1</option>
                       </select>
@@ -157,7 +157,7 @@
                     </td>
                     <td>
                       <button type="button" class="form-control" id="dbg_4_button"
-                      onclick="onClick_dbg_button_4('dbg_silo_4', 'dbg_podv_4', 'dbg_t_4')">
+                      onclick="onClickDbgBtn_4('dbg_silo_4', 'dbg_podv_4', 'dbg_t_4')">
                       Установить</button>
                     </td>
                   </tr>
@@ -170,7 +170,7 @@
                   </td>
                   <td>
                     <select class="form-control"
-                      id="dbg_silo_5" onchange="redrawSelectsRow(event.target.id)"
+                      id="dbg_silo_5" onchange="redrawRowOfSelects(event.target.id)"
                       style="width: 50px; text-align: right;">
                       <option value="1">1</option>
                     </select>
@@ -180,7 +180,7 @@
                   </td>
                   <td>
                     <select class="form-control"
-                      id="dbg_podv_5" onchange="redrawSelectsRow(event.target.id)"
+                      id="dbg_podv_5" onchange="redrawRowOfSelects(event.target.id)"
                       style="width: 50px; text-align: right;">
                       <option value="1">1</option>
                     </select>
@@ -197,7 +197,7 @@
                   </td>
                   <td>
                     <button type="button" class="form-control" id="dbg_5_button"
-                    onclick="onClick_dbg_button_5('dbg_silo_5', 'dbg_podv_5', 'dbg_v_5')">
+                    onclick="onClickDbgBtn_5('dbg_silo_5', 'dbg_podv_5', 'dbg_v_5')">
                     Установить</button>
                   </td>
                   </tr>
@@ -210,7 +210,7 @@
                   </td>
                   <td>
                     <select class="form-control"
-                      id="dbg_silo_6" onchange="redrawSelectsRow(event.target.id)"
+                      id="dbg_silo_6" onchange="redrawRowOfSelects(event.target.id)"
                       style="width: 50px; text-align: right;">
                       <option value="1">1</option>
                     </select>
@@ -220,7 +220,7 @@
                   </td>
                   <td>
                     <select class="form-control"
-                      id="dbg_podv_6" onchange="redrawSelectsRow(event.target.id)"
+                      id="dbg_podv_6" onchange="redrawRowOfSelects(event.target.id)"
                       style="width: 50px; text-align: right;">
                       <option value="1">1</option>
                     </select>
@@ -230,7 +230,7 @@
                   </td>
                   <td>
                     <select class="form-control"
-                      id="dbg_sensor_6" onchange="redrawSelectsRow(event.target.id)"
+                      id="dbg_sensor_6" onchange="redrawRowOfSelects(event.target.id)"
                       style="width: 50px; text-align: right;">
                       <option value="1">1</option>
                     </select>
@@ -245,7 +245,7 @@
                   </td>
                   <td>
                     <button type="button" class="form-control" id="dbg_6_button"
-                    onclick="onClick_dbg_button_6('dbg_silo_6', 'dbg_podv_6', 'dbg_sensor_6', 'dbg_t_6')">
+                    onclick="onClickDbgBtn_6('dbg_silo_6', 'dbg_podv_6', 'dbg_sensor_6', 'dbg_t_6')">
                     Установить</button>
                   </td>
                   </tr>
@@ -258,7 +258,7 @@
                     </td>
                     <td>
                       <select class="form-control"
-                        id="dbg_silo_7" onchange="redrawSelectsRow(event.target.id)"
+                        id="dbg_silo_7" onchange="redrawRowOfSelects(event.target.id)"
                         style="width: 50px; text-align: right;">
                         <option value="1">1</option>
                       </select>
@@ -268,7 +268,7 @@
                     </td>
                     <td>
                       <select class="form-control"
-                        id="dbg_podv_7" onchange="redrawSelectsRow(event.target.id)"
+                        id="dbg_podv_7" onchange="redrawRowOfSelects(event.target.id)"
                         style="width: 50px; text-align: right;">
                         <option value="1">1</option>
                       </select>
@@ -278,7 +278,7 @@
                     </td>
                     <td>
                       <select class="form-control"
-                        id="dbg_sensor_7" onchange="redrawSelectsRow(event.target.id)"
+                        id="dbg_sensor_7" onchange="redrawRowOfSelects(event.target.id)"
                         style="width: 50px; text-align: right;">
                         <option value="1">1</option>
                       </select>
@@ -293,18 +293,18 @@
                     </td>
                     <td>
                       <button type="button" class="form-control" id="dbg_7_button"
-                      onclick="onClick_dbg_button_7('dbg_silo_7', 'dbg_podv_7', 'dbg_sensor_7', 'dbg_v_7')">Установить</button>
+                      onclick="onClickDbgBtn_7('dbg_silo_7', 'dbg_podv_7', 'dbg_sensor_7', 'dbg_v_7')">Установить</button>
                     </td>
                   </tr>
                 </table>
 
                 <button type="button" class="form-control mt-5" id="dbg_8_button" style="position: absolute; width: 300px; bottom: 8%;"
-                onclick="onClick_dbg_button_8()">Обнулить все показания</button>
+                onclick="onClickDbgBtn_8()">Обнулить все показания</button>
 
                 <button type="button" class="form-control"
                         id="dbg_write_measurements_to_db"
                         style="position: absolute; width: 300px; bottom: 2%;"
-                        onclick="onClick_dbg_button_add_measurements()">
+                        onclick="onClickDbgBtn_AddMeas()">
                     Сохранить текущие показания в БД
                 </button>
                 <?php

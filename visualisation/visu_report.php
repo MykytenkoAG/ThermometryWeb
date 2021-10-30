@@ -55,7 +55,7 @@ function vRep_drawMeasCheckboxes($measurementArray){
                     <tr>
                         <tr>
                             <div class=\"form-check mt-0 mb-0\" style=\"margin-left: 3px; text-align: left\">
-                                <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchballdates\" onchange=\"prfChbAllDates();rprtprf_checkDatesAndBlockDownloadButtons();\">
+                                <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchballdates\" onchange=\"vRep_prfChbAllDates();vRep_rprtprf_checkDatesAndBlockDownloadButtons();\">
                                 <label class=\"form-check-label\">
                                     Все даты
                                 </label>
@@ -82,7 +82,7 @@ function vRep_drawMeasCheckboxes($measurementArray){
             $outStr.= "<tr>
                             <td>
                                 <div class=\"form-check mt-0 mb-1 collapse multi-collapse prfchbmc_$date\" style=\"margin-left: 3px; text-align: left\">
-                                    <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchball_$date\" onchange=\"prfChbCurrDate('prfchball_$date');rprtprf_checkDatesAndBlockDownloadButtons();\">
+                                    <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchball_$date\" onchange=\"vRep_prfChbCurrDate('prfchball_$date');vRep_rprtprf_checkDatesAndBlockDownloadButtons();\">
                                     <label class=\"form-check-label\">
                                         Все
                                     </label>
@@ -97,7 +97,7 @@ function vRep_drawMeasCheckboxes($measurementArray){
                         <tr>
                             <td>
                                 <div class=\"form-check mt-0 mb-1 collapse multi-collapse prfchbmc_$date\" style=\"margin-left: 3px; text-align: left\">
-                                    <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchb_".$date."_".$measTime."\"  onchange=\"rprtprf_checkDatesAndBlockDownloadButtons();\">
+                                    <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchb_".$date."_".$measTime."\"  onchange=\"vRep_rprtprf_checkDatesAndBlockDownloadButtons();\">
                                     <label class=\"form-check-label\">
                                         $measTime
                                     </label>

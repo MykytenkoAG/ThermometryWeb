@@ -1,7 +1,7 @@
 function init_report() {
 
 
-    rprtprf_checkDatesAndBlockDownloadButtons();
+    vRep_rprtprf_checkDatesAndBlockDownloadButtons();
 
     document.getElementById("hdr-href-report.php").setAttribute("class", "nav-link text-primary");
 
@@ -20,7 +20,7 @@ function init_report() {
     setSelectOptions(chart_podv_1, Object.keys(project_conf_array[silo_name_with_id_0]));
     setSelectOptions(chart_sensor_1, Object.keys(project_conf_array[silo_name_with_id_0][1]));
 
-    prfSelectsDisable();
+    vRep_prfSelectsDisable();
 
 
     const chart_silo_id = getCookie("chart_silo_id");
@@ -38,14 +38,14 @@ function init_report() {
         selects.item(selects.length - 2).value = project_conf_array[chart_silo_name][+chart_podv_num + 1][+chart_sensor_num + 1];
         selects.item(selects.length - 1).value = chart_period;
 
-        addNewLineOnChart();
+        vRep_addNewLineOnChart();
 
     }
 }
 
 //  Функции управления чекбоксами
 //  Вкл/Откл все чекбоксы
-function prfChbAllDates() {
+function vRep_prfChbAllDates() {
     const value = document.getElementById("prfchballdates").checked;
     let checkboxes = document.getElementsByTagName("input");
 
@@ -58,7 +58,7 @@ function prfChbAllDates() {
     return;
 }
 //  Вкл/Откл все чекбоксы для определенного дня
-function prfChbCurrDate(element_id) {
+function vRep_prfChbCurrDate(element_id) {
 
     const prfChbDate = document.getElementById(element_id);
     const date = element_id.split("_")[1];
@@ -76,7 +76,7 @@ function prfChbCurrDate(element_id) {
 }
 
 //  Включение/Отключение элементов выбора при нажатых радиокнопках
-function prfSelectsDisable() {
+function vRep_prfSelectsDisable() {
 
     if (document.getElementById("prfrb_avg-t-by-layer").checked || document.getElementById("prfrb_t-by-layer").checked) {
         document.getElementById("rprtprf_podv_1").disabled = true;
@@ -95,7 +95,7 @@ function prfSelectsDisable() {
 }
 
 //  Добавление кривой на график
-function addNewLineOnChart() {
+function vRep_addNewLineOnChart() {
 
     //  Получаем доступ ко всем полям
     let inputs = document.getElementById("sensor-temperatures-table").getElementsByTagName('input');
@@ -149,13 +149,13 @@ function addNewLineOnChart() {
             deleteCookie("chart_sensor_num");
             deleteCookie("chart_period");
 
-            addNewTableRow();
+            vRep_addNewTableRow();
 
         }
     });
 }
 //  Добавление строки в таблицу
-function addNewTableRow() {
+function vRep_addNewTableRow() {
 
     //  Отключаем элементы на последней строке
     let inputs = document.getElementById("sensor-temperatures-table").getElementsByTagName('input');
@@ -177,14 +177,14 @@ function addNewTableRow() {
     let td1 = document.createElement("td");
     let input_silo_num = document.createElement("select");
     input_silo_num.setAttribute("id", "rprtchart_silo_" + row_num);
-    input_silo_num.setAttribute("onchange", "redrawSelectsRow(event.target.id)");
+    input_silo_num.setAttribute("onchange", "redrawRowOfSelects(event.target.id)");
     input_silo_num.className = "form-control";
     td1.appendChild(input_silo_num);
 
     let td2 = document.createElement("TD");
     let input_podv_num = document.createElement("select");
     input_podv_num.setAttribute("id", "rprtchart_podv_" + row_num);
-    input_podv_num.setAttribute("onchange", "redrawSelectsRow(event.target.id)");
+    input_podv_num.setAttribute("onchange", "redrawRowOfSelects(event.target.id)");
     input_podv_num.className = "form-control";
     td2.appendChild(input_podv_num);
 
@@ -262,7 +262,7 @@ const config = {
 //  render / init block
 let myChart = new Chart(document.getElementById('myChart'), config);
 //  Функции для сохранения графика в PDF
-function Convert() {
+function vRep_Convert() {
     //По нажатию на кнопку получаем канвас
     var canvas = document.getElementById('myChart');
     // И создаем из него картиику в base64
@@ -273,12 +273,12 @@ function Convert() {
         width: canvas.width
     };
     // теперь из картинки делаем PDF
-    createPDF(myImage);
+    vRep_createPDF(myImage);
 }
 //image - должен иметь свойста height,width и data - хранит картинку в base64
-function createPDF(image) {
-    let w = ConvertPxToMM(image.width);
-    let h = ConvertPxToMM(image.height);
+function vRep_createPDF(image) {
+    let w = vRep_ConvertPxToMM(image.width);
+    let h = vRep_ConvertPxToMM(image.height);
     var orientation = w > h ? 'l' : 'p';
 
     //Создаем документ PDF размером с нашу картинку
@@ -292,14 +292,14 @@ function createPDF(image) {
     //Возможные значения : dataurl, datauristring, bloburl, blob, arraybuffer, ('save', filename)
     docPDF.output('save', 'График температуры.pdf');
 }
-function ConvertPxToMM(pixels) {
+function vRep_ConvertPxToMM(pixels) {
     return Math.floor(pixels * 0.264583);
 }
 
 //  Печатные формы ---------------------------------------------------------------------------------------------------------------------------------------
-function rprtprf_checkDatesAndBlockDownloadButtons(){
+function vRep_rprtprf_checkDatesAndBlockDownloadButtons(){
 
-    if(rprtprf_getArrayOfDates().length==0){
+    if(vRep_rprtprf_getArrayOfDates().length==0){
         document.getElementById("rprtprf-btn-download-PDF").disabled = true;
         document.getElementById("rprtprf-btn-download-XLS").disabled = true;
         document.getElementById("rprtprf-btn-download-CSV").disabled = true;
@@ -314,7 +314,7 @@ function rprtprf_checkDatesAndBlockDownloadButtons(){
 
 //  Получение массивов входных данных для создания печатных форм ---------------------------
 //  Получение массива дат
-function rprtprf_getArrayOfDates(){
+function vRep_rprtprf_getArrayOfDates(){
 
     let arrayOfDates = [];
 
@@ -332,7 +332,7 @@ function rprtprf_getArrayOfDates(){
     return arrayOfDates;
 }
 //  Получение массива силосов
-function rprtprf_getArrayOfSilo(){
+function vRep_rprtprf_getArrayOfSilo(){
 
     let arrayOfSilo = [];
     let currSilo = document.getElementById("rprtprf_silo_1");
@@ -351,7 +351,7 @@ function rprtprf_getArrayOfSilo(){
     return arrayOfSilo;
 }
 //  Получение массива подвесок
-function rprtprf_getArrayOfPodv(){
+function vRep_rprtprf_getArrayOfPodv(){
 
     let arrayOfPodvs = [];
     let currPodv = document.getElementById("rprtprf_podv_1");
@@ -370,7 +370,7 @@ function rprtprf_getArrayOfPodv(){
     return arrayOfPodvs;
 }
 //  Получение массива датчиков
-function rprtprf_getArrayOfSensors(){
+function vRep_rprtprf_getArrayOfSensors(){
 
     let arrayOfSensors = [];
     let currSensor = document.getElementById("rprtprf_sensor_1");
@@ -389,7 +389,7 @@ function rprtprf_getArrayOfSensors(){
     return arrayOfSensors;
 }
 //  Получение массива слоев
-function rprtprf_getArrayOfLayers(){
+function vRep_rprtprf_getArrayOfLayers(){
     
     let arrayOfLayers = [];
     let currLayer = document.getElementById("rprtprf_layer_1");
@@ -409,7 +409,7 @@ function rprtprf_getArrayOfLayers(){
 }
 
 //  Функции для сохранения печатных форм в формате PDF и XLSX ---------------------------------
-function createTableForPDFMake(JSONObj, field, tableHeader, col1Header, col2Header){
+function vRep_createTableForPDFMake(JSONObj, field, tableHeader, col1Header, col2Header){
 
     let outArr=[];
     outArr[0]=[{text:  tableHeader, style: 'tableHeader', colSpan: 2, alignment: 'center'},{}];
@@ -422,7 +422,7 @@ function createTableForPDFMake(JSONObj, field, tableHeader, col1Header, col2Head
     return outArr;
 }
 //  Создание объекта со свойствами PDF-документа
-function createBasicPDFPropStructure(){
+function vRep_createBasicPDFPropStructure(){
 
     let pdfProp = {};
     pdfProp.pageSize = "a4";
@@ -439,9 +439,9 @@ function createBasicPDFPropStructure(){
     return pdfProp;
 }
 //  Печатная форма "Средние температуры по слоям"
-function createPDFPropObj_AvgTemperaturesByLayer(JSONObj,headerText){
+function vRep_createPDFPropObj_AvgTemperaturesByLayer(JSONObj,headerText){
 
-    let pdfProp = createBasicPDFPropStructure();
+    let pdfProp = vRep_createBasicPDFPropStructure();
 
     let j=-1;
     for(let i=0; i<JSON.parse(JSONObj).length; i++){
@@ -459,11 +459,11 @@ function createPDFPropObj_AvgTemperaturesByLayer(JSONObj,headerText){
             pdfProp.content.push( {pageBreak: 'after', layout: 'noBorders', table: {} } );
             pdfProp.content[j].table = {body:[[  ]]};
 
-            pdfProp.content[j].table.body[0] = [ { table:{ body: createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } ];
+            pdfProp.content[j].table.body[0] = [ { table:{ body: vRep_createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } ];
 
             continue;
         }
-        pdfProp.content[j].table.body[0].push(   { table:{ body: createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } );
+        pdfProp.content[j].table.body[0].push(   { table:{ body: vRep_createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } );
         if(i==JSON.parse(JSONObj).length-1){
             pdfProp.content[j].pageBreak = "";
         }
@@ -472,9 +472,9 @@ function createPDFPropObj_AvgTemperaturesByLayer(JSONObj,headerText){
     return pdfProp;
 }
 //  Печатная форма "Температуры каждого датчика по слоям"
-function createPDFPropObj_SensorTemperaturesByLayer(JSONObj,headerText){
+function vRep_createPDFPropObj_SensorTemperaturesByLayer(JSONObj,headerText){
 
-    let pdfProp = createBasicPDFPropStructure();
+    let pdfProp = vRep_createBasicPDFPropStructure();
 
     let j=-1;
     for(let i=0; i<JSON.parse(JSONObj).length; i++){
@@ -492,11 +492,11 @@ function createPDFPropObj_SensorTemperaturesByLayer(JSONObj,headerText){
             pdfProp.content.push( {pageBreak: 'after', layout: 'noBorders', table: {} } );
             pdfProp.content[j].table = {body:[[  ]]};
 
-            pdfProp.content[j].table.body[0] = [ { table:{ body: createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } ];
+            pdfProp.content[j].table.body[0] = [ { table:{ body: vRep_createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } ];
 
             continue;
         }
-        pdfProp.content[j].table.body[0].push(   { table:{ body: createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } );
+        pdfProp.content[j].table.body[0].push(   { table:{ body: vRep_createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } );
         if(i==JSON.parse(JSONObj).length-1){
             pdfProp.content[j].pageBreak = "";
         }
@@ -505,9 +505,9 @@ function createPDFPropObj_SensorTemperaturesByLayer(JSONObj,headerText){
     return pdfProp;
 }
 //  Печатная форма "Температуры каждого датчика в подвеске"
-function createPDFPropObj_SensorTemperaturesByPodv(JSONObj,headerText){
+function vRep_createPDFPropObj_SensorTemperaturesByPodv(JSONObj,headerText){
 
-    let pdfProp = createBasicPDFPropStructure();
+    let pdfProp = vRep_createBasicPDFPropStructure();
 
     let j=-1;
     for(let i=0; i<JSON.parse(JSONObj).length; i++){
@@ -525,11 +525,11 @@ function createPDFPropObj_SensorTemperaturesByPodv(JSONObj,headerText){
             pdfProp.content.push( {pageBreak: 'after', layout: 'noBorders', table: {} } );
             pdfProp.content[j].table = {body:[[  ]]};
 
-            pdfProp.content[j].table.body[0] = [ { table:{ body: createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } ];
+            pdfProp.content[j].table.body[0] = [ { table:{ body: vRep_createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } ];
 
             continue;
         }
-        pdfProp.content[j].table.body[0].push(   { table:{ body: createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } );
+        pdfProp.content[j].table.body[0].push(   { table:{ body: vRep_createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } );
         if(i==JSON.parse(JSONObj).length-1){
             pdfProp.content[j].pageBreak = "";
         }
@@ -538,14 +538,14 @@ function createPDFPropObj_SensorTemperaturesByPodv(JSONObj,headerText){
     return pdfProp;
 }
 //  Функиця для получение JSON-объекта из PHP
-function getJSONForPrintedForms(fileFormat){
+function vRep_getJSONForPrintedForms(fileFormat){
 
-    const arrayOfDates = rprtprf_getArrayOfDates();
+    const arrayOfDates = vRep_rprtprf_getArrayOfDates();
 
     if (document.getElementById("prfrb_avg-t-by-layer").checked) {
 
-        const arrayOfSilo = rprtprf_getArrayOfSilo();
-        const arrayOfLayers = rprtprf_getArrayOfLayers();
+        const arrayOfSilo = vRep_rprtprf_getArrayOfSilo();
+        const arrayOfLayers = vRep_rprtprf_getArrayOfLayers();
 
         $.ajax({
             url: 'visualisation/visu_report.php',
@@ -556,19 +556,19 @@ function getJSONForPrintedForms(fileFormat){
                     'POST_vRep_getAvgTemperByLayer_arrayOfDates': arrayOfDates },
             dataType: 'html',
             success: function(fromPHP) {
-                const pdfProbObj = createPDFPropObj_AvgTemperaturesByLayer   (fromPHP, 'Данные о средних температурах по слоям');
+                const pdfProbObj = vRep_createPDFPropObj_AvgTemperaturesByLayer   (fromPHP, 'Данные о средних температурах по слоям');
                 if(fileFormat==="PDF"){
                     createPdf( pdfProbObj ).open();
                 } else if (fileFormat==="XLSX"){
-                    createXLSX(pdfProbObj);
+                    vRep_createXLSX(pdfProbObj);
                 }
             }
         });
 
     } else if (document.getElementById("prfrb_t-by-layer").checked) {
 
-        const arrayOfSilo = rprtprf_getArrayOfSilo();
-        const arrayOfLayers = rprtprf_getArrayOfLayers();
+        const arrayOfSilo = vRep_rprtprf_getArrayOfSilo();
+        const arrayOfLayers = vRep_rprtprf_getArrayOfLayers();
 
         $.ajax({
             url: 'visualisation/visu_report.php',
@@ -579,20 +579,20 @@ function getJSONForPrintedForms(fileFormat){
                     'POST_vRep_getSensorTemperByLayer_arrayOfDates': arrayOfDates },
             dataType: 'html',
             success: function(fromPHP) {
-                const pdfProbObj = createPDFPropObj_SensorTemperaturesByLayer(fromPHP, 'Данные о температурах каждого датчика в слоях');
+                const pdfProbObj = vRep_createPDFPropObj_SensorTemperaturesByLayer(fromPHP, 'Данные о температурах каждого датчика в слоях');
                 if(fileFormat==="PDF"){
                     createPdf( pdfProbObj ).open();
                 } else if (fileFormat==="XLSX"){
-                    createXLSX(pdfProbObj);
+                    vRep_createXLSX(pdfProbObj);
                 }
             }
         });
 
     } else if (document.getElementById("prfrb_t-by-sensor").checked) {
 
-        const arrayOfSilo = rprtprf_getArrayOfSilo();
-        const arrayOfPodvs = rprtprf_getArrayOfPodv();
-        const arrayOfSensors = rprtprf_getArrayOfSensors();
+        const arrayOfSilo = vRep_rprtprf_getArrayOfSilo();
+        const arrayOfPodvs = vRep_rprtprf_getArrayOfPodv();
+        const arrayOfSensors = vRep_rprtprf_getArrayOfSensors();
 
         $.ajax({
             url: 'visualisation/visu_report.php',
@@ -604,11 +604,11 @@ function getJSONForPrintedForms(fileFormat){
                     'POST_vRep_getSensorTemperByPodv_arrayOfDates': arrayOfDates },
             dataType: 'html',
             success: function(fromPHP) {
-                const pdfProbObj = createPDFPropObj_SensorTemperaturesByPodv(fromPHP, 'Данные о температурах каждого датчика в подвеске');
+                const pdfProbObj = vRep_createPDFPropObj_SensorTemperaturesByPodv(fromPHP, 'Данные о температурах каждого датчика в подвеске');
                 if(fileFormat==="PDF"){
                     createPdf( pdfProbObj ).open();
                 } else if (fileFormat==="XLSX"){
-                    createXLSX(pdfProbObj);
+                    vRep_createXLSX(pdfProbObj);
                 }
             }
         });
@@ -618,7 +618,7 @@ function getJSONForPrintedForms(fileFormat){
     return;
 }
 //  Создание структуры XLSX-документа
-function createXLSX(pdfProbObj){
+function vRep_createXLSX(pdfProbObj){
     var wb = XLSX.utils.book_new();
     wb.Props = {
             Title: "SheetJS Tutorial",
@@ -666,11 +666,11 @@ function createXLSX(pdfProbObj){
 
     wb.Sheets["New"] = ws;
 
-    saveXLSX(wb);
+    vRep_saveXLSX(wb);
     return;
 }
 //  Сохранение документа
-function saveXLSX(wb){
+function vRep_saveXLSX(wb){
 
     var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
     function s2ab(s) {

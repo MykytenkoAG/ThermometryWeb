@@ -28,17 +28,17 @@
                     ?>
                   </div>
 
-                    <button type="submit" class="btn btn-primary" id="table-prodtypes-btn-add" disabled>
+                    <button type="submit" class="btn btn-primary" id="sconf-table-prodtypes-btn-add" disabled>
                       <svg width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
                         <path d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z"/>
                       </svg>
                       Добавить
                     </button>
-                    <button type="submit" class="btn btn-success" id="table-prodtypes-btn-save-changes" disabled>
+                    <button type="submit" class="btn btn-success" id="sconf-table-prodtypes-btn-save-changes" disabled>
                       <img  src="img/button-save-changes.png" width="16" height="16"/>
                       <span>Сохранить изменения</span>
                     </button>
-                    <button type="submit" class="btn btn-danger"  id="table-prodtypes-btn-discard-changes" disabled>
+                    <button type="submit" class="btn btn-danger"  id="sconf-table-prodtypes-btn-discard-changes" disabled>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
                               <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
                               <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
@@ -65,10 +65,10 @@
                   </div>
 
                     <button type="submit" class="btn btn-success"
-                            id="table-prodtypesbysilo-btn-save-changes" disabled>
+                            id="sconf-table-prodtypesbysilo-btn-save-changes" disabled>
                             <img  src="img/button-save-changes.png" width="16" height="16"/>
                             <span>Сохранить изменения</span></button>
-                    <button type="submit" class="btn btn-danger" id="table-prodtypesbysilo-btn-discard-changes" disabled>
+                    <button type="submit" class="btn btn-danger" id="sconf-table-prodtypesbysilo-btn-discard-changes" disabled>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
                               <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
                               <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
@@ -128,7 +128,7 @@
                         Пользователь: <?php $currentUser= $accessLevel==1 ? "Оператор" : "Технолог"; echo $currentUser; ?>
                       </div>
                       <div class="row p-1">
-                        <button type="submit" id="silo-config-btn-change-password" class="btn btn-light">
+                        <button type="submit" id="sconf-silo-config-btn-change-password" class="btn btn-light">
                           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-key" viewBox="0 0 16 16">
                             <path d="M0 8a4 4 0 0 1 7.465-2H14a.5.5 0 0 1 .354.146l1.5 1.5a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0L13 9.207l-.646.647a.5.5 0 0 1-.708 0L11 9.207l-.646.647a.5.5 0 0 1-.708 0L9 9.207l-.646.647A.5.5 0 0 1 8 10h-.535A4 4 0 0 1 0 8zm4-3a3 3 0 1 0 2.712 4.285A.5.5 0 0 1 7.163 9h.63l.853-.854a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.793-.793-1-1h-6.63a.5.5 0 0 1-.451-.285A3 3 0 0 0 4 5z"/>
                             <path d="M4 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>

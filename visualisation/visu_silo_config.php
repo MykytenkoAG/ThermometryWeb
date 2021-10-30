@@ -39,8 +39,8 @@ function vSConf_draw_Prodtypes($dbh, $accessLevel){
                 <input type=\"text\"
 
                     id=\"prodtypes-product-name-".$row['product_id']."\"
-                    onchange=\"tblProdtypesUpdateRow(".$row['product_id'].")\"
-                    oninput=\"checkProductNames()\"
+                    onchange=\"vSConf_tblProdtypesUpdateRow(".$row['product_id'].")\"
+                    oninput=\"vSConf_checkProductNames()\"
 
                     class=\"form-control mx-auto productname\" aria-label=\"Sizing example input\" aria-describedby=\"inputGroup-sizing-sm\" style=\"width: 300px;\"
                     value=\"".$row['product_name']."\" $inputsDisabled></input>
@@ -49,7 +49,7 @@ function vSConf_draw_Prodtypes($dbh, $accessLevel){
                 <input type=\"number\"
 
                     id=\"prodtypes-t-min-".$row['product_id']."\"
-                    onchange=\"tblProdtypesUpdateRow(".$row['product_id'].")\"
+                    onchange=\"vSConf_tblProdtypesUpdateRow(".$row['product_id'].")\"
 
                     class=\"form-control mx-auto\" aria-label=\"Sizing example input\" aria-describedby=\"inputGroup-sizing-sm\" style=\"width: 80px;\"
                     value=\"".$row['t_min']."\" $inputsDisabled></input>
@@ -58,7 +58,7 @@ function vSConf_draw_Prodtypes($dbh, $accessLevel){
                 <input type=\"number\"
 
                     id=\"prodtypes-t-max-".$row['product_id']."\"
-                    onchange=\"tblProdtypesUpdateRow(".$row['product_id'].")\"
+                    onchange=\"vSConf_tblProdtypesUpdateRow(".$row['product_id'].")\"
 
                     class=\"form-control mx-auto\" aria-label=\"Sizing example input\" aria-describedby=\"inputGroup-sizing-sm\" style=\"width: 80px;\"
                     value=\"".$row['t_max']."\" $inputsDisabled></input>
@@ -67,7 +67,7 @@ function vSConf_draw_Prodtypes($dbh, $accessLevel){
                 <input type=\"number\"
 
                     id=\"prodtypes-v-min-".$row['product_id']."\"
-                    onchange=\"tblProdtypesUpdateRow(".$row['product_id'].")\"
+                    onchange=\"vSConf_tblProdtypesUpdateRow(".$row['product_id'].")\"
 
                     class=\"form-control mx-auto\" aria-label=\"Sizing example input\" aria-describedby=\"inputGroup-sizing-sm\" style=\"width: 60px;\"
                     value=\"".$row['v_min']."\" $inputsDisabled></input>
@@ -76,14 +76,14 @@ function vSConf_draw_Prodtypes($dbh, $accessLevel){
                 <input type=\"number\"
 
                     id=\"prodtypes-v-max-".$row['product_id']."\"
-                    onchange=\"tblProdtypesUpdateRow(".$row['product_id'].")\"
+                    onchange=\"vSConf_tblProdtypesUpdateRow(".$row['product_id'].")\"
 
                     class=\"form-control mx-auto\" aria-label=\"Sizing example input\" aria-describedby=\"inputGroup-sizing-sm\" style=\"width: 60px;\"
                     value=\"".$row['v_max']."\" $inputsDisabled></input>
             </td>
             <td>
                 <button type=\"submit\" class=\"btn btn-danger mx-auto\"
-                    id=\"prodtypes-remove-btn-".$row['product_id']."\" onclick=\"tblProdtypesRemoveRow(".$row['product_id'].")\" ";
+                    id=\"prodtypes-remove-btn-".$row['product_id']."\" onclick=\"vSConf_tblProdtypesRemoveRow(".$row['product_id'].")\" ";
                     
             if( ! is_null($row['silo_id']) || count($rows)==1 || $accessLevel<2){
                 $outStr .= "disabled";
@@ -164,7 +164,7 @@ function vSConf_draw_Prodtypesbysilo($dbh, $accessLevel){
 
         $grainLevelFromTSStr = "<select class=\"form-control mx-auto\" name=\"\"
                                     id=\"prodtypesbysilo-grain-level-from-TS-".$rows[$i]['silo_id']."\"
-                                    onchange=\"tblProdtypesbysiloUpdate()\" $inputsDisabled>";
+                                    onchange=\"vSConf_tblProdtypesbysiloUpdate()\" $inputsDisabled>";
 
         if($currValue=="auto"){
             $grainLevelFromTSStr .= "<option value=\"$currValue\">$grainLevelFromTSStrV</option><option value=\"manual\">в ручную</option>";
@@ -178,7 +178,7 @@ function vSConf_draw_Prodtypesbysilo($dbh, $accessLevel){
 
         $grainLevelStr = "  <select class=\"form-control mx-auto\" name=\"\"
                                 id=\"prodtypesbysilo-grain-level-".$rows[$i]['silo_id']."\"
-                                onchange=\"tblProdtypesbysiloUpdate()\" $grainLevelDisabled>
+                                onchange=\"vSConf_tblProdtypesbysiloUpdate()\" $grainLevelDisabled>
                                 <option value=\"".$rows[$i]['grain_level']."\">".$rows[$i]['grain_level']."</option>";
  
         for($j=0; $j<=($grainLevelsArr[$i]['max(sensor_num)']+1);$j++){
@@ -191,7 +191,7 @@ function vSConf_draw_Prodtypesbysilo($dbh, $accessLevel){
  
         $productNameStr =   "<select class=\"form-control mx-auto\" name=\"\"
                                 id=\"prodtypesbysilo-product-name-".$rows[$i]['silo_id']."\"
-                                onchange=\"tblProdtypesbysiloUpdate()\" $inputsDisabled>
+                                onchange=\"vSConf_tblProdtypesbysiloUpdate()\" $inputsDisabled>
                                 <option value=\"".$rows[$i]['product_id']."\">".$rows[$i]['product_name']."</option>";
 
         foreach($prodTypesArr as $product){

@@ -54,21 +54,21 @@
                         
                         <div class="form-check mt-2">
                           <input class="form-check-input" type="radio" name="exampleRadios"
-                                  id="prfrb_avg-t-by-layer" onchange="prfSelectsDisable()" value="avg-t-by-layer" checked>
+                                  id="prfrb_avg-t-by-layer" onchange="vRep_prfSelectsDisable()" value="avg-t-by-layer" checked>
                           <label class="form-check-label" for="prfrb_avg-t-by-layer">
                             Средние температуры в слоях
                           </label>
                         </div>
                         <div class="form-check mt-1">
                           <input class="form-check-input" type="radio" name="exampleRadios"
-                                  id="prfrb_t-by-layer" onchange="prfSelectsDisable()" value="t-by-layer">
+                                  id="prfrb_t-by-layer" onchange="vRep_prfSelectsDisable()" value="t-by-layer">
                           <label class="form-check-label" for="prfrb_t-by-layer">
                             Температуры каждого датчика в слоях
                           </label>
                         </div>
                         <div class="form-check mt-1">
                           <input class="form-check-input" type="radio" name="exampleRadios"
-                                  id="prfrb_t-by-sensor" onchange="prfSelectsDisable()" value="t-by-sensor">
+                                  id="prfrb_t-by-sensor" onchange="vRep_prfSelectsDisable()" value="t-by-sensor">
                           <label class="form-check-label" for="prfrb_t-by-sensor">
                             Температуры датчика в подвеске
                           </label>
@@ -82,7 +82,7 @@
                         <div class="mt-2">
                           <label for="rprtprf_silo_1" class="form-label">Силос</label>
                           <select class="form-control"
-                            id="rprtprf_silo_1"     onchange="redrawSelectsRow(event.target.id)"
+                            id="rprtprf_silo_1"     onchange="redrawRowOfSelects(event.target.id)"
                             style="width: 70px">
                             <option value="all">все</option>
                           </select>
@@ -92,7 +92,7 @@
                             <div class="col-4 mr-1">
                               <label for="rprtprf_podv_1" class="form-label" disabled>Подвеска</label>
                               <select class="form-control"
-                                id="rprtprf_podv_1" onchange="redrawSelectsRow(event.target.id)"
+                                id="rprtprf_podv_1" onchange="redrawRowOfSelects(event.target.id)"
                                 style="width: 70px">
                                 <option value="all">все</option>
                               </select>
@@ -121,7 +121,7 @@
                           <div class="row">
 
                             <div class="col p-1">
-                              <button type="submit" class="btn btn-primary mt-3 w-100" id="rprtprf-btn-download-PDF" onclick="getJSONForPrintedForms('PDF');">
+                              <button type="submit" class="btn btn-primary mt-3 w-100" id="rprtprf-btn-download-PDF" onclick="vRep_getJSONForPrintedForms('PDF');">
                                 <svg width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
                                   <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
                                   <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
@@ -131,7 +131,7 @@
                             </div>
 
                             <div class="col p-1">
-                              <button type="submit" class="btn btn-primary mt-3 w-100" id="rprtprf-btn-download-XLS" onclick="getJSONForPrintedForms('XLSX');">
+                              <button type="submit" class="btn btn-primary mt-3 w-100" id="rprtprf-btn-download-XLS" onclick="vRep_getJSONForPrintedForms('XLSX');">
                                 <svg width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
                                   <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
                                   <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
@@ -198,14 +198,14 @@
                       <tr>
                         <td>
                           <select class="form-control"
-                            id="rprtchart_silo_1" onchange="redrawSelectsRow(event.target.id)"
+                            id="rprtchart_silo_1" onchange="redrawRowOfSelects(event.target.id)"
                             style="width: 70px">
                             <option value="1">1</option>
                           </select>
                         </td>
                         <td>
                           <select class="form-control"
-                            id="rprtchart_podv_1" onchange="redrawSelectsRow(event.target.id)"
+                            id="rprtchart_podv_1" onchange="redrawRowOfSelects(event.target.id)"
                             style="width: 70px">
                             <option value="1">1</option>
                           </select>
@@ -230,14 +230,14 @@
                     </tbody>
                   </table>
 
-                  <button type="submit" class="btn btn-primary" onclick="addNewLineOnChart()">
+                  <button type="submit" class="btn btn-primary" onclick="vRep_addNewLineOnChart()">
                     <svg width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
                       <path d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z"/>
                     </svg>
                     Добавить
                   </button>
 
-                    <button type="submit" class="btn btn-primary" onclick="Convert();" style="width: 120px; height: 38px;">
+                    <button type="submit" class="btn btn-primary" onclick="vRep_Convert();" style="width: 120px; height: 38px;">
                       <table>
                         <tr>
                           <td>

@@ -136,7 +136,7 @@ function setSelectOptions(dom_element, options_arr) {
     Используется страницами report и debug_page
     Вызывается при изменении номера выбранного силоса и подвески
 */
-function redrawSelectsRow(select_element_id) {
+function redrawRowOfSelects(select_element_id) {
 
     const page = select_element_id.split("_")[0];
     const element_name = select_element_id.split("_")[1];
@@ -215,7 +215,7 @@ function isSoundOn() {
     return;
 }
 
-function acknowledgeAlarms() {
+function alarmsAck() {
     document.getElementById("alarm-sound").pause();
     $('#hdr-ack').removeClass("text-primary");
     $('#hdr-ack').addClass("text-black");
@@ -231,8 +231,8 @@ function acknowledgeAlarms() {
             console.log(fromPHP);
             if (current_page === "index.php") {
                 redrawTableCurrentAlarms();
-                redrawSiloStatus();
-                onSiloClicked(lastSiloID);
+                vIndRedrawSiloStatus();
+                vIndOnClickOnSilo(lastSiloID);
             }
         }
     });
@@ -243,7 +243,7 @@ function periodicActions() {
     isSoundOn();
     if (current_page === "index.php") {
         redrawTableCurrentAlarms();
-        redrawSiloStatus();
-        onSiloClicked(lastSiloID);
+        vIndRedrawSiloStatus();
+        vIndOnClickOnSilo(lastSiloID);
     }
 }
