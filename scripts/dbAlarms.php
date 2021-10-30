@@ -1,5 +1,7 @@
 <?php
 
+require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');
+
 $logFile = $_SERVER['DOCUMENT_ROOT'].'/webTermometry/logs/log.txt';
 
 //	Запись строки в журнал
@@ -12,7 +14,7 @@ function writeToLog($loggingString){
     return;
 }
 
-function clearLog(){
+function logClear(){
 	global $logFile;
     file_put_contents($logFile, "");
     return;
@@ -26,7 +28,7 @@ function clearLog(){
 */
 //	! Можно модифицировать, чтобы она возвращала количество новых алармов
 //	Если количество больше нуля, необходимо включать звук
-function setNACK($dbh, $serverDate){
+function alarms_set($dbh, $serverDate){
 
 	//	sensors JOIN productsbysilo JOIN products
 	$sql_joinedTable = "SELECT s.sensor_id, s.server_date, s.current_temperature, pbs.silo_name, s.podv_id, s.sensor_num, e.error_description
@@ -207,7 +209,7 @@ function setNACK($dbh, $serverDate){
 	Вызывается пользователем путем нажатия на кнопку
 	Сбрасывает флаг NACK и устанавливает флаг ACK
 */
-function setACK($dbh, $serverDate){
+function alarms_ack($dbh, $serverDate){
 	
 	$sql_joinedTable = "SELECT s.sensor_id, s.current_temperature, s.current_speed
 						FROM sensors AS s
@@ -382,7 +384,7 @@ function setACK($dbh, $serverDate){
 	затем АПС о превышении температуры
 	и затем АПС о превышении скорости ее изменения
 */
-function resetACK($dbh, $serverDate){
+function alarms_reset($dbh, $serverDate){
 
 	$loggingString = "";
 

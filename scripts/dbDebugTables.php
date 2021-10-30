@@ -1,6 +1,8 @@
 <?php
 
-function debug_drop_all_tables($dbh){
+require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');
+
+function ddl_debug_drop_all($dbh){
 
 	$query = 
 	   "DROP TABLE IF EXISTS zernoib.debug_sensors;
@@ -12,8 +14,11 @@ function debug_drop_all_tables($dbh){
 
     return;
 }
-//  silo_id, grain_level
-function debug_create_silo_table($dbh, $termoServerINI){
+/*
+    Поля:
+    silo_id, grain_level
+*/
+function ddl_debug_create_Silo($dbh, $termoServerINI){
 	
 	$sql = "CREATE TABLE IF NOT EXISTS zernoib.debug_silo
 			 (silo_id INT NOT NULL,
@@ -39,8 +44,11 @@ function debug_create_silo_table($dbh, $termoServerINI){
 
     return;
 }
-//  sensor_id, silo_id, podv_id, sensor_num, current_temperature, current_temperature_speed
-function debug_create_sensors_table($dbh, $termoServerINI){
+/*
+    Поля:
+    sensor_id, silo_id, podv_id, sensor_num, current_temperature, current_temperature_speed
+*/
+function ddl_debug_create_Sensors($dbh, $termoServerINI){
 
 	$sql = "CREATE TABLE IF NOT EXISTS zernoib.debug_sensors
 			 (sensor_id INT NOT NULL,
@@ -84,9 +92,9 @@ function debug_create_sensors_table($dbh, $termoServerINI){
     return;
 }
 
-//  Получение текущих значений параметров
-//  Запись значений из базы данных в массив $arrayOfTemperatures
-function debug_update_temperature_values($dbh){
+//  Получение текущих значений параметров из Базы Данных
+//  БД => $arrayOfTemperatures
+function db_debug_update_temperatures($dbh){
 
     $arrayOfTemperatures=array();
 
@@ -106,8 +114,8 @@ function debug_update_temperature_values($dbh){
 
     return $arrayOfTemperatures;
 }
-//  Запись значений из БД в массив $arrayOfTempSpeeds
-function debug_update_temperature_speeds_values($dbh){
+//  БД => $arrayOfTempSpeeds
+function db_debug_update_temperatureSpeeds($dbh){
 
     $arrayOfTempSpeeds=array();
 
@@ -127,8 +135,8 @@ function debug_update_temperature_speeds_values($dbh){
 
     return $arrayOfTempSpeeds;
 }
-//  Запись значений из БД в массив $arrayOfLevels
-function debug_update_level_values($dbh){
+//  БД => $arrayOfLevels
+function db_debug_update_grainLevels($dbh){
 
     $arrayOfLevels=array();
 

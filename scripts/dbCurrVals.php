@@ -1,7 +1,9 @@
 <?php
 
+require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');
+
 //	Функция для записи значений из массива $arrayOfLevels в Базу Данных
-function update_lvl($dbh, $arrayOfLevels){
+function db_update_grainLevels($dbh, $arrayOfLevels){
 	//	Определяем, есть ли силоса с автоматическим определением уровня
 	$query = "SELECT count(silo_id) FROM prodtypesbysilo WHERE grain_level_fromTS=1";
 	$sth = $dbh->query($query);
@@ -35,7 +37,7 @@ function update_lvl($dbh, $arrayOfLevels){
 	return;
 }
 //	Функция для записи значений из массивов $arrayOfTemperatures и $arrayOfTempSpeeds в Базу Данных от времени $serverDate
-function update_t_v($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate){
+function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate){
 
 	/*
 		Реализуем запись типа:

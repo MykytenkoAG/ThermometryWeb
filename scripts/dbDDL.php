@@ -1,11 +1,13 @@
 <?php
 
+require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');
+
 /*	Создание резервной копии таблиц dates и measurements
 	Создаем ini-файл для удобства прохода по ключам
 	Формат: [configuration]sensorsnumber=количество датчиков;[dates]date_id=дата;[date_id]sensor_id=temperature;
 	Возвращаемое значение: строка с названием файла
 */ 
-function createDBBackup($dbh){
+function ddl_backup_create_DatesMeas($dbh){
 
 	$dbBackupFile = $_SERVER['DOCUMENT_ROOT'].'/webTermometry/dbBackups/dbbackup '.date('d.m.Y H.i.s', time()).'.ini';
 	$backupString = "";
@@ -46,7 +48,7 @@ function createDBBackup($dbh){
 	return $dbBackupFile;
 }
 
-function restoreFromBackup($dbh, $dbBackupFile){
+function ddl_backup_restore_DatesMeas($dbh, $dbBackupFile){
 
 	//	Проверяем количество датчиков в файле и таблице dbSensors
 	//	Если не равно => Выход
@@ -118,7 +120,7 @@ function restoreFromBackup($dbh, $dbBackupFile){
 }
 
 //	Удаление/очистка таблиц
-function deleteAllTables($dbh){
+function ddl_drop_all($dbh){
 
 	$query = 
 	   "DROP TABLE IF EXISTS zernoib.measurements;
@@ -136,7 +138,7 @@ function deleteAllTables($dbh){
 	return;
 }
 
-function truncateTableMeasurements($dbh){
+function ddl_truncate_Measurements($dbh){
 
 	$query = 
 	   "TRUNCATE zernoib.measurements;";
@@ -149,7 +151,7 @@ function truncateTableMeasurements($dbh){
 }
 
 //	Создание таблиц
-function createTableUsers($dbh){
+function ddl_create_Users($dbh){
 	
 	$query = "CREATE TABLE IF NOT EXISTS zernoib.users
 			 (user_id INT NOT NULL AUTO_INCREMENT,
@@ -165,7 +167,7 @@ function createTableUsers($dbh){
 	return;
 }
 
-function createTableErrors($dbh){
+function ddl_create_Errors($dbh){
 	
 	$query = "CREATE TABLE IF NOT EXISTS zernoib.errors
 			 (error_id INT NOT NULL,
@@ -181,7 +183,7 @@ function createTableErrors($dbh){
 	return;
 }
 
-function createTableDates($dbh){
+function ddl_create_Dates($dbh){
 	
 	$query = "CREATE TABLE IF NOT EXISTS zernoib.dates
 			 (date_id INT NOT NULL AUTO_INCREMENT,
@@ -195,7 +197,7 @@ function createTableDates($dbh){
 	return;
 }
 
-function createTableProdtypes($dbh){
+function ddl_create_Prodtypes($dbh){
 
 	$query = "CREATE TABLE IF NOT EXISTS zernoib.prodtypes
 			 (product_id INT NOT NULL AUTO_INCREMENT,
@@ -211,7 +213,7 @@ function createTableProdtypes($dbh){
 	return;
 }
 
-function createTableProdtypesbysilo($dbh){
+function ddl_create_Prodtypesbysilo($dbh){
 	
 	$query = "CREATE TABLE IF NOT EXISTS zernoib.prodtypesbysilo
 			 (silo_id INT NOT NULL,
@@ -234,7 +236,7 @@ function createTableProdtypesbysilo($dbh){
 	return;
 }
 
-function createTableSensors($dbh){
+function ddl_create_Sensors($dbh){
 	
 	$query = "CREATE TABLE IF NOT EXISTS zernoib.sensors
 			 (sensor_id INT NOT NULL,
@@ -265,7 +267,7 @@ function createTableSensors($dbh){
 	return;
 }
 
-function createTableMeasurements($dbh){
+function ddl_create_Measurements($dbh){
 	
 	$query = "CREATE TABLE IF NOT EXISTS zernoib.measurements
 			 (date_id INT NOT NULL,
@@ -283,7 +285,7 @@ function createTableMeasurements($dbh){
 }
 
 //	Инициализация таблиц
-function initTableUsers($dbh, $initUsersINI){
+function ddl_init_Users($dbh, $initUsersINI){
 	
 	$query="INSERT INTO users (user_name, password, access_level) VALUES ";
 
@@ -301,7 +303,7 @@ function initTableUsers($dbh, $initUsersINI){
 	return;
 }
 
-function initTableErrors($dbh, $errCodesINI){
+function ddl_init_Errors($dbh, $errCodesINI){
 
 	$query="INSERT INTO errors (error_id, error_description, error_desc_short, error_desc_for_visu) VALUES ";
 
@@ -321,7 +323,7 @@ function initTableErrors($dbh, $errCodesINI){
 	return;
 }
 
-function initTableDates($dbh, $serverDate){
+function ddl_init_Dates($dbh, $serverDate){
 
 	$query="INSERT INTO dates (date) VALUES (STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'));";
 	$stmt = $dbh->prepare($query);
@@ -331,7 +333,7 @@ function initTableDates($dbh, $serverDate){
 	return;
 }
 
-function initTableProdtypes($dbh, $initProductsINI){
+function ddl_init_Prodtypes($dbh, $initProductsINI){
 
 	$query="INSERT INTO prodtypes (product_name, t_min, t_max, v_min, v_max) VALUES ";
 
@@ -351,7 +353,7 @@ function initTableProdtypes($dbh, $initProductsINI){
 	return;
 }
 
-function initTableProdbysilo($dbh, $termoClientINI, $termoServerINI){
+function ddl_init_Prodtypesbysilo($dbh, $termoClientINI, $termoServerINI){
 
     $query = "SELECT product_id FROM zernoib.prodtypes ORDER BY product_id ASC LIMIT 1";
     $sth = $dbh->query($query);
@@ -385,7 +387,7 @@ function initTableProdbysilo($dbh, $termoClientINI, $termoServerINI){
 	return;
 }
 
-function initTableSensors($dbh, $termoServerINI,$serverDate){
+function ddl_init_Sensors($dbh, $termoServerINI,$serverDate){
 
 	$query="INSERT INTO sensors (sensor_id, silo_id, podv_id, sensor_num, current_temperature, current_speed, server_date) VALUES ";
 

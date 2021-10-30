@@ -5,13 +5,13 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');
 
 if( ! $simulation_mode ){
-	addNewMeasurement($dbh, $arrayOfTemperatures, $serverDate);
+	add_new_measurement($dbh, $arrayOfTemperatures, $serverDate);
 }
 
 //	measurements
 //	Выбор id последней даты
 //	Запись температур из массива $arrayOfTemperatures
-function addNewMeasurement($dbh, $arrayOfTemperatures,$serverDate){
+function add_new_measurement($dbh, $arrayOfTemperatures,$serverDate){
 
 	$query="INSERT INTO dates (date) VALUES (STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'));";
 	$stmt = $dbh->prepare($query);
