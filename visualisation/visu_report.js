@@ -1,16 +1,18 @@
 function init_report() {
 
-
-    vRep_rprtprf_checkDatesAndBlockDownloadButtons();
-
     document.getElementById("hdr-href-report.php").setAttribute("class", "nav-link text-primary");
-
+    //  Блокировка кнопок "Скачать PDF" и "Скачать XLSX"
+    vRep_rprtprf_checkDatesAndBlockDownloadButtons();
+    //  Инициализация элементов select печатных форм
     setSelectOptions(document.getElementById("rprtprf_silo_1"), ["all"].concat(Object.keys(project_conf_array)));
-    setSelectOptions(document.getElementById("rprtprf_podv_1"), ["all"].concat(Object.keys(project_conf_array[silo_name_with_max_podv_number]))); //  проблема, в случае, если в проекте нет силоса с номером один
+    setSelectOptions(document.getElementById("rprtprf_podv_1"), ["all"].concat(Object.keys(project_conf_array[silo_name_with_max_podv_number])));
     setSelectOptions(document.getElementById("rprtprf_layer_1"), ["all"].concat(Object.keys(project_conf_array[silo_name_with_max_podv_number][1])));
     setSelectOptions(document.getElementById("rprtprf_sensor_1"), ["all"].concat(Object.keys(project_conf_array[silo_name_with_max_podv_number][1])));
 
-    let selects = document.getElementById("sensor-temperatures-table").getElementsByTagName('select');
+    vRep_prfSelectsDisable();
+
+    //  Инициализация элементов select графика температуры
+    let selects = document.getElementById("rep-chart-time-temperature").getElementsByTagName('select');
 
     let chart_silo_1 = selects.item(selects.length - 4);
     let chart_podv_1 = selects.item(selects.length - 3);
@@ -20,19 +22,17 @@ function init_report() {
     setSelectOptions(chart_podv_1, Object.keys(project_conf_array[silo_name_with_id_0]));
     setSelectOptions(chart_sensor_1, Object.keys(project_conf_array[silo_name_with_id_0][1]));
 
-    vRep_prfSelectsDisable();
-
-
-    const chart_silo_id = getCookie("chart_silo_id");
+    //  Построение графика, в случае если мы попали на эту страницу из главной
+    const chart_silo_name = getCookie("chart_silo_name");
     const chart_podv_num = getCookie("chart_podv_num");
     const chart_sensor_num = getCookie("chart_sensor_num");
     const chart_period = getCookie("chart_period");
-    if (chart_silo_id != "" && chart_silo_id != null &&
+    if (chart_silo_name != "" && chart_silo_name != null &&
         chart_podv_num != "" && chart_podv_num != null &&
         chart_sensor_num != "" && chart_sensor_num != null &&
         chart_period != "" && chart_period != null) {
 
-        const chart_silo_name = Object.keys(project_conf_array)[chart_silo_id];
+        const chart_silo_name = Object.keys(project_conf_array)[chart_silo_name];
         selects.item(selects.length - 4).value = chart_silo_name;
         selects.item(selects.length - 3).value = Object.keys(project_conf_array[chart_silo_name])[chart_podv_num];
         selects.item(selects.length - 2).value = project_conf_array[chart_silo_name][+chart_podv_num + 1][+chart_sensor_num + 1];
@@ -98,25 +98,25 @@ function vRep_prfSelectsDisable() {
 function vRep_addNewLineOnChart() {
 
     //  Получаем доступ ко всем полям
-    let inputs = document.getElementById("sensor-temperatures-table").getElementsByTagName('input');
-    let selects = document.getElementById("sensor-temperatures-table").getElementsByTagName('select');
+    const inputs = document.getElementById("rep-chart-time-temperature").getElementsByTagName('input');
+    const selects = document.getElementById("rep-chart-time-temperature").getElementsByTagName('select');
 
-    let silo_id = selects.item(selects.length - 4).value;
-    let podv_id = +selects.item(selects.length - 3).value;
-    let sensor_num = +selects.item(selects.length - 2).value;
-    let line_colour = inputs.item(inputs.length - 1).value;
-    let period = selects.item(selects.length - 1).value;
+    const silo_name = selects.item(selects.length - 4).value;
+    const podv_id = +selects.item(selects.length - 3).value;
+    const sensor_num = +selects.item(selects.length - 2).value;
+    const line_colour = inputs.item(inputs.length - 1).value;
+    const period = selects.item(selects.length - 1).value;
 
-    //  !       Передаем параметры в PHP
     $.ajax({
         url: 'visualisation/visu_report.php',
         type: 'POST',
         cache: false,
-        data: { 'POST_vRep_getTableForChart_silo_name': silo_id, 'POST_vRep_getTableForChart_podv_id': podv_id - 1, 'POST_vRep_getTableForChart_sensor_num': sensor_num - 1, 'POST_vRep_getTableForChart_period': period },
+        data: { 'POST_vRep_getTableForChart_silo_name': silo_name,
+                'POST_vRep_getTableForChart_podv_id': podv_id - 1,
+                'POST_vRep_getTableForChart_sensor_num': sensor_num - 1,
+                'POST_vRep_getTableForChart_period': period },
         dataType: 'html',
         success: function(fromPHP) {
-
-            //console.log(fromPHP);
 
             const newDataset = {
                 label: '',
@@ -133,7 +133,7 @@ function vRep_addNewLineOnChart() {
             JSON.parse(fromPHP).forEach(element => {
                 newDataset.data.push({ x: element["date"], y: element["temperature"] });
             });
-            newDataset.label = silo_id + '.' + podv_id + '.' + sensor_num;
+            newDataset.label = silo_name + '.' + podv_id + '.' + sensor_num;
             newDataset.backgroundColor[0] = 'rgba(' + parseInt(line_colour.slice(1, 3), 16) + "," +
                 parseInt(line_colour.slice(3, 5), 16) + "," +
                 parseInt(line_colour.slice(5, 7), 16) + ",1)";
@@ -144,7 +144,7 @@ function vRep_addNewLineOnChart() {
             myChart.data.datasets.push(newDataset);
             myChart.update();
 
-            deleteCookie("chart_silo_id");
+            deleteCookie("chart_silo_name");
             deleteCookie("chart_podv_num");
             deleteCookie("chart_sensor_num");
             deleteCookie("chart_period");
@@ -158,8 +158,8 @@ function vRep_addNewLineOnChart() {
 function vRep_addNewTableRow() {
 
     //  Отключаем элементы на последней строке
-    let inputs = document.getElementById("sensor-temperatures-table").getElementsByTagName('input');
-    let selects = document.getElementById("sensor-temperatures-table").getElementsByTagName('select');
+    let inputs = document.getElementById("rep-chart-time-temperature").getElementsByTagName('input');
+    let selects = document.getElementById("rep-chart-time-temperature").getElementsByTagName('select');
 
     selects.item(selects.length - 4).disabled = true;
     selects.item(selects.length - 3).disabled = true;
@@ -170,7 +170,7 @@ function vRep_addNewTableRow() {
     row_num = +selects.item(selects.length - 4).id.split("_")[2] + 1; //  Номер строки. Вычисляем для присваивания нового id элементам
 
     //  получаем доступ к tbody
-    let tbody = document.getElementById("sensor-temperatures-table").getElementsByTagName("tbody")[0];
+    let tbody = document.getElementById("rep-chart-time-temperature").getElementsByTagName("tbody")[0];
     //  создаем новую строку
     let row = document.createElement("tr");
     //  создаем столбцы
@@ -261,6 +261,10 @@ const config = {
 };
 //  render / init block
 let myChart = new Chart(document.getElementById('myChart'), config);
+
+
+//  !!!!!
+//  !   Следует заменить на библиотеку PDF Make
 //  Функции для сохранения графика в PDF
 function vRep_Convert() {
     //По нажатию на кнопку получаем канвас
@@ -302,11 +306,9 @@ function vRep_rprtprf_checkDatesAndBlockDownloadButtons(){
     if(vRep_rprtprf_getArrayOfDates().length==0){
         document.getElementById("rprtprf-btn-download-PDF").disabled = true;
         document.getElementById("rprtprf-btn-download-XLS").disabled = true;
-        document.getElementById("rprtprf-btn-download-CSV").disabled = true;
     } else {
         document.getElementById("rprtprf-btn-download-PDF").disabled = false;
         document.getElementById("rprtprf-btn-download-XLS").disabled = false;
-        document.getElementById("rprtprf-btn-download-CSV").disabled = false;
     }
 
     return;

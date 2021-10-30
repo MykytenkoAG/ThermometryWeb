@@ -1,10 +1,10 @@
 <?php
 
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/dbDebugTables.php');
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/dbDDL.php');
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/dbCurrVals.php');
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/dbAlarms.php');
+require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');		//	Параметры подключения к БД и связи с Термосервером
+require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/dbDebugTables.php');		//	Создание, удаление и изменение отладочных таблиц в БД
+require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/dbDDL.php');				//	Создание и инициализация всех таблиц в БД
+require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/dbCurrVals.php');			//	Запись текущих измеренных значений в БД
+require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/dbAlarms.php');				//	Работа с сигналами АПС
 
 /*
 	Процедура запуска:
@@ -343,17 +343,8 @@ function getConfForVisu_SiloNameWithMaxPodvNumber($dbh){
 }
 
 //  AJAX --------------------------------------------------------------------------------------------------------------------------------------------------------
-if( isset($_POST['POST_currValsFromTS_read_vals']) ) {
-	echo "Данные успешно прочитаны" ;
-}
-
-if( isset($_POST['POST_currValsFromTS_is_sound_on']) ) {
-
-    $dbBackupFile = @parse_ini_string(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/webTermometry/dbBackups/dbbackup 29.10.2021 21.24.58.ini'), true);
-
-    //echo ddl_backup_restore_DatesMeas($dbh, $dbBackupFile);
-
-    echo isSoundOn($dbh);
+if( isset($_POST['POST_currValsFromTS_get_number_of_new_alarms']) ) {
+    echo alarms_get_nack_number($dbh);
 }
 
 if( isset($_POST['POST_currValsFromTS_acknowledge_alarms']) ) {

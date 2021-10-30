@@ -1,19 +1,15 @@
 <?php require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/auth.php'); ?>
 <!doctype html>
-
 <html lang="en">
   <head>
-    
     <?php
       $webSiteTitle="Отчет";
       require_once "blocks/head.php";
       require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/visualisation/visu_report.php');
     ?>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.2/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.2/vfs_fonts.min.js"></script>
     <script src="node_modules/xlsx/dist/xlsx.full.min.js"></script>
-
   </head>
   <body>
       <?php
@@ -184,7 +180,7 @@
 
                 <div class="card-body">
 
-                  <table class="table table-hover text-center" id="sensor-temperatures-table">
+                  <table class="table table-hover text-center" id="rep-chart-time-temperature">
                     <thead>
                       <tr>
                         <th scope="col">Силос</th>

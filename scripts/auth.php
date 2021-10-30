@@ -13,7 +13,7 @@ function auth_signIn($dbh, $userName, $password){
     $hash = "jasdghlkjsdh";
     $password = md5($hash.$password);
 
-    $query = "SELECT SESSION_curr_access_level FROM users WHERE user_name = '$userName' AND password = '$password';" ;
+    $query = "SELECT access_level FROM users WHERE user_name = '$userName' AND password = '$password';" ;
 	$sth = $dbh->query($query);
 
     $user = $sth->fetchAll();
@@ -22,22 +22,21 @@ function auth_signIn($dbh, $userName, $password){
 		return "WRONG";
 	}
 
-    return $user[0]['SESSION_curr_access_level'];
+    return $user[0]['access_level'];
 }
 
 if( isset($_POST['POST_auth_signIn_user_name']) && isset($_POST['POST_auth_signIn_password']) ) {
-    if( auth_signIn($dbh, $_POST['POST_auth_signIn_user_name'], $_POST['POST_auth_signIn_password']) != "WRONG"){
-        $_SESSION["SESSION_curr_access_level"] = auth_signIn($dbh, $_POST['POST_auth_signIn_user_name'], $_POST['POST_auth_signIn_password']);
-        echo "OK";
-    } else {
-        echo "WRONG";
+    $accLvl = auth_signIn($dbh, $_POST['POST_auth_signIn_user_name'], $_POST['POST_auth_signIn_password']);
+    if( in_array( $accLvl, array(1,2)) ){
+        $_SESSION["SESSION_curr_access_level"] = $accLvl;
     }
+    echo $accLvl;
 }
 
 //  Выход из текущей учетной записи
 if( isset($_POST['POST_auth_signOut']) ) {
     $_SESSION["SESSION_curr_access_level"] = 0;
-    echo "OK";
+    echo "Signed out";
 }
 
 //  Смена пароля
@@ -50,7 +49,7 @@ function auth_changePassword($dbh, $userName, $password){
     $stmt = $dbh->prepare($query);
     $stmt->execute();
 
-    return "OK";
+    return "Password was changed";
 }
 
 if( isset($_POST['POST_auth_changePassword_userName']) && isset($_POST['POST_auth_changePassword_password']) ) {
@@ -64,7 +63,7 @@ if (isset($_SESSION["SESSION_curr_access_level"])){
 
 //  Получение текущего пользователя из сессии
 function auth_getCurrentUser(){
-        $current_user = "anonymous";
+    $current_user = "anonymous";
 
     if ( isset($_SESSION["SESSION_curr_access_level"]) ){
 

@@ -270,7 +270,7 @@ if( isset($_POST['POST_vRep_getSensorTemperByPodv_arrayOfSilos']) && isset($_POS
 }
 
 //  Получение таблицы температур для графика -----------------------------------------------------------------------------------------------------------------------------
-function vRep_getTableForChart($dbh,$silo_name, $podv_id, $sens_num, $dateStart, $dateEnd){
+function vRep_getTableForChart($dbh, $silo_name, $podv_id, $sens_num, $dateStart, $dateEnd){
     
     $sql = "SELECT d.date, m.temperature
             FROM sensors AS s INNER JOIN measurements AS m ON s.sensor_id=m.sensor_id

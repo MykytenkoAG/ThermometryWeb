@@ -1,11 +1,9 @@
-let dbg_message="";
-
 function init_debug_page(){
 
     document.getElementById("hdr-href-debug_page.php").setAttribute("class", "nav-link text-primary");
 
     //  Инициализация элементов select
-    for(let i=1; i<=7; i++){
+    for(let i=1; i<=7; i++){    //  7 - потому, что 7 строк кнопок
         let current_silo = document.getElementById("dbg_silo_"+i);
         setSelectOptions(current_silo, Object.keys(project_conf_array));
         redrawRowOfSelects("dbg_silo_"+i);
@@ -18,7 +16,6 @@ function init_debug_page(){
 }
 //  Отрисовка таблицы со всеми параметрами
 function redrawMainDbgTable(){
-
     $.ajax({
         url: 'visualisation/visu_debug_page.php',
         type: 'POST',
@@ -27,21 +24,14 @@ function redrawMainDbgTable(){
         dataType: 'html',
         success: function(fromPHP) {
             document.getElementById("debug_parameters_table").innerHTML = fromPHP;
-            
-            if(dbg_message!=""){
-                document.getElementById("modal-info-body-message").innerText = dbg_message;
-                $("#modal-info").modal('show');
-            }
         }
     });
-
     return;
 }
 //  Установить температуру для всех датчиков силоса
 function onClickDbgBtn_1(silo_name_id, temperature_id){
     const silo_name = document.getElementById(silo_name_id).value;
     const temperature = document.getElementById(temperature_id).value;
-
     $.ajax({
         url:    'visualisation/visu_debug_page.php',
         type:   'POST',
@@ -50,18 +40,15 @@ function onClickDbgBtn_1(silo_name_id, temperature_id){
                 'POST_vDbgPage_dbg_1_temperature': temperature },
         dataType: 'html',
         success: function(fromPHP) {
-            dbg_message=fromPHP;
             redrawMainDbgTable();
         }
     });
-
     return;
 }
 //  Установить скорость изменения температуры для всех датчиков силоса
 function onClickDbgBtn_2(silo_name_id, temperature_speed_id){
     const silo_name = document.getElementById(silo_name_id).value;
     const temperature_speed = document.getElementById(temperature_speed_id).value;
-
     $.ajax({
         url:    'visualisation/visu_debug_page.php',
         type:   'POST',
@@ -70,18 +57,15 @@ function onClickDbgBtn_2(silo_name_id, temperature_speed_id){
                 'POST_vDbgPage_dbg_2_t_speed':   temperature_speed },
         dataType: 'html',
         success: function(fromPHP) {
-            dbg_message=fromPHP;
             redrawMainDbgTable();
         }
     });
-
     return;
 }
 //  Установить уровень заполнения силоса
 function onClickDbgBtn_3(silo_name_id, level_id){
     const silo_name = document.getElementById(silo_name_id).value;
     const level = document.getElementById(level_id).value;
-
     $.ajax({
         url:    'visualisation/visu_debug_page.php',
         type:   'POST',
@@ -90,11 +74,9 @@ function onClickDbgBtn_3(silo_name_id, level_id){
                 'POST_vDbgPage_dbg_3_grain_level':    level },
         dataType: 'html',
         success: function(fromPHP) {
-            dbg_message=fromPHP;
             redrawMainDbgTable();
         }
     });
-
     return;
 }
 //  Установить температуру для всех датчиков подвески
@@ -102,7 +84,6 @@ function onClickDbgBtn_4(silo_name_id, podv_num_id, temperature_id){
     const silo_name = document.getElementById(silo_name_id).value;
     const podv_num = document.getElementById(podv_num_id).value;
     const temperature = document.getElementById(temperature_id).value;
-
     $.ajax({
         url:    'visualisation/visu_debug_page.php',
         type:   'POST',
@@ -112,11 +93,9 @@ function onClickDbgBtn_4(silo_name_id, podv_num_id, temperature_id){
                 'POST_vDbgPage_dbg_4_temperature':    temperature },
         dataType: 'html',
         success: function(fromPHP) {
-            dbg_message=fromPHP;
             redrawMainDbgTable();
         }
     });
-
     return;
 }
 //  Установить скорость изменения температуры для всех датчиков подвески
@@ -124,7 +103,6 @@ function onClickDbgBtn_5(silo_name_id, podv_num_id, temperature_speed_id){
     const silo_name = document.getElementById(silo_name_id).value;
     const podv_num = document.getElementById(podv_num_id).value;
     const temperature_speed = document.getElementById(temperature_speed_id).value;
-
     $.ajax({
         url:    'visualisation/visu_debug_page.php',
         type:   'POST',
@@ -134,11 +112,9 @@ function onClickDbgBtn_5(silo_name_id, podv_num_id, temperature_speed_id){
                 'POST_vDbgPage_dbg_5_t_speed':    temperature_speed },
         dataType: 'html',
         success: function(fromPHP) {
-            dbg_message=fromPHP;
             redrawMainDbgTable();
         }
     });
-
     return;
 }
 //  Установить температуру для одного датчика
@@ -147,7 +123,6 @@ function onClickDbgBtn_6(silo_name_id, podv_num_id, sensor_num_id, temperature_i
     const podv_num = document.getElementById(podv_num_id).value;
     const sensor_num = document.getElementById(sensor_num_id).value;
     const temperature = document.getElementById(temperature_id).value;
-
     $.ajax({
         url:    'visualisation/visu_debug_page.php',
         type:   'POST',
@@ -158,11 +133,9 @@ function onClickDbgBtn_6(silo_name_id, podv_num_id, sensor_num_id, temperature_i
                 'POST_vDbgPage_dbg_6_temperature':    temperature },
         dataType: 'html',
         success: function(fromPHP) {
-            dbg_message=fromPHP;
             redrawMainDbgTable();
         }
     });
-
     return;
 }
 //  Установить скорость изменения температуры для одного датчика
@@ -171,7 +144,6 @@ function onClickDbgBtn_7(silo_name_id, podv_num_id, sensor_num_id, temperature_s
     const podv_num = document.getElementById(podv_num_id).value;
     const sensor_num = document.getElementById(sensor_num_id).value;
     const temperature_speed = document.getElementById(temperature_speed_id).value;
-
     $.ajax({
         url:    'visualisation/visu_debug_page.php',
         type:   'POST',
@@ -182,11 +154,9 @@ function onClickDbgBtn_7(silo_name_id, podv_num_id, sensor_num_id, temperature_s
                 'POST_vDbgPage_dbg_7_t_speed':    temperature_speed },
         dataType: 'html',
         success: function(fromPHP) {
-            dbg_message=fromPHP;
             redrawMainDbgTable();
         }
     });
-
     return;
 }
 //  Обнулить все показания
@@ -198,16 +168,13 @@ function onClickDbgBtn_8(){
         data: { 'POST_vDbgPage_dbg_8_set_all_params_to_0':  1 },
         dataType: 'html',
         success: function(fromPHP) {
-            dbg_message = fromPHP;
             redrawMainDbgTable();
         }
     });
-
     return;
 }
 //  Добавить текущие показания в Базу Данных
 function onClickDbgBtn_AddMeas(){
-
     $.ajax({
         url:    'visualisation/visu_debug_page.php',
         type:   'POST',
@@ -215,13 +182,9 @@ function onClickDbgBtn_AddMeas(){
         data: { 'POST_vDbgPage_write_measurements_to_db': 1 },
         dataType: 'html',
         success: function(fromPHP) {
-            dbg_message=fromPHP;
-            document.getElementById("modal-info-body-message").innerText = dbg_message;
+            document.getElementById("modal-info-body-message").innerText = fromPHP;
             $("#modal-info").modal('show');
         }
     });
-
     return;
 }
-
-

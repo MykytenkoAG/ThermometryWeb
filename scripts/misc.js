@@ -2,7 +2,7 @@ let curr_user;
 const current_page = window.location.pathname.split("/").pop() === "" ? "index.php" : window.location.pathname.split("/").pop();
 const mainTimerPeriod = 10000;
 const mainTimer = setInterval(periodicActions, mainTimerPeriod);
-let alarmSound = 0;
+let alarmsNACKNumber = 0;
 let serverDateTime;
 let silo_names_array = [];
 let project_conf_array = [];
@@ -11,12 +11,12 @@ let silo_name_with_max_podv_number;
 
 //  Действия при загрузке каждой страницы -------------------------------------------------------------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", () => {
-    authGetCurrentUser();
-    isSoundOn();
+    authGetCurrentUser();                               //  Запрашиваем текущего пользователя из сессии
+    getNewAlarmsNumber();                               //  Проверяем наличие новых алармов, чтобы в случае необходимости включить звук
     if (current_page === "index.php") {
         init_index();
     } else if (current_page === "report.php"){
-        getConf_ProjectConfArr();
+        getConf_ProjectConfArr();                       //  Если мы на странице с множеством выпадающих элементов, сначала получаем конфигурационные массивы
     } else if (current_page === "debug_page.php") {
         getConf_ProjectConfArr();
     } else if (current_page === "silo_config.php") {
@@ -56,8 +56,9 @@ function getConf_ArrayOfSiloNames() {
         data: { 'POST_currValsFromTS_get_silo_names_array': 1 },
         dataType: 'html',
         success: function(fromPHP) {
-            console.log(fromPHP);
+            //  массив с названиями силосов, в котором индекс - это silo_id, а значение - название силоса
             silo_names_array = (JSON.parse(fromPHP));
+            //  делаем активным силос с silo_id==0
             document.getElementById("current-silo-name").innerHTML = "Силос " + silo_names_array[0];
         }
     });
@@ -103,7 +104,7 @@ function getConf_SiloNameWithMaxPodvNumber() {
         dataType: 'html',
         success: function(fromPHP) {
             silo_name_with_max_podv_number = (JSON.parse(fromPHP));
-            if (current_page === "report.php") {
+            if (current_page === "report.php") {                        //  после получения всех необходимых массивов можно переходить к инициализации
                 init_report();
             } else if (current_page === "debug_page.php") {
                 init_debug_page();
@@ -138,13 +139,15 @@ function setSelectOptions(dom_element, options_arr) {
 */
 function redrawRowOfSelects(select_element_id) {
 
+    //  Парсим id элемента
     const page = select_element_id.split("_")[0];
     const element_name = select_element_id.split("_")[1];
     const row_number = select_element_id.split("_")[2];
 
     const current_silo = document.getElementById(page + "_silo_" + row_number);
 
-    const opt_0 = current_silo.options[0].value === "all" ? ["all"] : [];
+    //  В зависимости от того, пренадлежит ли элемент к печатным формам или нет, в нем будет присутствовать или отсутствовать пункт "Все"
+    const opt_0 = current_silo.options[0].value === "all" ? ["all"] : [];                               /*глобальная переменная*/
     const current_silo_selected_ind = current_silo.options[current_silo.selectedIndex].value === "all" ? silo_name_with_max_podv_number : current_silo.options[current_silo.selectedIndex].value;
 
     let element_podv = document.getElementById(page + "_podv_" + row_number);
@@ -183,42 +186,49 @@ function redrawRowOfSelects(select_element_id) {
 }
 
 //  Работа с АПС ---------------------------------------------------------------------------------------------------------------------------------------------
-function isSoundOn() {
+function controlAudio(OnOff){
+    if(OnOff===1){
+        document.getElementById("alarm-sound").loop = true;     //  Включаем звук
+        document.getElementById("alarm-sound").play();
+        $('#hdr-ack').removeClass("text-black");                //  Подсвечиваем кнопку квитирования
+        $('#hdr-ack').addClass("text-primart");
+    } else {
+        document.getElementById("alarm-sound").loop = false;
+        document.getElementById("alarm-sound").pause();
+        $('#hdr-ack').removeClass("text-primary");
+        $('#hdr-ack').addClass("text-black");
+    }
+    return;
+}
+
+function getNewAlarmsNumber() {
 
     $.ajax({
         url: '/webTermometry/scripts/currValsFromTS.php',
         type: 'POST',
         cache: false,
-        data: { 'POST_currValsFromTS_is_sound_on': 1 },
+        data: { 'POST_currValsFromTS_get_number_of_new_alarms': 1 },
         dataType: 'html',
         success: function(fromPHP) {
 
-            console.log(fromPHP);
-
-            console.log(curr_user);
-            console.log(current_page);
-
-            if (fromPHP == "YES") {
-                alarmSound = 1;
-                document.getElementById("alarm-sound").loop = true;
-                document.getElementById("alarm-sound").play();
-                $('#hdr-ack').removeClass("text-black");
-                $('#hdr-ack').addClass("text-primart");
-            } else {
-
-                document.getElementById("alarm-sound").pause();
-
+            if (fromPHP > alarmsNACKNumber) {           //  Если появились неквитированные алармы
+                controlAudio(1);                        //  Включаем звук
             }
 
+            alarmsNACKNumber = fromPHP;
+
+            if (current_page === "index.php") {
+                vIndRedrawTableCurrentAlarms();         //  Перерисовываем таблицу с текущими алармами
+                vIndRedrawSiloStatus();                 //  Показываем текущий статус каждого силоса
+                vIndOnClickOnSilo(lastSiloID);          //  Перерисовываем таблицу с текущими показаниями
+            }
+            
         }
     });
     return;
 }
 
 function alarmsAck() {
-    document.getElementById("alarm-sound").pause();
-    $('#hdr-ack').removeClass("text-primary");
-    $('#hdr-ack').addClass("text-black");
 
     $.ajax({
         url: '/webTermometry/scripts/currValsFromTS.php',
@@ -227,23 +237,13 @@ function alarmsAck() {
         data: { 'POST_currValsFromTS_acknowledge_alarms': 1 },
         dataType: 'html',
         success: function(fromPHP) {
-            alarmSound = 0;
-            console.log(fromPHP);
-            if (current_page === "index.php") {
-                redrawTableCurrentAlarms();
-                vIndRedrawSiloStatus();
-                vIndOnClickOnSilo(lastSiloID);
-            }
+            controlAudio(0);            //  Выключаем звук
+            getNewAlarmsNumber();       //  Проверяем появление новых алармов
         }
     });
     return;
 }
 
 function periodicActions() {
-    isSoundOn();
-    if (current_page === "index.php") {
-        redrawTableCurrentAlarms();
-        vIndRedrawSiloStatus();
-        vIndOnClickOnSilo(lastSiloID);
-    }
+    getNewAlarmsNumber();           //  Проверяем появление новых алармов, а заодно выполняем считывание текущих показаний и занесение их в БД
 }

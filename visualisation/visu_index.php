@@ -1,6 +1,7 @@
 <?php
+
 require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/auth.php');
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');   //  ! Можно оптимизировать
+require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');
 
 // Левый сайтбар ------------------------------------------------------------------------------------------------------------------------------------------------------
 //  OUT = html table < NACK, time, silo_name, podv_num, sensor_num, reason >

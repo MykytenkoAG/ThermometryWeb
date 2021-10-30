@@ -10,10 +10,10 @@ function authGetCurrentUser(){
         dataType: 'html',
         success: function(fromPHP) {
             curr_user = fromPHP;
-            if((current_page==="silo_config.php") && !["oper","tehn"].includes(curr_user)){
+            if((current_page==="silo_config.php") && !["oper","tehn"].includes(curr_user)){     //  Выход на главную в случае, если мы на странице настроек
                 document.location.href = "index.php";
             }
-            if((current_page==="silo_config.php") && curr_user==="tehn"){
+            if((current_page==="silo_config.php") && curr_user==="tehn"){                       //  Включение кнопки "Добавить", в случае, если пользователь - технолог
                 vSConf_buttonEnable("sconf-table-prodtypes-btn-add");
             }
         }
@@ -48,7 +48,7 @@ function authSignIn(user, inputPassID){
                 modalPasswordInputClear('modal-pass-change-pwd2');
                 $("#modal-info").modal('show');
             } else {
-                document.location.href = current_page;
+                document.location.href = current_page;         //   В случае правильно введенного пароля просто перезагружаем страницу, все остальное сделано в PHP
             }
         }
     });
@@ -58,7 +58,6 @@ function authSignIn(user, inputPassID){
 /*  Функция выхода из текущей учетной записи
 */
 function authSignOut(){
-
     $.ajax({
         url: '/webTermometry/scripts/auth.php',
         type: 'POST',
@@ -73,7 +72,6 @@ function authSignOut(){
             }
         }
     });
-
     return;
 }
 /*  Функция для смены пароля

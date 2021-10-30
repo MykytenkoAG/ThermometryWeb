@@ -1,6 +1,5 @@
 <?php
 
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/auth.php');
 require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');
 
 //  Отрисовка таблицы "Типы продукта"

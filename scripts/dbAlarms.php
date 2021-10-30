@@ -1,7 +1,6 @@
 <?php
 
 require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');
-
 $logFile = $_SERVER['DOCUMENT_ROOT'].'/webTermometry/logs/log.txt';
 
 //	Запись строки в журнал
@@ -26,8 +25,6 @@ function logClear(){
 	а затем происходит логирование
 	Вызывается 1 раз в 10 секунд
 */
-//	! Можно модифицировать, чтобы она возвращала количество новых алармов
-//	Если количество больше нуля, необходимо включать звук
 function alarms_set($dbh, $serverDate){
 
 	//	sensors JOIN productsbysilo JOIN products
@@ -141,6 +138,7 @@ function alarms_set($dbh, $serverDate){
 		$rows = $sth->fetchAll();
 
 		if(count($rows)>0){
+
 			$sensor_ids=array();
 			foreach($rows as $row){
 				array_push( $sensor_ids, $row['sensor_id']);
@@ -165,7 +163,6 @@ function alarms_set($dbh, $serverDate){
 			$stmt->execute();
 		}
 	}
-
 
 	//	Logging
     $loggingString = "";
@@ -539,23 +536,12 @@ function alarms_reset($dbh, $serverDate){
 	return;
 }
 //	Функция определения того, есть ли неквитированные алармы
-function isSoundOn($dbh){
-
-    $sql = "SELECT sensor_id FROM sensors WHERE NACK_Tmax=1 OR NACK_Vmax=1 OR NACK_err=1;";
-
-    $sth = $dbh->query($sql);
-
-    if($sth==false){
-        return false;
-    }
-
-	$rows = $sth->fetchAll();
-
-	if(count($rows)>0){
-		return "YES";
+function alarms_get_nack_number($dbh){
+	$sql = "SELECT count(sensor_id) FROM zernoib.sensors WHERE (NACK_err=1 OR NACK_Tmax=1 OR NACK_Vmax=1)";
+	$sth = $dbh->query($sql);
+	if($sth!=false){
+		return $sth->fetchAll()[0]['count(sensor_id)'];
 	}
-
-    return "NO";
 }
 
 ?>

@@ -1,9 +1,10 @@
-let intent_page;
+let intent_page;                                                                //  вспомогательная переменная на тот случай, если пользователь хочет перейти на какую-либо
+                                                                                //  страницу, не сохранив изменения на странице настроек
 $("a").hover(
     function() {
-        if(  ($(this).attr('id').split("-").pop()  === current_page) ||
-             ($(this).attr('id').split("-").pop()  === curr_user)    ||
-             (($(this).attr('id').split("-").pop() === "ack") && alarmSound===1) ){
+        if(  ($(this).attr('id').split("-").pop()  === current_page) ||                 //  изменять подсветку текущей страницы нельзя
+             ($(this).attr('id').split("-").pop()  === curr_user)    ||                 //  текущего пользователя тоже
+             (($(this).attr('id').split("-").pop() === "ack") && alarmsNACKNumber>0) ){ //  и кнопку квитирования при наличии неквитированных сигналов АПС
             return;
         }
         $(this).removeClass("text-black");
@@ -12,7 +13,7 @@ $("a").hover(
     function() {
         if(  ($(this).attr('id').split("-").pop()  === current_page) ||
              ($(this).attr('id').split("-").pop()  === curr_user)    ||
-             (($(this).attr('id').split("-").pop() === "ack") && alarmSound===1)){
+             (($(this).attr('id').split("-").pop() === "ack") && alarmsNACKNumber>0)){
             return;
         }
         $(this).removeClass("text-primary");

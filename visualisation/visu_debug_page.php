@@ -1,6 +1,6 @@
 <?php
 
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');
+require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/dbMeasurements.php');
 //  Получение главной отладочной таблицы
 function vDbg_draw_debugParamsTable($dbh){
 

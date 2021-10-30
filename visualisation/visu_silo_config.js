@@ -35,7 +35,6 @@ function vSConf_getArrayOfLevels() {
         dataType: 'html',
         success: function(fromPHP) {
             arrayOfLevels = (JSON.parse(fromPHP));
-            console.log(arrayOfLevels);
         }
     });
     return;

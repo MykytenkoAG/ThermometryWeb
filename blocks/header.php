@@ -14,7 +14,7 @@ title="Режим симуляции данных">
                         Отладка
                     </a>
                 </li>
-            
+
                 <li>
                     <a href="#" id="hdr-href-index.php"         class="nav-link text-black" data-bs-toggle="tooltip" data-bs-placement="right"
 title="Просмотр активных сигналов АПС
@@ -125,6 +125,6 @@ title="Квитировать сигналы АПС">
     </nav>
     
     <script type="text/javascript" src="blocks/header.js"></script>
-    <audio id="alarm-sound" src="sound/ES_Submarine Alarm 1 - SFX Producer.mp3"></audio>
+    <audio id="alarm-sound" src="sound/alarm_sound.mp3"></audio>
 
 </header>

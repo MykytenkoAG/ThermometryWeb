@@ -110,7 +110,7 @@
                         echo "<select class=\"form-control\"
                         id=\"dbg_level_3\" onchange=\"redrawRowOfSelects(event.target.id)\"
                         style=\"width: 100px;\" $debugPageDisableElements>
-                        <option value=\"1\">1</option>
+                        <option value=\"0\">0</option>
                       </select>";
                       ?>
                       
