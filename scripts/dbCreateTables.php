@@ -73,7 +73,7 @@ function restoreFromBackup($dbh, $dbBackupFile){
 	$stmt = $dbh->prepare($query);
 	$stmt->execute();
 	
-	$query = "INSERT INTO dates (date_id, date) VALUES ";
+	$query = "REPLACE INTO dates (date_id, date) VALUES ";
 
 	foreach($dbBackupFile['dates'] as $key => $value){
 		$query .= "(".$key.","."'".$value."'"."),";
@@ -98,7 +98,7 @@ function restoreFromBackup($dbh, $dbBackupFile){
 	$stmt->execute();
 
 
-	$query = "INSERT INTO measurements (date_id, sensor_id, temperature) VALUES ";
+	$query = "REPLACE INTO measurements (date_id, sensor_id, temperature) VALUES ";
 
 
 	foreach ($dbBackupFile as $key => $value) {

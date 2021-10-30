@@ -2,6 +2,7 @@
 require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/auth.php');
 require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');   //  ! Можно оптимизировать
 
+// Левый сайтбар ------------------------------------------------------------------------------------------------------------------------------------------------------
 //  OUT = html table < NACK, time, silo_name, podv_num, sensor_num, reason >
 function getCurrentAlarms($dbh){
 
@@ -104,78 +105,48 @@ if( isset($_POST['get_current_alarms']) ) {
     echo getCurrentAlarms($dbh);
 }
 
-//  out: = [silo_id=>[{round,square},img_index]]
-function getSiloCurrentStatus($dbh){
+function disableAllDefectiveSensors($dbh){
+	
+	$query="UPDATE sensors SET is_enabled=0 WHERE current_temperature > 84";
+	$stmt = $dbh->prepare($query);
+	$stmt->execute();
 
-    $outArr = array();    
-    
-    $sql = "SELECT  sensor_id, s.silo_id,
-                    NACK_Tmax, ACK_Tmax, NACK_Vmax, ACK_Vmax, NACK_err, ACK_err,
-                    error_id, pbs.is_square
-            FROM sensors AS s inner join prodtypesbysilo AS pbs ON s.silo_id=pbs.silo_id;";
-
-    $sth = $dbh->query($sql);
-
-    if($sth==false){
-    return false;
-    }
-    $rows = $sth->fetchAll();
-
-    $curr_silo_id=""; $curr_silo_status=""; $curr_silo_type="";
-
-    foreach($rows as $row){
-
-        if($curr_silo_id!=$row['silo_id']){
-            $curr_silo_id = $row['silo_id'];
-            if($curr_silo_status!=""){
-                array_push($outArr, array($curr_silo_type, $curr_silo_status) );
-            }
-            $curr_silo_status=5;
-        }
-
-        $curr_silo_type = $row['is_square'];                                                                        //  0: round, 1: square
-
-
-        if( in_array($row['error_id'],array(255,256))){
-            $curr_silo_status = 0;                                                                                  //  OFF
-            continue;
-        }
-
-        if( in_array($row['error_id'],array(253,254))){
-            $curr_silo_status = 1;                                                                                  //  CRC
-            continue;
-        }
-
-        if( $row['NACK_Tmax']==1 or $row['NACK_Vmax']==1 or $row['NACK_err']==1){
-            $curr_silo_status = 2;                                                                                  //  NACK
-            continue;
-        }
-
-        if( $curr_silo_status!=3 and
-            ($row['ACK_Tmax']==1 or $row['ACK_Vmax']==1 or $row['ACK_err']==1)){
-            $curr_silo_status = 3;                                                                                  //  ACK
-            continue;
-        }
-
-        if( !in_array($curr_silo_status,array(0,1,2,3)) and
-            ($row['NACK_Tmax']==0 and $row['NACK_Vmax']==0 and $row['NACK_err']==0 and
-             $row['ACK_Tmax']==0 and $row['ACK_Vmax']==0 and $row['ACK_err']==0)){
-            $curr_silo_status = 4;                                                                                  //  OK
-            continue;
-        }
-
-    }
-
-    //array_push($outArr, $curr_silo_type.$curr_silo_status);
-    array_push($outArr, array($curr_silo_type, $curr_silo_status) );
-
-    return $outArr;
+	return;
 }
 
-if( isset($_POST['get_silo_current_status']) ) {
-    echo json_encode(getSiloCurrentStatus($dbh));
+if( isset($_POST['disable_all_defective_sensors']) ) {
+	disableAllDefectiveSensors($dbh);
+    echo "Датчики включены";
 }
 
+function enableAllSensors($dbh){
+	
+	$query="UPDATE sensors SET is_enabled=1";
+	$stmt = $dbh->prepare($query);
+	$stmt->execute();
+
+	return;
+}
+
+if( isset($_POST['enable_all_sensors']) ) {
+	enableAllSensors($dbh);
+    echo "датчики отключены";
+}
+
+function enableAutoLvlOnAllSilo($dbh){
+    $query="UPDATE prodtypesbysilo SET grain_level_fromTS = 1;";
+
+	$stmt = $dbh->prepare($query);
+	$stmt->execute();
+
+    return;
+}
+
+if( isset($_POST['enable_auto_lvl_mode']) ) {
+    enableAutoLvlOnAllSilo($dbh);
+}
+
+//  Основная часть ----------------------------------------------------------------------------------------------------------------------------------------------------
 //  Функция отрисовки главного плана расположения силосов
 function drawSiloPlan($dbh){ 
 
@@ -276,7 +247,80 @@ function drawSiloPlan($dbh){
     return $outStr;
 }
 
-//  Получение текущих параметров для силоса
+//  out: = [silo_id=>[{round,square},img_index]]
+function getSiloCurrentStatus($dbh){
+
+    $outArr = array();    
+    
+    $sql = "SELECT  sensor_id, s.silo_id,
+                    NACK_Tmax, ACK_Tmax, NACK_Vmax, ACK_Vmax, NACK_err, ACK_err,
+                    error_id, pbs.is_square
+            FROM sensors AS s inner join prodtypesbysilo AS pbs ON s.silo_id=pbs.silo_id;";
+
+    $sth = $dbh->query($sql);
+
+    if($sth==false){
+    return false;
+    }
+    $rows = $sth->fetchAll();
+
+    $curr_silo_id=""; $curr_silo_status=""; $curr_silo_type="";
+
+    foreach($rows as $row){
+
+        if($curr_silo_id!=$row['silo_id']){
+            $curr_silo_id = $row['silo_id'];
+            if($curr_silo_status!=""){
+                array_push($outArr, array($curr_silo_type, $curr_silo_status) );
+            }
+            $curr_silo_status=5;
+        }
+
+        $curr_silo_type = $row['is_square'];                                                                        //  0: round, 1: square
+
+
+        if( in_array($row['error_id'],array(255,256))){
+            $curr_silo_status = 0;                                                                                  //  OFF
+            continue;
+        }
+
+        if( in_array($row['error_id'],array(253,254))){
+            $curr_silo_status = 1;                                                                                  //  CRC
+            continue;
+        }
+
+        if( $row['NACK_Tmax']==1 or $row['NACK_Vmax']==1 or $row['NACK_err']==1){
+            $curr_silo_status = 2;                                                                                  //  NACK
+            continue;
+        }
+
+        if( $curr_silo_status!=3 and
+            ($row['ACK_Tmax']==1 or $row['ACK_Vmax']==1 or $row['ACK_err']==1)){
+            $curr_silo_status = 3;                                                                                  //  ACK
+            continue;
+        }
+
+        if( !in_array($curr_silo_status,array(0,1,2,3)) and
+            ($row['NACK_Tmax']==0 and $row['NACK_Vmax']==0 and $row['NACK_err']==0 and
+             $row['ACK_Tmax']==0 and $row['ACK_Vmax']==0 and $row['ACK_err']==0)){
+            $curr_silo_status = 4;                                                                                  //  OK
+            continue;
+        }
+
+    }
+
+    //array_push($outArr, $curr_silo_type.$curr_silo_status);
+    array_push($outArr, array($curr_silo_type, $curr_silo_status) );
+
+    return $outArr;
+}
+
+if( isset($_POST['get_silo_current_status']) ) {
+    echo json_encode(getSiloCurrentStatus($dbh));
+}
+
+//  Правый сайтбар -----------------------------------------------------------------------------------------------------------------------------------------------------
+//  Получение текущих параметров продукта для текущего силоса
 //  out: [название продукта, Tmax, Vmax, ProdTmin, ProdTavg, ProdTmax, ProdVmin, ProdVavg, ProdVmax, RngTmin, RngTmax, RngVmax]
 function getSiloParameters($dbh, $silo_id){
 
@@ -561,47 +605,6 @@ function changeLevelFromSlider($dbh, $silo_id, $grainLevel){
 //  Изменение уровня из главной страницы
 if( isset($_POST['change_level_from_slider_silo_id']) && isset($_POST['change_level_from_slider_grain_level']) ) {
     changeLevelFromSlider($dbh, $_POST['change_level_from_slider_silo_id'], $_POST['change_level_from_slider_grain_level']);
-}
-
-function enableAutoLvlOnAllSilo($dbh){
-    $query="UPDATE prodtypesbysilo SET grain_level_fromTS = 1;";
-
-	$stmt = $dbh->prepare($query);
-	$stmt->execute();
-
-    return;
-}
-
-if( isset($_POST['enable_auto_lvl_mode']) ) {
-    enableAutoLvlOnAllSilo($dbh);
-}
-
-function disableAllDefectiveSensors($dbh){
-	
-	$query="UPDATE sensors SET is_enabled=0 WHERE current_temperature > 84";
-	$stmt = $dbh->prepare($query);
-	$stmt->execute();
-
-	return;
-}
-
-if( isset($_POST['disable_all_defective_sensors']) ) {
-	disableAllDefectiveSensors($dbh);
-    echo "Датчики включены";
-}
-
-function enableAllSensors($dbh){
-	
-	$query="UPDATE sensors SET is_enabled=1";
-	$stmt = $dbh->prepare($query);
-	$stmt->execute();
-
-	return;
-}
-
-if( isset($_POST['enable_all_sensors']) ) {
-	enableAllSensors($dbh);
-    echo "датчики отключены";
 }
 
 function sensorDisable($dbh, $silo_id, $podv_id, $sensor_num){

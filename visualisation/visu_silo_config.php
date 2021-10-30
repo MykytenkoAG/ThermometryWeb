@@ -234,7 +234,7 @@ function drawTableProdtypesbysilo($dbh, $accessLevel){
 if( isset($_POST['draw_table_prodtypes_by_silo']) ) {
     echo drawTableProdtypesbysilo($dbh, $accessLevel);
 }
-
+//  Формирование очереди с перечнем изменений для таблицы "Типы продукта"
 function prodtypesRemove($dbh, $product_id){
 
     $sql = "DELETE FROM prodtypes WHERE product_id=$product_id";
@@ -292,7 +292,7 @@ if( isset($_POST['tbl_prodtypes_changes_queue']) ) {
 
     echo "Изменения успешно внесены в Базу Данных";
 }
-
+//  Формирование массива с перечнем изменений для таблицы "Загрузка силосов"
 function prodtypesbysiloUpdate($dbh, $silo_id, $grainLevelFromTS, $grain_level, $product_id){
 
     $sql = "UPDATE prodtypesbysilo SET grain_level_FromTS='$grainLevelFromTS', grain_level='$grain_level', product_id='$product_id' WHERE silo_id=$silo_id";

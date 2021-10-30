@@ -2,6 +2,7 @@
 
 require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');
 
+//  Печатные формы -------------------------------------------------------------------------------------------------------------------------------------------------------
 //  Получить все даты измерений
 //  out = [дата => массив времен измерений]
 function getAllMeasurementDates($dbh){
@@ -44,7 +45,7 @@ function getAllMeasurementDates($dbh){
 
     return $outArr;
 }
-
+//  Отрисовка кнопок с датами и чекбоксов с конкретным временем измерения
 function createMeasurementCheckboxes($measurementArray){
 
     $outStr = "<table>";
@@ -112,6 +113,7 @@ function createMeasurementCheckboxes($measurementArray){
     return $outStr;
 }
 
+//  Получение параметров для печатных форм -------------------------------------------------------------------------------------------------------------------------------
 //  Средние температуры в слоях
 function getAvgTemperaturesByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $arrayOfDates){
 
@@ -267,6 +269,7 @@ if( isset($_POST['prfrb_t_by_sensor_arrayOfSilos']) && isset($_POST['prfrb_t_by_
     echo json_encode( getSensorTemperaturesByPodv($dbh, $_POST['prfrb_t_by_sensor_arrayOfSilos'], $_POST['prfrb_t_by_sensor_arrayOfPodv'], $_POST['prfrb_t_by_sensor_arrayOfSensors'], $_POST['prfrb_t_by_sensor_arrayOfDates']) );
 }
 
+//  Получение таблицы температур для графика -----------------------------------------------------------------------------------------------------------------------------
 function getTimeTemperatureTable($dbh,$silo_name, $podv_id, $sens_num, $dateStart, $dateEnd){
     
     $sql = "SELECT d.date, m.temperature

@@ -23,7 +23,7 @@ if( isset($_POST['is_sound_on']) ) {
 
     //echo restoreFromBackup($dbh, $dbBackupFile);
 
-    //echo isSoundOn($dbh);
+    echo isSoundOn($dbh);
 }
 
 if( isset($_POST['acknowledge']) ) {

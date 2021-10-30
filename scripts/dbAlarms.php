@@ -347,7 +347,7 @@ function setACK($dbh, $serverDate){
 					JOIN prodtypesbysilo AS pbs
 						ON s.silo_id=pbs.silo_id
 					LEFT JOIN errors AS e ON s.error_id = e.error_id
-				WHERE ((s.ACK_err=1 OR s.ACK_Tmax=1 OR s.ACK_Vmax=1) AND s.server_date=$serverDate)";
+				WHERE ((s.ACK_err=1 OR s.ACK_Tmax=1 OR s.ACK_Vmax=1) AND s.server_date='$serverDate')";
 	$sth = $dbh->query($sql);
 
 	if($sth!=false){
