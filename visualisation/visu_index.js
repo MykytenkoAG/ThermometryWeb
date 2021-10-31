@@ -326,9 +326,9 @@ function vIndWriteGrainLvlFromSlider(silo_id) {
 //  Построение графика температуры для выбранного силоса
 //  В функции происходит запоминание номера датчика в cookie и переход на страницу "Отчет"
 function vIndDrawChartForSelectedSensor(silo_id, podv_num, sensor_num, period) {
-    document.cookie = "chart_silo_name=" + silo_id + ";";
-    document.cookie = "chart_podv_num=" + podv_num + ";";
-    document.cookie = "chart_sensor_num=" + sensor_num + ";";
+    document.cookie = "chart_silo_name=" + silo_names_array[silo_id] + ";";
+    document.cookie = "chart_podv_num=" + (+podv_num+1) + ";";
+    document.cookie = "chart_sensor_num=" + (+sensor_num+1) + ";";
     document.cookie = "chart_period=" + period + ";";
     document.location.href = "report.php";
     return;

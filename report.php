@@ -152,7 +152,7 @@
                 <div class="d-flex mb-2 justify-content-center">
                   <h5 class="card-title justify-content-center" style="font-family: Arial, Helvetica, sans-serif; font-size: 28px;">График температуры</h5>
                 </div>
-                <canvas id="myChart"></canvas>
+                <canvas id="temperatureGraph"></canvas>
 
                 <script type="text/javascript" src="node_modules/chart.js/dist/chart.js"></script>
                 <script src="node_modules/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.js"></script>

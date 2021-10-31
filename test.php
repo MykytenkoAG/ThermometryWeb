@@ -8,6 +8,8 @@
 </head>
 <body>
 
+    <iframe src="docs/ТСС-02 - инструкция по эксплуатации ПО.pdf" width="1800" height="500">
+
     <?php
         //require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');
         /*

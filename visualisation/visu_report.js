@@ -32,10 +32,9 @@ function init_report() {
         chart_sensor_num != "" && chart_sensor_num != null &&
         chart_period != "" && chart_period != null) {
 
-        const chart_silo_name = Object.keys(project_conf_array)[chart_silo_name];
         selects.item(selects.length - 4).value = chart_silo_name;
-        selects.item(selects.length - 3).value = Object.keys(project_conf_array[chart_silo_name])[chart_podv_num];
-        selects.item(selects.length - 2).value = project_conf_array[chart_silo_name][+chart_podv_num + 1][+chart_sensor_num + 1];
+        selects.item(selects.length - 3).value = chart_podv_num;
+        selects.item(selects.length - 2).value = chart_sensor_num;
         selects.item(selects.length - 1).value = chart_period;
 
         vRep_addNewLineOnChart();
@@ -141,8 +140,8 @@ function vRep_addNewLineOnChart() {
                 parseInt(line_colour.slice(3, 5), 16) + "," +
                 parseInt(line_colour.slice(5, 7), 16) + ",1)";
 
-            myChart.data.datasets.push(newDataset);
-            myChart.update();
+            temperatureGraph.data.datasets.push(newDataset);
+            temperatureGraph.update();
 
             deleteCookie("chart_silo_name");
             deleteCookie("chart_podv_num");
@@ -260,7 +259,7 @@ const config = {
     }
 };
 //  render / init block
-let myChart = new Chart(document.getElementById('myChart'), config);
+let temperatureGraph = new Chart(document.getElementById('temperatureGraph'), config);
 
 
 //  !!!!!
@@ -268,7 +267,7 @@ let myChart = new Chart(document.getElementById('myChart'), config);
 //  Функции для сохранения графика в PDF
 function vRep_Convert() {
     //По нажатию на кнопку получаем канвас
-    var canvas = document.getElementById('myChart');
+    var canvas = document.getElementById('temperatureGraph');
     // И создаем из него картиику в base64
     var quality = 1; // качество от 0 до 1, заодно и сжать можно
     var myImage = {
@@ -314,7 +313,7 @@ function vRep_rprtprf_checkDatesAndBlockDownloadButtons(){
     return;
 }
 
-//  Получение массивов входных данных для создания печатных форм ---------------------------
+//  Получение массивов входных данных для создания печатных форм
 //  Получение массива дат
 function vRep_rprtprf_getArrayOfDates(){
 
@@ -410,7 +409,7 @@ function vRep_rprtprf_getArrayOfLayers(){
     return arrayOfLayers;
 }
 
-//  Функции для сохранения печатных форм в формате PDF и XLSX ---------------------------------
+//  Функции для сохранения печатных форм в формате PDF и XLSX
 //  Функиця для получение JSON-объекта из PHP
 function vRep_getJSONForPrintedForms(fileFormat){
 
@@ -609,8 +608,6 @@ function vRep_saveXLSX(wb, sheetHeader){
 }
 
 function creatPrintedFormXLSX(JSONObj, field1, field2, field3, field4, sheetHeader){
-
-    //vRep_createXLSX(JSONObj);
 
     var wb = XLSX.utils.book_new();
     wb.Props = {
