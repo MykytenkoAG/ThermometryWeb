@@ -411,134 +411,6 @@ function vRep_rprtprf_getArrayOfLayers(){
 }
 
 //  Функции для сохранения печатных форм в формате PDF и XLSX ---------------------------------
-function vRep_createTableForPDFMake(JSONObj, field, tableHeader, col1Header, col2Header){
-
-    let outArr=[];
-    outArr[0]=[{text:  tableHeader, style: 'tableHeader', colSpan: 2, alignment: 'center'},{}];
-    outArr.push( [col1Header, col2Header] );
-
-    for(let i=0; i<JSONObj[field].length; i++){
-        outArr.push( [i+1, JSONObj[field][i][i+1]] );
-    }
-
-    return outArr;
-}
-//  Создание объекта со свойствами PDF-документа
-function vRep_createBasicPDFPropStructure(){
-
-    let pdfProp = {};
-    pdfProp.pageSize = "a4";
-    pdfProp.pageOrientation = "landscape";
-    pdfProp.pageMargins = [20,30,20,20];
-    pdfProp.styles = {};
-    pdfProp.styles.header = {};
-    pdfProp.styles.header.fontSize = 18;
-    pdfProp.styles.header.bold = true;
-    pdfProp.styles.header.alignment = "center";
-    pdfProp.styles.header.margin = [0,0,0,10];
-    pdfProp.content = [];
-
-    return pdfProp;
-}
-//  Печатная форма "Средние температуры по слоям"
-function vRep_createPDFPropObj_AvgTemperaturesByLayer(JSONObj,headerText){
-
-    let pdfProp = vRep_createBasicPDFPropStructure();
-
-    let j=-1;
-    for(let i=0; i<JSON.parse(JSONObj).length; i++){
-
-        const currJSONObj = JSON.parse(JSONObj)[i];
-        const field = 'layerTemperatures';
-        const tableHeader = "Силос " + currJSONObj['silo']+"\n"+ "Дата: " + currJSONObj['date'].split(" ")[0] + "\n" + currJSONObj['date'].split(" ")[1];
-        const col1Header = "Слой №";
-        const col2Header = "Средняя\nтемпература";
-
-        if(i==0 || (i%6==0)){
-            j++;
-            pdfProp.content.push( {text: headerText, style: 'header', alignment: 'center'} );
-            j++;
-            pdfProp.content.push( {pageBreak: 'after', layout: 'noBorders', table: {} } );
-            pdfProp.content[j].table = {body:[[  ]]};
-
-            pdfProp.content[j].table.body[0] = [ { table:{ body: vRep_createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } ];
-
-            continue;
-        }
-        pdfProp.content[j].table.body[0].push(   { table:{ body: vRep_createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } );
-        if(i==JSON.parse(JSONObj).length-1){
-            pdfProp.content[j].pageBreak = "";
-        }
-    }
-
-    return pdfProp;
-}
-//  Печатная форма "Температуры каждого датчика по слоям"
-function vRep_createPDFPropObj_SensorTemperaturesByLayer(JSONObj,headerText){
-
-    let pdfProp = vRep_createBasicPDFPropStructure();
-
-    let j=-1;
-    for(let i=0; i<JSON.parse(JSONObj).length; i++){
-
-        const currJSONObj = JSON.parse(JSONObj)[i];
-        const field = 'sensorTemperatures';
-        const tableHeader = "Силос " + currJSONObj['silo']+"\n"+ "Дата: " + currJSONObj['date'].split(" ")[0] + "\n" + currJSONObj['date'].split(" ")[1] + "\n" + "Слой " + currJSONObj['layer'];
-        const col1Header = "Подв. №";
-        const col2Header = "Температура";
-
-        if(i==0 || (i%6==0)){
-            j++;
-            pdfProp.content.push( {text: headerText, style: 'header', alignment: 'center'} );
-            j++;
-            pdfProp.content.push( {pageBreak: 'after', layout: 'noBorders', table: {} } );
-            pdfProp.content[j].table = {body:[[  ]]};
-
-            pdfProp.content[j].table.body[0] = [ { table:{ body: vRep_createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } ];
-
-            continue;
-        }
-        pdfProp.content[j].table.body[0].push(   { table:{ body: vRep_createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } );
-        if(i==JSON.parse(JSONObj).length-1){
-            pdfProp.content[j].pageBreak = "";
-        }
-    }
-
-    return pdfProp;
-}
-//  Печатная форма "Температуры каждого датчика в подвеске"
-function vRep_createPDFPropObj_SensorTemperaturesByPodv(JSONObj,headerText){
-
-    let pdfProp = vRep_createBasicPDFPropStructure();
-
-    let j=-1;
-    for(let i=0; i<JSON.parse(JSONObj).length; i++){
-
-        const currJSONObj = JSON.parse(JSONObj)[i];
-        const field = 'sensorTemperatures';
-        const tableHeader = "Силос " + currJSONObj['silo']+"\n"+ "Дата: " + currJSONObj['date'].split(" ")[0] + "\n" + currJSONObj['date'].split(" ")[1] + "\n" + "Подвеска " + currJSONObj['podv'];
-        const col1Header = "Дат. №";
-        const col2Header = "Температура";
-
-        if(i==0 || (i%6==0)){
-            j++;
-            pdfProp.content.push( {text: headerText, style: 'header', alignment: 'center'} );
-            j++;
-            pdfProp.content.push( {pageBreak: 'after', layout: 'noBorders', table: {} } );
-            pdfProp.content[j].table = {body:[[  ]]};
-
-            pdfProp.content[j].table.body[0] = [ { table:{ body: vRep_createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } ];
-
-            continue;
-        }
-        pdfProp.content[j].table.body[0].push(   { table:{ body: vRep_createTableForPDFMake(currJSONObj, field, tableHeader, col1Header, col2Header) } } );
-        if(i==JSON.parse(JSONObj).length-1){
-            pdfProp.content[j].pageBreak = "";
-        }
-    }
-
-    return pdfProp;
-}
 //  Функиця для получение JSON-объекта из PHP
 function vRep_getJSONForPrintedForms(fileFormat){
 
@@ -558,11 +430,15 @@ function vRep_getJSONForPrintedForms(fileFormat){
                     'POST_vRep_getAvgTemperByLayer_arrayOfDates': arrayOfDates },
             dataType: 'html',
             success: function(fromPHP) {
-                const pdfProbObj = vRep_createPDFPropObj_AvgTemperaturesByLayer   (fromPHP, 'Данные о средних температурах по слоям');
+                const field1 = 'date';
+                const field2 = 'silo';
+                const field3 = '';
+                const field4 = 'layerTemperatures';
+                const sheetHeader = 'Данные о средних температурах по слоям';
                 if(fileFormat==="PDF"){
-                    createPdf( pdfProbObj ).open();
+                    createPrintedFormPDF(JSON.parse(fromPHP), field1, field2, field3, field4, sheetHeader);
                 } else if (fileFormat==="XLSX"){
-                    vRep_createXLSX(pdfProbObj);
+                    creatPrintedFormXLSX(JSON.parse(fromPHP), field1, field2, field3, field4, sheetHeader);
                 }
             }
         });
@@ -581,11 +457,15 @@ function vRep_getJSONForPrintedForms(fileFormat){
                     'POST_vRep_getSensorTemperByLayer_arrayOfDates': arrayOfDates },
             dataType: 'html',
             success: function(fromPHP) {
-                const pdfProbObj = vRep_createPDFPropObj_SensorTemperaturesByLayer(fromPHP, 'Данные о температурах каждого датчика в слоях');
+                const field1 = 'date';
+                const field2 = 'silo';
+                const field3 = 'layer';
+                const field4 = 'sensorTemperatures';
+                const sheetHeader = 'Данные о температуре каждого датчика в слоях';
                 if(fileFormat==="PDF"){
-                    createPdf( pdfProbObj ).open();
+                    createPrintedFormPDF(JSON.parse(fromPHP), field1, field2, field3, field4, sheetHeader);
                 } else if (fileFormat==="XLSX"){
-                    vRep_createXLSX(pdfProbObj);
+                    creatPrintedFormXLSX(JSON.parse(fromPHP), field1, field2, field3, field4, sheetHeader);
                 }
             }
         });
@@ -606,11 +486,15 @@ function vRep_getJSONForPrintedForms(fileFormat){
                     'POST_vRep_getSensorTemperByPodv_arrayOfDates': arrayOfDates },
             dataType: 'html',
             success: function(fromPHP) {
-                const pdfProbObj = vRep_createPDFPropObj_SensorTemperaturesByPodv(fromPHP, 'Данные о температурах каждого датчика в подвеске');
+                const field1 = 'date';
+                const field2 = 'silo';
+                const field3 = 'podv';
+                const field4 = 'sensorTemperatures';
+                const sheetHeader = 'Данные о температурах каждого датчика в подвеске';
                 if(fileFormat==="PDF"){
-                    createPdf( pdfProbObj ).open();
+                    createPrintedFormPDF(JSON.parse(fromPHP), field1, field2, field3, field4, sheetHeader);
                 } else if (fileFormat==="XLSX"){
-                    vRep_createXLSX(pdfProbObj);
+                    creatPrintedFormXLSX(JSON.parse(fromPHP), field1, field2, field3, field4, sheetHeader);
                 }
             }
         });
@@ -619,6 +503,102 @@ function vRep_getJSONForPrintedForms(fileFormat){
 
     return;
 }
+
+//  Создание объекта с базовыми свойствами PDF-документа
+function vRep_createBasicPDFPropStructure(){
+
+    let pdfProp = {};
+    pdfProp.pageSize = "a4";
+    pdfProp.pageOrientation = "landscape";
+    pdfProp.pageMargins = [20,30,20,20];
+    pdfProp.styles = {};
+    pdfProp.styles.header = {};
+    pdfProp.styles.header.fontSize = 18;
+    pdfProp.styles.header.bold = true;
+    pdfProp.styles.header.alignment = "center";
+    pdfProp.styles.header.margin = [0,0,0,10];
+    pdfProp.content = [];
+
+    return pdfProp;
+}
+
+function vRep_create2dTableForCurrDate(JSONObj, field, tableHeader, col1Header, col2Header){
+
+    let outArr=[];
+    outArr[0]=[{text:  tableHeader, style: 'tableHeader', colSpan: 2, alignment: 'center'},{}];
+    outArr.push( [col1Header, col2Header] );
+
+    for(let i=0; i<JSONObj[field].length; i++){
+        outArr.push( [i+1, JSONObj[field][i][i+1]] );
+    }
+
+    return outArr;
+}
+
+function createPrintedFormPDF(JSONObj, field1, field2, field3, field4, sheetHeader){
+
+    //  console.log(JSONObj);
+
+    let pdfProp = vRep_createBasicPDFPropStructure();
+    let field; let col1Header; let col2Header; let tableHeader;
+
+    if (sheetHeader==="Данные о средних температурах по слоям") {
+        field = field4;
+        col1Header = "Слой №";
+        col2Header = "Средняя\nтемпература";
+    } else if (sheetHeader==="Данные о температуре каждого датчика в слоях"){
+        field = field4;
+        col1Header = "Подв. №";
+        col2Header = "Температура";
+    } else if (sheetHeader==="Данные о температурах каждого датчика в подвеске"){
+        field = field4;
+        col1Header = "Дат. №";
+        col2Header = "Температура";
+    }
+
+    let j=-1;
+    for(let i=0; i<JSONObj.length; i++){
+
+        const currJSONObj = JSONObj[i];
+
+        if (sheetHeader==="Данные о средних температурах по слоям") {
+            tableHeader = "Силос " + currJSONObj[field2]+"\n"+ "Дата: " + currJSONObj[field1].split(" ")[0] + "\n" + currJSONObj[field1].split(" ")[1];
+        } else if (sheetHeader==="Данные о температуре каждого датчика в слоях"){
+            tableHeader = "Силос " + currJSONObj[field2]+"\n"+ "Дата: " + currJSONObj[field1].split(" ")[0] + "\n" + currJSONObj[field1].split(" ")[1] + "\n" + "Слой " + currJSONObj[field3];
+        } else if (sheetHeader==="Данные о температурах каждого датчика в подвеске"){
+            tableHeader = "Силос " + currJSONObj[field2]+"\n"+ "Дата: " + currJSONObj[field1].split(" ")[0] + "\n" + currJSONObj[field1].split(" ")[1] + "\n" + "Подвеска " + currJSONObj[field3];
+        }
+        
+        if(i==0 || (i%6==0)){
+            j++;
+            pdfProp.content.push( {text: sheetHeader, style: 'header', alignment: 'center'} );
+            j++;
+            pdfProp.content.push( {pageBreak: 'after', layout: 'noBorders', table: {} } );
+            pdfProp.content[j].table = {body:[[  ]]};
+
+            pdfProp.content[j].table.body[0] = [ { table:{ body: vRep_create2dTableForCurrDate(currJSONObj, field, tableHeader, col1Header, col2Header) } } ];
+
+            continue;
+        }
+        pdfProp.content[j].table.body[0].push(   { table:{ body: vRep_create2dTableForCurrDate(currJSONObj, field, tableHeader, col1Header, col2Header) } } );
+        if(i==JSONObj.length-1){
+            pdfProp.content[j].pageBreak = "";
+        }
+    }
+
+    createPdf( pdfProp ).open();
+
+    return;
+}
+
+function creatPrintedFormXLSX(JSONObj, field1, field2, field3, field4, sheetHeader){
+
+
+    //vRep_createXLSX(JSONObj);
+
+    return;
+}
+
 //  Создание структуры XLSX-документа
 function vRep_createXLSX(pdfProbObj){
     var wb = XLSX.utils.book_new();
