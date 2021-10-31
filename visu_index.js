@@ -13,7 +13,7 @@ function init_index() {
 //  Левый сайтбар ------------------------------------------------------------------------------------------------------------------------------
 function vIndRedrawTableCurrentAlarms() {
     $.ajax({
-        url: 'visualisation/visu_index.php',
+        url: '/webTermometry/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_get_current_alarms': 1 },
@@ -51,7 +51,7 @@ $('#btn-enable-all-auto-lvl-mode').click(function() {
 
 function vIndDisAllDefectiveSensors() {
     $.ajax({
-        url: 'visualisation/visu_index.php',
+        url: '/webTermometry/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_dis_all_defective_sensors': 1 },
@@ -65,7 +65,7 @@ function vIndDisAllDefectiveSensors() {
 
 function vIndEnAllSensors() {
     $.ajax({
-        url: 'visualisation/visu_index.php',
+        url: '/webTermometry/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_enable_all_sensors': 1 },
@@ -79,7 +79,7 @@ function vIndEnAllSensors() {
 
 function vIndEnAutoLvlOnAllSilo() {
     $.ajax({
-        url: 'visualisation/visu_index.php',
+        url: '/webTermometry/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_enable_auto_lvl_mode_on_all_silo': 1 },
@@ -125,7 +125,7 @@ const timer_silo_blink = setInterval(() => {
 function vIndRedrawSiloStatus() {
 
     $.ajax({
-        url: 'visualisation/visu_index.php',
+        url: '/webTermometry/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_get_curr_silo_status': 1 },
@@ -173,13 +173,14 @@ function vIndOnClickOnValsSelectBtn(btn_id) {
 
 function vIndredrawTblProdParameters(silo_id) {
     $.ajax({
-        url: 'visualisation/visu_index.php',
+        url: '/webTermometry/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_silo_id_for_product_parameters': silo_id },
         dataType: 'html',
         success: function(fromPHP) {
 
+            console.log(fromPHP);
             document.getElementById("ind-prod-tbl-1-prodtype").innerHTML = JSON.parse(fromPHP)[0];
             document.getElementById("ind-prod-tbl-1-t-max").innerHTML = JSON.parse(fromPHP)[1];
             document.getElementById("ind-prod-tbl-1-v-max").innerHTML = JSON.parse(fromPHP)[2];
@@ -201,7 +202,7 @@ function vIndredrawTblProdParameters(silo_id) {
 
 function vIndredrawTblTemperatures(silo_id) {
     $.ajax({
-        url: 'visualisation/visu_index.php',
+        url: '/webTermometry/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_temperature_table_silo_id': silo_id },
@@ -215,7 +216,7 @@ function vIndredrawTblTemperatures(silo_id) {
 
 function vIndredrawTblTemperatureSpeeds(silo_id) {
     $.ajax({
-        url: 'visualisation/visu_index.php',
+        url: '/webTermometry/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_speeds_table_silo_id': silo_id },
@@ -230,7 +231,7 @@ function vIndredrawTblTemperatureSpeeds(silo_id) {
 //  Включение/Отключение конкретного датчика/подвески путем нажатия на ячейку с измеренным значением температуры или скорости ее изменения
 function vIndSelectedSensorDisable(silo_id, podv_num, sensor_num) {
     $.ajax({
-        url: 'visualisation/visu_index.php',
+        url: '/webTermometry/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_sensorDisable_silo_id': silo_id, 'POST_vInd_sensorDisable_podv_id': podv_num, 'POST_vInd_sensorDisable_sensor_num': sensor_num },
@@ -244,7 +245,7 @@ function vIndSelectedSensorDisable(silo_id, podv_num, sensor_num) {
 
 function vIndSelectedSensorEnable(silo_id, podv_num, sensor_num) {
     $.ajax({
-        url: 'visualisation/visu_index.php',
+        url: '/webTermometry/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_sensorEnable_silo_id': silo_id, 'POST_vInd_sensorEnable_podv_id': podv_num, 'POST_vInd_sensorEnable_sensor_num': sensor_num },
@@ -258,7 +259,7 @@ function vIndSelectedSensorEnable(silo_id, podv_num, sensor_num) {
 
 function vIndSelectedPodvDisable(silo_id, podv_num) {
     $.ajax({
-        url: 'visualisation/visu_index.php',
+        url: '/webTermometry/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_podvDisable_silo_id': silo_id, 'POST_vInd_podvDisable_podv_id': podv_num },
@@ -272,7 +273,7 @@ function vIndSelectedPodvDisable(silo_id, podv_num) {
 
 function vIndSelectedPodvEnable(silo_id, podv_num) {
     $.ajax({
-        url: 'visualisation/visu_index.php',
+        url: '/webTermometry/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_podvEnable_silo_id': silo_id, 'POST_vInd_podvEnable_podv_id': podv_num },
@@ -287,7 +288,7 @@ function vIndSelectedPodvEnable(silo_id, podv_num) {
 //  Изменение уровня при помощи слайдера
 function vIndChangeSourceOfLvl(silo_id, lvl_mode) {
     $.ajax({
-        url: 'visualisation/visu_index.php',
+        url: '/webTermometry/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_change_source_of_grain_level_silo_id': silo_id, 'POST_vInd_change_source_of_grain_level_source': lvl_mode },
@@ -310,7 +311,7 @@ function vIndWriteGrainLvlFromSlider(silo_id) {
     }
 
     $.ajax({
-        url: 'visualisation/visu_index.php',
+        url: '/webTermometry/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_writeLevelFromSliderForCurrSilo_silo_id': silo_id, 'POST_vInd_writeLevelFromSliderForCurrSilo_grainLevel': lvl_slider.value },

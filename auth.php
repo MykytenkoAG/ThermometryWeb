@@ -1,9 +1,12 @@
 <?php
 
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');
+require_once ('configParameters.php');
 
 //  Данный файл включается во все страницы проекта
-session_start();    //  сессия необходима для сохранения текущего пользователя
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+//session_start();    //  сессия необходима для сохранения текущего пользователя
 
 $accessLevel=0;
 

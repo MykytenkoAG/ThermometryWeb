@@ -1,6 +1,6 @@
 <?php
 
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');
+require_once ('configParameters.php');
 
 //	Функция для записи значений из массива $arrayOfLevels в Базу Данных
 function db_update_grainLevels($dbh, $arrayOfLevels){

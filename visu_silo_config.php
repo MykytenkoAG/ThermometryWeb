@@ -1,6 +1,6 @@
 <?php
 
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');
+require_once ('currValsFromTS.php');
 
 //  Отрисовка таблицы "Типы продукта"
 function vSConf_draw_Prodtypes($dbh, $accessLevel){

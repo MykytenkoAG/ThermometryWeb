@@ -1,17 +1,19 @@
-<?php require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/auth.php'); ?>
+<?php require_once('auth.php'); ?>
 <!doctype html>
 <html lang="ru">
   <head>
+    
     <?php
       $webSiteTitle="Термометрия";
-      require_once "blocks/head.php";
-      require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/visualisation/visu_index.php');
+      require_once "head.php";
+      require_once('visu_index.php');
     ?>
   </head>
   <body>
+    
       <?php
-        require_once "blocks/header.php";
-        require_once "blocks/modals.php";
+        require_once "header.php";
+        require_once "modals.php";
       ?>
 
       <style>
@@ -269,5 +271,5 @@
       </main>
           
   </body>
-  <script type="text/javascript" src="visualisation/visu_index.js"></script>
+  <script type="text/javascript" src="visu_index.js"></script>
 </html>

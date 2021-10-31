@@ -3,7 +3,7 @@
 */
 function authGetCurrentUser(){
     $.ajax({
-        url: '/webTermometry/scripts/auth.php',
+        url: '/webTermometry/auth.php',
         type: 'POST',
         cache: false,
         data: { 'POST_auth_getCurrentUser': 1 },
@@ -33,7 +33,7 @@ function authSignIn(user, inputPassID){
     password = document.getElementById(inputPassID).value;
 
     $.ajax({
-        url: '/webTermometry/scripts/auth.php',
+        url: '/webTermometry/auth.php',
         type: 'POST',
         cache: false,
         data: { 'POST_auth_signIn_user_name': user , 'POST_auth_signIn_password': password },
@@ -59,7 +59,7 @@ function authSignIn(user, inputPassID){
 */
 function authSignOut(){
     $.ajax({
-        url: '/webTermometry/scripts/auth.php',
+        url: '/webTermometry/auth.php',
         type: 'POST',
         cache: false,
         data: { 'POST_auth_signOut': 1 },
@@ -92,7 +92,7 @@ function authPasswordChange(user, inputPassID1, inputPassID2){
         $("#modal-info").modal('show');
     } else {
         $.ajax({
-            url: '/webTermometry/scripts/auth.php',
+            url: '/webTermometry/auth.php',
             type: 'POST',
             cache: false,
             data: { 'POST_auth_changePassword_userName': user , 'POST_auth_changePassword_password': pwd1 },

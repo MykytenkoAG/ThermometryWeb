@@ -2,10 +2,10 @@
 /*  Данный скрипт вызывается 1 раз в 30 минут в фоне для записи показаний температуры в базу данных
 */
 
-require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');
+require_once('currValsFromTS.php');
 
 if( ! $simulation_mode ){
-	add_new_measurement($dbh, $arrayOfTemperatures, $serverDate);
+	echo add_new_measurement($dbh, $arrayOfTemperatures, $serverDate);
 }
 
 //	measurements

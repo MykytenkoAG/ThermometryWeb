@@ -1,6 +1,6 @@
 <?php
 
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');
+require_once ('configParameters.php');
 
 function ddl_debug_drop_all($dbh){
 

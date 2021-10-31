@@ -11,7 +11,7 @@
     <iframe src="docs/ТСС-02 - инструкция по эксплуатации ПО.pdf" width="1800" height="500">
 
     <?php
-        //require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/currValsFromTS.php');
+        //require_once('currValsFromTS.php');
         /*
         echo "<br>";
         print_r($arrayOfTemperatures);
@@ -31,6 +31,10 @@
         //	Создание объекта PDO для работы с Базой Данных
         $dbh = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);	//[PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
         $serverDate="19.10.2021 14:05:00";
+
+        echo "123";
+        //echo $_SERVER["DOCUMENT_ROOT"];
+        echo "456";
 
     ?>
 

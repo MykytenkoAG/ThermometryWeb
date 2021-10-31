@@ -17,7 +17,7 @@ function init_debug_page(){
 //  Отрисовка таблицы со всеми параметрами
 function redrawMainDbgTable(){
     $.ajax({
-        url: 'visualisation/visu_debug_page.php',
+        url: 'visu_debug_page.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vDbgPage_dbg_refresh': 1 },
@@ -33,7 +33,7 @@ function onClickDbgBtn_1(silo_name_id, temperature_id){
     const silo_name = document.getElementById(silo_name_id).value;
     const temperature = document.getElementById(temperature_id).value;
     $.ajax({
-        url:    'visualisation/visu_debug_page.php',
+        url:    'visu_debug_page.php',
         type:   'POST',
         cache: false,
         data: { 'POST_vDbgPage_dbg_1_silo_name':   silo_name,
@@ -50,7 +50,7 @@ function onClickDbgBtn_2(silo_name_id, temperature_speed_id){
     const silo_name = document.getElementById(silo_name_id).value;
     const temperature_speed = document.getElementById(temperature_speed_id).value;
     $.ajax({
-        url:    'visualisation/visu_debug_page.php',
+        url:    'visu_debug_page.php',
         type:   'POST',
         cache:  false,
         data: { 'POST_vDbgPage_dbg_2_silo_name': silo_name,
@@ -67,7 +67,7 @@ function onClickDbgBtn_3(silo_name_id, level_id){
     const silo_name = document.getElementById(silo_name_id).value;
     const level = document.getElementById(level_id).value;
     $.ajax({
-        url:    'visualisation/visu_debug_page.php',
+        url:    'visu_debug_page.php',
         type:   'POST',
         cache:  false,
         data: { 'POST_vDbgPage_dbg_3_silo_name':      silo_name,
@@ -85,7 +85,7 @@ function onClickDbgBtn_4(silo_name_id, podv_num_id, temperature_id){
     const podv_num = document.getElementById(podv_num_id).value;
     const temperature = document.getElementById(temperature_id).value;
     $.ajax({
-        url:    'visualisation/visu_debug_page.php',
+        url:    'visu_debug_page.php',
         type:   'POST',
         cache:  false,
         data: { 'POST_vDbgPage_dbg_4_silo_name':      silo_name,
@@ -104,7 +104,7 @@ function onClickDbgBtn_5(silo_name_id, podv_num_id, temperature_speed_id){
     const podv_num = document.getElementById(podv_num_id).value;
     const temperature_speed = document.getElementById(temperature_speed_id).value;
     $.ajax({
-        url:    'visualisation/visu_debug_page.php',
+        url:    'visu_debug_page.php',
         type:   'POST',
         cache:  false,
         data: { 'POST_vDbgPage_dbg_5_silo_name':  silo_name,
@@ -124,7 +124,7 @@ function onClickDbgBtn_6(silo_name_id, podv_num_id, sensor_num_id, temperature_i
     const sensor_num = document.getElementById(sensor_num_id).value;
     const temperature = document.getElementById(temperature_id).value;
     $.ajax({
-        url:    'visualisation/visu_debug_page.php',
+        url:    'visu_debug_page.php',
         type:   'POST',
         cache:  false,
         data: { 'POST_vDbgPage_dbg_6_silo_name':      silo_name ,
@@ -145,7 +145,7 @@ function onClickDbgBtn_7(silo_name_id, podv_num_id, sensor_num_id, temperature_s
     const sensor_num = document.getElementById(sensor_num_id).value;
     const temperature_speed = document.getElementById(temperature_speed_id).value;
     $.ajax({
-        url:    'visualisation/visu_debug_page.php',
+        url:    'visu_debug_page.php',
         type:   'POST',
         cache:  false,
         data: { 'POST_vDbgPage_dbg_7_silo_name':  silo_name,
@@ -162,7 +162,7 @@ function onClickDbgBtn_7(silo_name_id, podv_num_id, sensor_num_id, temperature_s
 //  Обнулить все показания
 function onClickDbgBtn_8(){
     $.ajax({
-        url:    'visualisation/visu_debug_page.php',
+        url:    'visu_debug_page.php',
         type:   'POST',
         cache:  false,
         data: { 'POST_vDbgPage_dbg_8_set_all_params_to_0':  1 },
@@ -176,7 +176,7 @@ function onClickDbgBtn_8(){
 //  Добавить текущие показания в Базу Данных
 function onClickDbgBtn_AddMeas(){
     $.ajax({
-        url:    'visualisation/visu_debug_page.php',
+        url:    'visu_debug_page.php',
         type:   'POST',
         cache:  false,
         data: { 'POST_vDbgPage_write_measurements_to_db': 1 },

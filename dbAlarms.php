@@ -1,7 +1,7 @@
 <?php
 
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');
-$logFile = $_SERVER['DOCUMENT_ROOT'].'/webTermometry/logs/log.txt';
+require_once ('configParameters.php');
+$logFile = 'logs/log.txt';
 
 //	Запись строки в журнал
 function writeToLog($loggingString){

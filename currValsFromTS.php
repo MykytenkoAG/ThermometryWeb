@@ -1,10 +1,10 @@
 <?php
 
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');		//	Параметры подключения к БД и связи с Термосервером
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/dbDebugTables.php');		//	Создание, удаление и изменение отладочных таблиц в БД
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/dbDDL.php');				//	Создание и инициализация всех таблиц в БД
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/dbCurrVals.php');			//	Запись текущих измеренных значений в БД
-require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/dbAlarms.php');				//	Работа с сигналами АПС
+require_once ('configParameters.php');		//	Параметры подключения к БД и связи с Термосервером
+require_once ('dbDebugTables.php');			//	Создание, удаление и изменение отладочных таблиц в БД
+require_once ('dbDDL.php');					//	Создание и инициализация всех таблиц в БД
+require_once ('dbCurrVals.php');			//	Запись текущих измеренных значений в БД
+require_once ('dbAlarms.php');				//	Работа с сигналами АПС
 
 /*
 	Процедура запуска:
@@ -22,10 +22,10 @@ function replaceForbiddenChars($str){
 	return $str;
 }
 //	Чтение главных конфигурационных файлов проекта
-$termoServerINI  =	@parse_ini_string(replaceForbiddenChars(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/webTermometry/settings/TermoServer.ini')), true);
-if( count($termoServerINI)==0 ){	$error .= "Файл TermoServer.ini отсутствует в каталоге webTermometry/settings;";}
-$termoClientINI  =	@parse_ini_string(replaceForbiddenChars(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/webTermometry/settings/TermoClient.ini')), true);
-if( count($termoClientINI)==0 ){	$error .= "Файл TermoClient.ini отсутствует в каталоге webTermometry/settings;";}
+$termoServerINI  =	@parse_ini_string(replaceForbiddenChars(file_get_contents('settings/TermoServer.ini')), true);
+if( count($termoServerINI)==0 ){	$error .= "Файл TermoServer.ini отсутствует в каталоге webTermometry/settings;".getcwd();}
+$termoClientINI  =	@parse_ini_string(replaceForbiddenChars(file_get_contents('settings/TermoClient.ini')), true);
+if( count($termoClientINI)==0 ){	$error .= "Файл TermoClient.ini отсутствует в каталоге webTermometry/settings;".getcwd();}
 
 /*	Проверка соответствия файлов TermoServer.ini и TermoClient.ini
 	Функция производит проверку наличия всех силосов из TermoServer.ini в TermoClient.ini
@@ -55,17 +55,17 @@ if( ! doINIFilesMatchEachOther($termoServerINI,$termoClientINI) ){
 	$error .= "Файлы TermoServer.ini и TermoClient.exe не соответствуют друг другу;";
 }
 
-if($error!=""){	die(require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/error_page.php'));}
+if($error!=""){	die(require_once('error_page.php'));}
 
 //	Функции для работы с программой TermoServer -----------------------------------------------------------------------------------------------------
 //	Функция для получения строки с текущими значениями
 //	В случае, если термосервер не запущен, происходит запись в глобальную переменную $error
 function getFromTS_inputString($IPAddr, $port){
 	global $error;
-	$error = "Проверьте, запущен ли термосервер";
+	$error = "Проверьте, запущен ли термосервер $IPAddr, $port";
 	//http://docs.php.net/fsockopen
 	$fp = @fsockopen($IPAddr, $port, $errno, $errstr, 30)
-		or die(require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/error_page.php'));	//	Перенаправление на страницу с описанием ошибки
+		or die(require_once('error_page.php'));	//	Перенаправление на страницу с описанием ошибки
 	if (!$fp) {
 		echo "$errstr ($errno)<br />\n";    
 	} else {
@@ -202,7 +202,7 @@ if( ! $simulation_mode) {
 	if( ! ( count( arrayRecursiveDiff( createAssocArr_TermoServer($termoServerINI) , createAssocArr_ArrayOfTemperatures($arrayOfTemperatures)   ) )==0 &&
 		    count( arrayRecursiveDiff( createAssocArr_ArrayOfTemperatures($arrayOfTemperatures) , createAssocArr_TermoServer($termoServerINI)   ) )==0 )  ){
 		$error = "Текущий файл TermoServer.ini не соответствует настрокам термосервера. Скопируйте актуальный файл TermoServer.ini в папку settings;";
-		die(require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/error_page.php'));
+		die(require_once('error_page.php'));
 	}
 
  } else {
@@ -231,10 +231,10 @@ if( ! ( count( arrayRecursiveDiff( createAssocArr_TermoServer($termoServerINI) ,
 
 	ddl_drop_all($dbh);
 
-	ddl_create_Users($dbh);				ddl_init_Users($dbh, $initUsersINI);
-	ddl_create_Errors($dbh);			ddl_init_Errors($dbh, $errCodesINI);
+	ddl_create_Users($dbh);				ddl_init_Users($dbh);
+	ddl_create_Errors($dbh);			ddl_init_Errors($dbh);
 	ddl_create_Dates($dbh);				ddl_init_Dates($dbh, $serverDate);
-	ddl_create_Prodtypes($dbh);			ddl_init_Prodtypes($dbh, $initProductsINI);
+	ddl_create_Prodtypes($dbh);			ddl_init_Prodtypes($dbh);
 	ddl_create_Prodtypesbysilo($dbh);	ddl_init_Prodtypesbysilo($dbh, $termoClientINI,$termoServerINI);
 	ddl_create_Sensors($dbh);			ddl_init_Sensors($dbh, $termoServerINI,$serverDate);
 	ddl_create_Measurements($dbh);

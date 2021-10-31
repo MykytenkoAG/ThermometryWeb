@@ -50,7 +50,7 @@ function deleteCookie(name) {
 //  Получение массива с именами силосов для быстрого отображения названия силоса на главной странице
 function getConf_ArrayOfSiloNames() {
     $.ajax({
-        url: '/webTermometry/scripts/currValsFromTS.php',
+        url: '/webTermometry/currValsFromTS.php',
         type: 'POST',
         cache: false,
         data: { 'POST_currValsFromTS_get_silo_names_array': 1 },
@@ -67,7 +67,7 @@ function getConf_ArrayOfSiloNames() {
 //  Получение главного конфигурационного массива [[массив с именами (при этом индекс элемента - это id силоса)],[массив с подвесками],[массив с датчиками]]
 function getConf_ProjectConfArr() {
     $.ajax({
-        url: '/webTermometry/scripts/currValsFromTS.php',
+        url: '/webTermometry/currValsFromTS.php',
         type: 'POST',
         cache: false,
         data: { 'POST_currValsFromTS_get_project_conf_array': 1 },
@@ -82,7 +82,7 @@ function getConf_ProjectConfArr() {
 //  Получение названия силоса с id==0. Необходимо для страницы "Отчет" в сайтбаре для построения графиков
 function getConf_SiloNameWithID0() {
     $.ajax({
-        url: '/webTermometry/visualisation/visu_report.php',
+        url: '/webTermometry/currValsFromTS.php',
         type: 'POST',
         cache: false,
         data: { 'POST_currValsFromTS_get_silo_name_with_id_0': 1 },
@@ -97,7 +97,7 @@ function getConf_SiloNameWithID0() {
 //  Получение массива с максимальным количеством подвесок. Необходимо для страницы "Отчет" в сайтбаре с печатными формами
 function getConf_SiloNameWithMaxPodvNumber() {
     $.ajax({
-        url: '/webTermometry/visualisation/visu_report.php',
+        url: '/webTermometry/currValsFromTS.php',
         type: 'POST',
         cache: false,
         data: { 'POST_currValsFromTS_get_silo_number_with_max_podv_number': 1 },
@@ -204,7 +204,7 @@ function controlAudio(OnOff){
 function getNewAlarmsNumber() {
 
     $.ajax({
-        url: '/webTermometry/scripts/currValsFromTS.php',
+        url: '/webTermometry/currValsFromTS.php',
         type: 'POST',
         cache: false,
         data: { 'POST_currValsFromTS_get_number_of_new_alarms': 1 },
@@ -231,7 +231,7 @@ function getNewAlarmsNumber() {
 function alarmsAck() {
 
     $.ajax({
-        url: '/webTermometry/scripts/currValsFromTS.php',
+        url: '/webTermometry/currValsFromTS.php',
         type: 'POST',
         cache: false,
         data: { 'POST_currValsFromTS_acknowledge_alarms': 1 },

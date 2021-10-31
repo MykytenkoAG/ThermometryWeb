@@ -1,18 +1,18 @@
-<?php require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/auth.php'); ?>
+<?php require_once('auth.php'); ?>
 <!doctype html>
 <html lang="en">
   <head>
     <?php
       $webSiteTitle="DEBUG";
-      require_once "blocks/head.php";
-      require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/visualisation/visu_debug_page.php');
+      require_once "head.php";
+      require_once('visu_debug_page.php');
     ?>
   </head>
   <body>
     <?php
-      require_once "blocks/header.php";
-      require_once "blocks/modals.php";
-      require_once ($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/configParameters.php');
+      require_once "header.php";
+      require_once "modals.php";
+      require_once ('configParameters.php');
     ?>
     <div class="container-fluid h-100">
       <main>
@@ -330,6 +330,6 @@
         </div>
       </main>
     </div>
-    <script type="text/javascript" src="visualisation/visu_debug_page.js"></script>
+    <script type="text/javascript" src="visu_debug_page.js"></script>
   </body>
 </html>

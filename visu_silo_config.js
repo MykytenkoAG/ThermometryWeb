@@ -28,7 +28,7 @@ function init_silo_config() {
 //  Получение массива с текущими уровнями для установки уровня в автоматическом режиме для таблицы "Загрузка силосов"
 function vSConf_getArrayOfLevels() {
     $.ajax({
-        url: '/webTermometry/scripts/currValsFromTS.php',
+        url: '/webTermometry/currValsFromTS.php',
         type: 'POST',
         cache: false,
         data: { 'POST_currValsFromTS_get_array_of_levels': 1 },
@@ -69,7 +69,7 @@ function vSConf_buttonEnable(button_id) {
 //  Отрисовка таблицы "Типы продукта"
 function vSConf_redrawTableProdtypes() {
     $.ajax({
-        url: 'visualisation/visu_silo_config.php',
+        url: 'visu_silo_config.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vSConf_draw_Prodtypes': 1 },
@@ -87,7 +87,7 @@ function vSConf_redrawTableProdtypes() {
 //  Отрисовка таблицы "Загрузка силосов"
 function vSConf_redrawTableProdtypesbysilo() {
     $.ajax({
-        url: 'visualisation/visu_silo_config.php',
+        url: 'visu_silo_config.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vSConf_draw_Prodtypesbysilo': 1 },
@@ -107,7 +107,7 @@ function vSConf_siloConfigSaveChanges() {
 
     if (tbl_prodtypes_changed == 1) {
         $.ajax({
-            url: 'visualisation/visu_silo_config.php',
+            url: 'visu_silo_config.php',
             type: 'POST',
             cache: false,
             data: { 'POST_vSConf_prodtypes_changes_queue': SConf_prodtypes_changes_queue },
@@ -123,7 +123,7 @@ function vSConf_siloConfigSaveChanges() {
 
     if (tbl_prodtypesbysilo_changed == 1) {
         $.ajax({
-            url: 'visualisation/visu_silo_config.php',
+            url: 'visu_silo_config.php',
             type: 'POST',
             cache: false,
             data: { 'POST_vSConf_prodtypesbysilo_update_list': SConf_prodtypesbysilo_update_list },

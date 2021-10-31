@@ -1,11 +1,11 @@
-<?php require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/auth.php'); ?>
+<?php require_once('auth.php'); ?>
 <!doctype html>
 <html lang="en">
   <head>
     <?php
       $webSiteTitle="Отчет";
-      require_once "blocks/head.php";
-      require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/visualisation/visu_report.php');
+      require_once "head.php";
+      require_once('visu_report.php');
     ?>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.2/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.2/vfs_fonts.min.js"></script>
@@ -13,8 +13,8 @@
   </head>
   <body>
       <?php
-        require_once "blocks/header.php";
-        require_once "blocks/modals.php";
+        require_once "header.php";
+        require_once "modals.php";
       ?>
       <main>
         <div class="row row-cols-1 row-cols-sm-1 row-cols-md-1 row-cols-lg-1 row-cols-xl-2 row-cols-xxl-3 m-0 g-0">
@@ -156,7 +156,7 @@
 
                 <script type="text/javascript" src="node_modules/chart.js/dist/chart.js"></script>
                 <script src="node_modules/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.js"></script>
-                <script type="text/javascript" src="visualisation/visu_report.js"></script>
+                <script type="text/javascript" src="visu_report.js"></script>
                 <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
                 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
                 <script type="text/javascript" src="node_modules/jspdf/dist/jspdf.umd.min.js"></script>-->

@@ -1,17 +1,17 @@
-<?php require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/scripts/auth.php'); ?>
+<?php require_once('auth.php'); ?>
 <!doctype html>
 <html lang="en">
   <head>
     <?php
       $webSiteTitle="Настройки";
-      require_once "blocks/head.php";
-      require_once($_SERVER['DOCUMENT_ROOT'].'/webTermometry/visualisation/visu_silo_config.php');
+      require_once "head.php";
+      require_once('visu_silo_config.php');
     ?>
   </head>
   <body>
       <?php
-        require_once "blocks/header.php";
-        require_once "blocks/modals.php";
+        require_once "header.php";
+        require_once "modals.php";
       ?>
       <main>
         <div class="row row-cols-1 row-cols-sm-1 row-cols-xxl-3 g-0">
@@ -144,6 +144,6 @@
           </div>
         </div>
       </main>
-     <script src="visualisation/visu_silo_config.js"></script>
+     <script src="visu_silo_config.js"></script>
     </body>
 </html>

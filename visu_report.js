@@ -107,7 +107,7 @@ function vRep_addNewLineOnChart() {
     const period = selects.item(selects.length - 1).value;
 
     $.ajax({
-        url: 'visualisation/visu_report.php',
+        url: 'visu_report.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vRep_getTableForChart_silo_name': silo_name,
@@ -421,7 +421,7 @@ function vRep_getJSONForPrintedForms(fileFormat){
         const arrayOfLayers = vRep_rprtprf_getArrayOfLayers();
 
         $.ajax({
-            url: 'visualisation/visu_report.php',
+            url: 'visu_report.php',
             type: 'POST',
             cache: false,
             data: { 'POST_vRep_getAvgTemperByLayer_arrayOfSilos': arrayOfSilo,
@@ -448,7 +448,7 @@ function vRep_getJSONForPrintedForms(fileFormat){
         const arrayOfLayers = vRep_rprtprf_getArrayOfLayers();
 
         $.ajax({
-            url: 'visualisation/visu_report.php',
+            url: 'visu_report.php',
             type: 'POST',
             cache: false,
             data: { 'POST_vRep_getSensorTemperByLayer_arrayOfSilos': arrayOfSilo,
@@ -476,7 +476,7 @@ function vRep_getJSONForPrintedForms(fileFormat){
         const arrayOfSensors = vRep_rprtprf_getArrayOfSensors();
 
         $.ajax({
-            url: 'visualisation/visu_report.php',
+            url: 'visu_report.php',
             type: 'POST',
             cache: false,
             data: { 'POST_vRep_getSensorTemperByPodv_arrayOfSilos': arrayOfSilo,

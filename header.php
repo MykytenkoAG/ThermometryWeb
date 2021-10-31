@@ -72,6 +72,11 @@ title="Квитировать сигналы АПС">
                     </a>
                 </li>
 <?php
+
+    if(!isset($accessLevel)){
+        $accessLevel = 0;
+    }
+
     if( in_array( $accessLevel, array(0,1) ) ){
         $textColor = $accessLevel==1 ? "text-success" : "text-black";
         $operTooltip = $accessLevel==1 ? "" : "data-bs-toggle=\"tooltip\" data-bs-placement=\"right\" title=\"Авторизоваться как оператор\"";
@@ -124,7 +129,7 @@ title="Квитировать сигналы АПС">
         </div>
     </nav>
     
-    <script type="text/javascript" src="blocks/header.js"></script>
+    <script type="text/javascript" src="header.js"></script>
     <audio id="alarm-sound" src="sound/alarm_sound.mp3"></audio>
 
 </header>
