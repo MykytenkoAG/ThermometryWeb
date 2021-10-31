@@ -522,6 +522,7 @@ function vRep_createBasicPDFPropStructure(){
     return pdfProp;
 }
 
+//  Функция создания двухмерного массива для текущей даты, который можно будет вставить в PDF и XLSX документ
 function vRep_create2dTableForCurrDate(JSONObj, field, tableHeader, col1Header, col2Header){
 
     let outArr=[];
@@ -591,68 +592,8 @@ function createPrintedFormPDF(JSONObj, field1, field2, field3, field4, sheetHead
     return;
 }
 
-function creatPrintedFormXLSX(JSONObj, field1, field2, field3, field4, sheetHeader){
-
-
-    //vRep_createXLSX(JSONObj);
-
-    return;
-}
-
-//  Создание структуры XLSX-документа
-function vRep_createXLSX(pdfProbObj){
-    var wb = XLSX.utils.book_new();
-    wb.Props = {
-            Title: "SheetJS Tutorial",
-            Subject: "Test",
-            Author: "NE",
-            CreatedDate: new Date(2017,12,19)
-    };
-
-    wb.SheetNames.push("New");
-
-
-    let currentCol = 0; let currentRow = 1;
-    /* Initial row */
-    var ws = XLSX.utils.json_to_sheet([ { A: pdfProbObj.content[0].text } ], {header: ["A"], skipHeader: true});
-
-    for(let i=0; i<pdfProbObj.content.length; i++ ){
-        
-        if(pdfProbObj.content[i].table){
-            for(let j=0; j<pdfProbObj.content[i].table.body[0].length; j++){
-
-                for(let k=0; k<pdfProbObj.content[i].table.body[0][j].table.body.length; k++){
-
-                    let cellContent;
-                    if(k==0){
-                        cellContent = pdfProbObj.content[i].table.body[0][j].table.body[k][0]['text'].split("\n");
-                        console.log(cellContent)
-                    } else {
-                        cellContent = pdfProbObj.content[i].table.body[0][j].table.body[k];
-                    }
-
-                    XLSX.utils.sheet_add_json(ws, [
-                        cellContent
-                    ], {skipHeader: true, origin: {c:currentCol, r:currentRow} });
-
-                    currentRow++;
-
-                }
-
-                currentCol +=3; currentRow = 1;
-
-            }
-        }
-
-    }
-
-    wb.Sheets["New"] = ws;
-
-    vRep_saveXLSX(wb);
-    return;
-}
-//  Сохранение документа
-function vRep_saveXLSX(wb){
+//  Сохранение XLSX-файла
+function vRep_saveXLSX(wb, sheetHeader){
 
     var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
     function s2ab(s) {
@@ -662,7 +603,140 @@ function vRep_saveXLSX(wb){
             return buf;
     }
 
-    saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), 'test.xlsx');
+    saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), (sheetHeader+'.xlsx'));
+
+    return;
+}
+
+function creatPrintedFormXLSX(JSONObj, field1, field2, field3, field4, sheetHeader){
+
+    //vRep_createXLSX(JSONObj);
+
+    var wb = XLSX.utils.book_new();
+    wb.Props = {
+            Title: "Printed forms",
+            Subject: "Printed form",
+            Author: "NE",
+            CreatedDate: new Date(2021,10,31)
+    };
+
+    //  Координаты текущей ячейки
+    let currentCol = 0; let currentRow = 0;
+
+    //  Заголовок таблицы
+    let ws;
+
+    let field; let col1Header; let col2Header; let tableHeader;
+    let currentSheet;
+
+    //  Переменные для функции vRep_create2dTableForCurrDate()
+    if (sheetHeader==="Данные о средних температурах по слоям") {
+        field = field4;
+        col1Header = "Слой №";
+        col2Header = "Средняя\nтемпература";
+    } else if (sheetHeader==="Данные о температуре каждого датчика в слоях"){
+        field = field4;
+        col1Header = "Подв. №";
+        col2Header = "Температура";
+    } else if (sheetHeader==="Данные о температурах каждого датчика в подвеске"){
+        field = field4;
+        col1Header = "Дат. №";
+        col2Header = "Температура";
+    }
+
+    for(let i=0; i<JSONObj.length; i++ ){
+
+        const currJSONObj = JSONObj[i];
+
+        if( currentSheet != ("Силос " + currJSONObj[field2]) ){
+            if(i>0){
+                wb.Sheets[currentSheet] = ws;
+            }
+            currentSheet = ("Силос " + currJSONObj[field2]);
+            //  Создание нового листа
+            wb.SheetNames.push(currentSheet);
+            //  Инициализация нового листа
+            ws = XLSX.utils.json_to_sheet([ { A: "" } ], {header: ["A"], skipHeader: true});
+            currentCol = 0; currentRow = 0;
+        }
+
+        if (sheetHeader==="Данные о средних температурах по слоям") {
+            
+            XLSX.utils.sheet_add_json(ws, [
+                ["Дата: " + currJSONObj[field1].split(" ")[0]]
+            ], {skipHeader: true, origin: {c:currentCol, r:currentRow} });
+
+            currentRow++;
+
+            XLSX.utils.sheet_add_json(ws, [
+                [currJSONObj[field1].split(" ")[1]]
+            ], {skipHeader: true, origin: {c:currentCol, r:currentRow} });
+
+            currentRow++;
+
+        } else if (sheetHeader==="Данные о температуре каждого датчика в слоях"){
+            
+            XLSX.utils.sheet_add_json(ws, [
+                ["Дата: " + currJSONObj[field1].split(" ")[0]]
+            ], {skipHeader: true, origin: {c:currentCol, r:currentRow} });
+
+            currentRow++;
+
+            XLSX.utils.sheet_add_json(ws, [
+                [currJSONObj[field1].split(" ")[1]]
+            ], {skipHeader: true, origin: {c:currentCol, r:currentRow} });
+
+            currentRow++;
+
+            XLSX.utils.sheet_add_json(ws, [
+                ["Слой " + currJSONObj[field3]]
+            ], {skipHeader: true, origin: {c:currentCol, r:currentRow} });
+
+            currentRow++;
+
+        } else if (sheetHeader==="Данные о температурах каждого датчика в подвеске"){
+            
+            XLSX.utils.sheet_add_json(ws, [
+                ["Дата: " + currJSONObj[field1].split(" ")[0]]
+            ], {skipHeader: true, origin: {c:currentCol, r:currentRow} });
+
+            currentRow++;
+
+            XLSX.utils.sheet_add_json(ws, [
+                [currJSONObj[field1].split(" ")[1]]
+            ], {skipHeader: true, origin: {c:currentCol, r:currentRow} });
+
+            currentRow++;
+
+            XLSX.utils.sheet_add_json(ws, [
+                ["Подвеска " + currJSONObj[field3]]
+            ], {skipHeader: true, origin: {c:currentCol, r:currentRow} });
+
+            currentRow++;
+
+        }
+
+        const currDateTemperatures = vRep_create2dTableForCurrDate(currJSONObj, field, "", col1Header, col2Header);
+
+        for(let j=1; j<currDateTemperatures.length; j++){
+
+            XLSX.utils.sheet_add_json(ws, [
+                currDateTemperatures[j]
+            ], {skipHeader: true, origin: {c:currentCol, r:currentRow} });
+
+            currentRow++;
+
+        }
+
+        currentCol +=3; currentRow = 0;
+
+        if(i==JSONObj.length-1){
+            wb.Sheets[currentSheet] = ws;
+        }
+
+    }
+
+    vRep_saveXLSX(wb, sheetHeader);
 
     return;
 }
