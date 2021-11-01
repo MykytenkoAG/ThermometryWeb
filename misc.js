@@ -21,6 +21,8 @@ document.addEventListener("DOMContentLoaded", () => {
         getConf_ProjectConfArr();
     } else if (current_page === "silo_config.php") {
         init_silo_config();
+    } else if (current_page === "instruction.php") {
+        init_instruction();
     }
 
 });
