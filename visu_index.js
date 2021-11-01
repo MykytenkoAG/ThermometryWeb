@@ -180,7 +180,7 @@ function vIndredrawTblProdParameters(silo_id) {
         dataType: 'html',
         success: function(fromPHP) {
 
-            console.log(fromPHP);
+            //console.log(fromPHP);
             document.getElementById("ind-prod-tbl-1-prodtype").innerHTML = JSON.parse(fromPHP)[0];
             document.getElementById("ind-prod-tbl-1-t-max").innerHTML = JSON.parse(fromPHP)[1];
             document.getElementById("ind-prod-tbl-1-v-max").innerHTML = JSON.parse(fromPHP)[2];

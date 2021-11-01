@@ -93,20 +93,56 @@
 
                   <div class="row row-cols-3 row-cols-sm-1 row-cols-xxl-1 mt-2">
 
-                    <!--<div class="col-4 mb-2">
+                  <div class="col-4 mb-2">
                       <div class="row">
-                        Протокол работы программы
+                        Работа с ПО Термосервер
                       </div>
                       <div class="row p-1">
-                        <button type="submit" id="silo-config-btn-web-server-log-download" class="btn btn-light">
-                          <svg width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
-                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                            <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                        <button type="submit" id="sconf-ts-connection-settings" class="btn btn-light">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+                            <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+                            <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
                           </svg>
-                          Скачать
+                          Настроить
                         </button>
                       </div>
-                    </div>-->
+                    </div>
+
+                    <div class="col-4 mb-2">
+                      <div class="row">
+                        Работа с БД
+                      </div>
+                      <div class="row p-1 mb-3">
+                        <button type="submit" id="sconf-db-create-backup" class="btn btn-light">
+                          Резервное копирование БД
+                        </button>
+                      </div>
+
+
+                      <form action="visu_silo_config.php" method="post" enctype="multipart/form-data">
+                        Восстановление БД из резервной копии:
+                        <div class="row mb-3">
+                          <div class="col-6 g-1">
+                            <label  class="btn btn-light w-100">
+                              <i class=""></i>Файл<input type="file" style="display: none;"  name="databaseBackupFile">
+                            </label>
+                          </div>
+                          <div class="col-6 g-1">
+                            <button class="btn btn-light" type="submit" id="sconf-db-restore-from-backup" name="POST_sconf_db_restore_from_backup">
+                              Восстановить
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+
+
+
+                      <div class="row p-1">
+                        <button type="submit" id="sconf-db-truncate-measurements" class="btn btn-light">
+                          Очистить БД
+                        </button>
+                      </div>
+                    </div>
 
                     <div class="col-4 mb-2">
                       <div class="row">
@@ -137,6 +173,7 @@
                         </button>
                       </div>                   
                     </div>
+
                   </div>
                 </div>
               </div>

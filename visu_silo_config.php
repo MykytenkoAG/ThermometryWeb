@@ -320,4 +320,65 @@ if( isset($_POST['POST_vSConf_prodtypesbysilo_update_list']) ) {
 
 }
 
+//  Настройка параметров подключения к Термосервер
+if( isset($_POST['POST_vSConf_get_ts_connection_settings']) ) {
+    echo json_encode(array($IPAddr,$port));
+}
+
+function vSConf_ts_connection_settings_save($dbh, $ts_ip, $ts_port){
+
+    $query = "UPDATE zernoib.ts_conn_settings SET ts_ip='$ts_ip', ts_port='$ts_port' WHERE id=1;";
+    $stmt = $dbh->prepare($query);
+    $stmt->execute();
+
+    return "Настройки подключения к ПО Термосервер успешно применены";
+}
+
+if( isset($_POST['POST_vSConf_ts_connection_settings_save_ip']) && isset($_POST['POST_vSConf_ts_connection_settings_save_port']) ) {
+    echo vSConf_ts_connection_settings_save($dbh, $_POST['POST_vSConf_ts_connection_settings_save_ip'], $_POST['POST_vSConf_ts_connection_settings_save_port']);
+}
+
+//  Резервное копирование БД
+//  Отправка AJAX запроса, который должен вернуть ссылку на файл
+if( isset($_POST['POST_vSConf_db_create_backup']) ) {
+    $sql_backup_file = "dbBackups/". dbname . date("_d.m.Y_H.i.s") . '.sql';
+    $dumpCommand = '/wamp64/bin/mysql/mysql5.7.31/bin/mysqldump.exe --host='.servername.' --user='.username.' --password='.password.' --databases '.dbname.' > '. $sql_backup_file;
+    system($dumpCommand);
+    echo $sql_backup_file;
+}
+
+//  Восстановить БД из резервной копии
+//  ! Необходимо добавить try catch, так как возможны ошибки при выполнении sql команд
+//  ! Также следует почитать об ограничениях на загрузку файлов через браузер
+function vSConf_db_restore_from_backup($dbh, $dbBackupFile){
+    $stmt = $dbh->prepare( $dbBackupFile );
+    $stmt->execute();
+    return;
+}
+
+if(isset($_POST["POST_sconf_db_restore_from_backup"])) {
+    $target_dir = "uploads/";
+    $target_file = $target_dir . basename($_FILES["databaseBackupFile"]["name"]);
+    if(move_uploaded_file($_FILES["databaseBackupFile"]["tmp_name"], $target_file)){
+        $fileInfo = finfo_open(FILEINFO_MIME_TYPE);
+        $detected_type = finfo_file( $fileInfo, $target_file );
+        finfo_close( $fileInfo );
+        if($detected_type!=="text/plain"){
+            echo "Вы выбрали файл неподдерживаемого формата!";
+        } else {
+            vSConf_db_restore_from_backup($dbh, file_get_contents($target_file));   //  Файл прошел проверку на тип. Пробуем восстановить состояние БД
+            require_once('silo_config.php');
+        }
+    } else {
+        echo "Ошибка при загрузке файла на сервер";
+    }
+}
+
+//  Очистить БД
+//  Отправка AJAX-запроса с командой на очистку БД с измерениями
+if( isset($_POST['POST_vSConf_db_truncate_measurements']) ) {
+    ddl_truncate_Measurements($dbh);
+    echo "База данных успешно очищена";
+}
+
 ?>

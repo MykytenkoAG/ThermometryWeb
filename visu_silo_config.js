@@ -454,3 +454,102 @@ $("#sconf-silo-config-btn-change-password").click(function() {
     document.getElementById("modal-pass-change-btn-ok").setAttribute("onclick", "authPasswordChange('" + curr_user + "', 'modal-pass-change-pwd1', 'modal-pass-change-pwd2')");
     $("#modal-pass-change").modal('show');
 });
+
+//  Настройка параметров подключения к Термосервер
+//  Создать модальное окно с двумя полями ввода: IP и port
+$("#sconf-ts-connection-settings").click(function() {
+    $.ajax({
+        url: 'visu_silo_config.php',
+        type: 'POST',
+        cache: false,
+        data: { 'POST_vSConf_get_ts_connection_settings': 1 },
+        dataType: 'html',
+        success: function(fromPHP) {
+            document.getElementById("modal-ts-connection-settings-ip").value = JSON.parse(fromPHP)[0];
+            document.getElementById("modal-ts-connection-settings-port").value = JSON.parse(fromPHP)[1];
+            vSConf_checkIP();
+            $("#modal-ts-connection-settings").modal('show');
+        }
+    });
+});
+
+//  Валидация ip-адреса
+function vSConf_checkIP() {
+
+    const value = document.getElementById("modal-ts-connection-settings-ip").value;
+
+    var pattern = new RegExp(/((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*$))/);
+    if (pattern.test(value)) {
+        document.getElementById("modal-ts-connection-settings-ip").setAttribute("style", "color:black");
+        document.getElementById("modal-ts-connection-settings-btn-ok").disabled = false;
+        return;
+    }
+    document.getElementById("modal-ts-connection-settings-ip").setAttribute("style", "color:red");
+    document.getElementById("modal-ts-connection-settings-btn-ok").disabled = true;
+    return;
+
+}
+
+//  Сохранение настроек подключения к ПО Термосервер
+function vSConf_ts_connection_settings_Save(){
+
+    const ts_ip = document.getElementById("modal-ts-connection-settings-ip").value;
+    const ts_port = document.getElementById("modal-ts-connection-settings-port").value;
+    
+    $.ajax({
+        url: 'visu_silo_config.php',
+        type: 'POST',
+        cache: false,
+        data: { 'POST_vSConf_ts_connection_settings_save_ip': ts_ip,
+                'POST_vSConf_ts_connection_settings_save_port': ts_port},
+        dataType: 'html',
+        success: function(fromPHP) {
+
+            document.getElementById("modal-info-body-message").innerText = fromPHP;
+            $("#modal-info").modal('show');
+
+        }
+    });
+
+    return;
+}
+
+//  Резервное копирование БД
+//  Отправка AJAX запроса, который должен вернуть ссылку на файл
+$("#sconf-db-create-backup").click(function() {
+    $.ajax({
+        url: 'visu_silo_config.php',
+        type: 'POST',
+        cache: false,
+        data: { 'POST_vSConf_db_create_backup': 1 },
+        dataType: 'html',
+        success: function(fromPHP) {
+            window.location.href = fromPHP;
+        }
+    });
+});
+
+//  Очистить БД
+//  Отправка AJAX-запроса с командой на очистку БД с измерениями
+//  После успешного выполнения команды необходимо вызвать модальное окно с уведомлением об успешной очистке БД
+$("#sconf-db-truncate-measurements").click(function() {
+    document.getElementById("modal-are-you-sure-text").innerText = "Очистить базу данных?";
+    document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
+    document.getElementById("modal-are-you-sure-btn-cancel").innerText = "Отмена";
+    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "vSConf_db_truncate_measurements()");
+    $("#modal-are-you-sure").modal('show');
+});
+
+function vSConf_db_truncate_measurements(){
+    $.ajax({
+        url: 'visu_silo_config.php',
+        type: 'POST',
+        cache: false,
+        data: { 'POST_vSConf_db_truncate_measurements': 1 },
+        dataType: 'html',
+        success: function(fromPHP) {
+            document.getElementById("modal-info-body-message").innerText = fromPHP;
+            $("#modal-info").modal('show');
+        }
+    });
+}
