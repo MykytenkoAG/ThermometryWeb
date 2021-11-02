@@ -307,11 +307,6 @@
                         onclick="onClickDbgBtn_AddMeas()">
                     Сохранить текущие показания в БД
                 </button>
-                <?php
-                  if($simulation_mode){
-                    echo "<div style=\"position: absolute; bottom: 2%; right:2%\">ВКЛЮЧЕН РЕЖИМ ОТЛАДКИ</div>";
-                  }
-                ?>
               </div>
             </div>
           </div>

@@ -446,15 +446,7 @@ function vSConf_tblProdtypesbysiloUpdate() {
     return;
 }
 
-//  Опции
-//  Изменить пароль
-$("#sconf-silo-config-btn-change-password").click(function() {
-    document.getElementById("modal-sign-in-btn-close").setAttribute("onclick", "modalPasswordInputClear('modal-pass-change-pwd1');modalPasswordInputClear('modal-pass-change-pwd2')");
-    document.getElementById("modal-sign-in-btn-cancel").setAttribute("onclick", "modalPasswordInputClear('modal-pass-change-pwd1');modalPasswordInputClear('modal-pass-change-pwd2')");
-    document.getElementById("modal-pass-change-btn-ok").setAttribute("onclick", "authPasswordChange('" + curr_user + "', 'modal-pass-change-pwd1', 'modal-pass-change-pwd2')");
-    $("#modal-pass-change").modal('show');
-});
-
+//  Опции ---------------------------------------------------------------------------------------------------------------
 //  Настройка параметров подключения к Термосервер
 //  Создать модальное окно с двумя полями ввода: IP и port
 $("#sconf-ts-connection-settings").click(function() {
@@ -514,6 +506,11 @@ function vSConf_ts_connection_settings_Save(){
     return;
 }
 
+//  Операции с БД
+$("#sconf-db-operations").click(function() {
+    $("#modal-db-operations").modal('show');
+});
+
 //  Резервное копирование БД
 //  Отправка AJAX запроса, который должен вернуть ссылку на файл
 $("#sconf-db-create-backup").click(function() {
@@ -553,3 +550,11 @@ function vSConf_db_truncate_measurements(){
         }
     });
 }
+
+//  Изменить пароль
+$("#sconf-silo-config-btn-change-password").click(function() {
+    document.getElementById("modal-sign-in-btn-close").setAttribute("onclick", "modalPasswordInputClear('modal-pass-change-pwd1');modalPasswordInputClear('modal-pass-change-pwd2')");
+    document.getElementById("modal-sign-in-btn-cancel").setAttribute("onclick", "modalPasswordInputClear('modal-pass-change-pwd1');modalPasswordInputClear('modal-pass-change-pwd2')");
+    document.getElementById("modal-pass-change-btn-ok").setAttribute("onclick", "authPasswordChange('" + curr_user + "', 'modal-pass-change-pwd1', 'modal-pass-change-pwd2')");
+    $("#modal-pass-change").modal('show');
+});

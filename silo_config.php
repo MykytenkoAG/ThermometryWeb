@@ -1,6 +1,6 @@
 <?php require_once('auth.php'); ?>
 <!doctype html>
-<html lang="en">
+<html lang="ru">
   <head>
     <?php
       $webSiteTitle="Настройки";
@@ -93,86 +93,51 @@
 
                   <div class="row row-cols-3 row-cols-sm-1 row-cols-xxl-1 mt-2">
 
-                  <div class="col-4 mb-2">
-                      <div class="row">
-                        Работа с ПО Термосервер
-                      </div>
-                      <div class="row p-1">
-                        <button type="submit" id="sconf-ts-connection-settings" class="btn btn-light">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
-                            <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
-                            <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
-                          </svg>
-                          Настроить
-                        </button>
-                      </div>
+                    <div class="col-4 p-1">
+                      Работа с ПО Термосервер
                     </div>
+                    
+                    <button type="submit" id="sconf-ts-connection-settings" class="btn btn-light mb-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sliders" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3h9.05zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8h2.05zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1h9.05z"/>
+                      </svg>
+                      Настроить
+                    </button>
 
-                    <div class="col-4 mb-2">
-                      <div class="row">
+                    <div class="col-4 p-1">
                         Работа с БД
-                      </div>
-                      <div class="row p-1 mb-3">
-                        <button type="submit" id="sconf-db-create-backup" class="btn btn-light">
-                          Резервное копирование БД
-                        </button>
-                      </div>
-
-
-                      <form action="visu_silo_config.php" method="post" enctype="multipart/form-data">
-                        Восстановление БД из резервной копии:
-                        <div class="row mb-3">
-                          <div class="col-6 g-1">
-                            <label  class="btn btn-light w-100">
-                              <i class=""></i>Файл<input type="file" style="display: none;"  name="databaseBackupFile">
-                            </label>
-                          </div>
-                          <div class="col-6 g-1">
-                            <button class="btn btn-light" type="submit" id="sconf-db-restore-from-backup" name="POST_sconf_db_restore_from_backup">
-                              Восстановить
-                            </button>
-                          </div>
-                        </div>
-                      </form>
-
-
-
-                      <div class="row p-1">
-                        <button type="submit" id="sconf-db-truncate-measurements" class="btn btn-light">
-                          Очистить БД
-                        </button>
-                      </div>
                     </div>
 
-                    <div class="col-4 mb-2">
-                      <div class="row">
-                        Протокол работы АПС
-                      </div>
-                      <div class="row p-1">
-                        <a href="logs/log.txt" type="submit" id="silo-config-btn-alarms-log-download" class="btn btn-light" download>
-                          <svg width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
-                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                            <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
-                          </svg>
-                          Скачать
-                          </a>
-                      </div>
-                    </div>
+                    <button type="submit" id="sconf-db-operations" class="btn btn-light mb-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-server" viewBox="0 0 16 16">
+                        <path d="M1.333 2.667C1.333 1.194 4.318 0 8 0s6.667 1.194 6.667 2.667V4c0 1.473-2.985 2.667-6.667 2.667S1.333 5.473 1.333 4V2.667z"/>
+                        <path d="M1.333 6.334v3C1.333 10.805 4.318 12 8 12s6.667-1.194 6.667-2.667V6.334a6.51 6.51 0 0 1-1.458.79C11.81 7.684 9.967 8 8 8c-1.966 0-3.809-.317-5.208-.876a6.508 6.508 0 0 1-1.458-.79z"/>
+                        <path d="M14.667 11.668a6.51 6.51 0 0 1-1.458.789c-1.4.56-3.242.876-5.21.876-1.966 0-3.809-.316-5.208-.876a6.51 6.51 0 0 1-1.458-.79v1.666C1.333 14.806 4.318 16 8 16s6.667-1.194 6.667-2.667v-1.665z"/>
+                      </svg>
+                      Операции
+                    </button>
 
-                    <div class="col-4 mb-2">
-                      <div class="row">
-                        Пользователь: <?php $currentUser= $accessLevel==1 ? "Оператор" : "Технолог"; echo $currentUser; ?>
-                      </div>
-                      <div class="row p-1">
-                        <button type="submit" id="sconf-silo-config-btn-change-password" class="btn btn-light">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-key" viewBox="0 0 16 16">
-                            <path d="M0 8a4 4 0 0 1 7.465-2H14a.5.5 0 0 1 .354.146l1.5 1.5a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0L13 9.207l-.646.647a.5.5 0 0 1-.708 0L11 9.207l-.646.647a.5.5 0 0 1-.708 0L9 9.207l-.646.647A.5.5 0 0 1 8 10h-.535A4 4 0 0 1 0 8zm4-3a3 3 0 1 0 2.712 4.285A.5.5 0 0 1 7.163 9h.63l.853-.854a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.793-.793-1-1h-6.63a.5.5 0 0 1-.451-.285A3 3 0 0 0 4 5z"/>
-                            <path d="M4 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
-                          </svg>
-                          Изменить пароль
-                        </button>
-                      </div>                   
+                    <div class="col-4 p-1">
+                      Протокол работы АПС
                     </div>
+                    <a href="logs/log.txt" type="submit" id="silo-config-btn-alarms-log-download" class="btn btn-light w-100 mb-3" download>
+                      <svg width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                        <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                      </svg>
+                      Скачать
+                      </a>
+
+                    <div class="col-4 p-1">
+                      Пользователь: <?php $currentUser= $accessLevel==1 ? "Оператор" : "Технолог"; echo $currentUser; ?>
+                    </div>
+                    <button type="submit" id="sconf-silo-config-btn-change-password" class="btn btn-light w-100">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-key" viewBox="0 0 16 16">
+                        <path d="M0 8a4 4 0 0 1 7.465-2H14a.5.5 0 0 1 .354.146l1.5 1.5a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0L13 9.207l-.646.647a.5.5 0 0 1-.708 0L11 9.207l-.646.647a.5.5 0 0 1-.708 0L9 9.207l-.646.647A.5.5 0 0 1 8 10h-.535A4 4 0 0 1 0 8zm4-3a3 3 0 1 0 2.712 4.285A.5.5 0 0 1 7.163 9h.63l.853-.854a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.793-.793-1-1h-6.63a.5.5 0 0 1-.451-.285A3 3 0 0 0 4 5z"/>
+                        <path d="M4 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                      </svg>
+                      Изменить пароль
+                    </button>
 
                   </div>
                 </div>

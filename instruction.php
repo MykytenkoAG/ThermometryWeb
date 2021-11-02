@@ -64,7 +64,7 @@
 
           <div class="g-1" style="width:97%">
               <video id="instr-mp4-video" style="margin: 10px; height: calc(100vh - 110px); width: calc(100vw - 85px);" controls>
-                <source src="video/Chapter 1 - Introduction.mp4" type="video/mp4">
+                <source src="video/instruction.mp4" type="video/mp4">
                 Your browser does not support HTML video.
               </video>
               <iframe id="instr-pdf-document" src="docs/ТСС-02 - инструкция по эксплуатации ПО.pdf" style="margin: 10px; height: calc(100vh - 110px); width: calc(100vw - 85px);">
