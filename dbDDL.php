@@ -306,7 +306,7 @@ function ddl_init_Users($dbh){
 
 function ddl_init_Errors($dbh){
 
-	$query="INSERT INTO errors (error_id, error_description, error_desc_short, error_desc_for_visu) VALUES 
+	$query="REPLACE INTO errors (error_id, error_description, error_desc_short, error_desc_for_visu) VALUES 
 			(85,  'Обрыв плюсового провода', '85', 'Обрыв плюсового провода'),
 			(127, 'Неисправность датчика температуры', 'Дат-', 'Неисправность дат. температуры'),
 			(128, 'Температура не измерялась', '-', 'Температура не измерялась'),
@@ -351,6 +351,64 @@ function ddl_init_Prodtypes($dbh){
 	return;
 }
 
+//	Функция сортировки ini-файлов по именам силосов. Полезна в больших проектах, где имена в ini-файле идут в разнобой
+function getTermoServerIniSortedBySiloName($termoClientINI,$termoServerINI){
+
+	$outArr=array();
+
+	foreach ($termoServerINI as $key => $value) {
+		if( preg_match('/Silos([0-9]+)/',$key,$matches) ){
+
+			$outArr[] = array(	'SiloNumInFile'	=> $matches[1],
+				
+								'SilosName'		=> $termoServerINI[$key]['SilosName'],
+								'PodvCount'		=> $termoServerINI[$key]['PodvCount'],
+								'SensorsStr'	=> $termoServerINI[$key]['SensorsStr'],
+								'DeviceAddress'	=> $termoServerINI[$key]['DeviceAddress'],
+								'FirstPodvShift'=> $termoServerINI[$key]['FirstPodvShift'],
+								'off_'			=> $termoServerINI[$key]['off_'],
+
+								'Left'			=> $termoClientINI[$key]['Left'],
+								'Top'			=> $termoClientINI[$key]['Top'],
+								'Size'			=> $termoClientINI[$key]['Size'],
+								'sType'			=> $termoClientINI[$key]['sType'],
+								'Group'			=> $termoClientINI[$key]['Group']);
+
+		}
+	}
+
+	$arr_SiloNumInFile = array_column($outArr, 'SiloNumInFile');
+	$arr_SilosName = array_column($outArr, 'SilosName');
+	$arr_PodvCount = array_column($outArr, 'PodvCount');
+	$arr_SensorsStr = array_column($outArr, 'SensorsStr');
+	$arr_DeviceAddress = array_column($outArr, 'DeviceAddress');
+	$arr_FirstPodvShift = array_column($outArr, 'FirstPodvShift');
+	$arr_off = array_column($outArr, 'off_');
+	$arr_Left = array_column($outArr, 'Left');
+	$arr_Top = array_column($outArr, 'Top');
+	$arr_Size = array_column($outArr, 'Size');
+	$arr_sType = array_column($outArr, 'sType');
+	$arr_Group = array_column($outArr, 'Group');
+
+
+	array_multisort($arr_SilosName, SORT_ASC,
+					$arr_SiloNumInFile, SORT_ASC,
+					$arr_PodvCount, SORT_ASC,
+					$arr_SensorsStr, SORT_ASC,
+					$arr_DeviceAddress, SORT_ASC,
+					$arr_FirstPodvShift, SORT_ASC,
+					$arr_off, SORT_ASC,
+					$arr_Left, SORT_ASC,
+					$arr_Top, SORT_ASC,
+					$arr_Size, SORT_ASC,
+					$arr_sType, SORT_ASC,
+					$arr_Group, SORT_ASC,
+					$outArr);
+
+	return $outArr;
+
+}
+
 function ddl_init_Prodtypesbysilo($dbh, $termoClientINI, $termoServerINI){
 
     $query = "SELECT product_id FROM zernoib.prodtypes ORDER BY product_id ASC LIMIT 1";
@@ -360,7 +418,23 @@ function ddl_init_Prodtypesbysilo($dbh, $termoClientINI, $termoServerINI){
 
 	$query="INSERT INTO prodtypesbysilo (silo_id, silo_name, bs_addr, product_id, grain_level_fromTS, grain_level, is_square, size, position_col, position_row) VALUES ";
 
-    foreach ($termoServerINI as $key => $value) {
+	$ini_arr = getTermoServerIniSortedBySiloName($termoClientINI,$termoServerINI);
+
+	for($i=0; $i<count($ini_arr); $i++){
+		$query.="(".$i.","													//	silo_id
+		."'".$ini_arr[$i]['SilosName']."'".","								//	silo_name
+		."'".$ini_arr[$i]['DeviceAddress']."'".","							//	bs_addr
+		."'".$product_id."'".","											//	product_id = 1
+		."TRUE".","															//	grain_level_from_TS = 1
+		."0".","															//	grain_level = 0
+		."'".$ini_arr[$i]['sType']."'".","									//	is_square
+		."'".str_replace(",", ".", $ini_arr[$i]['Size'])."'".","			//	size
+		."'".str_replace(",", ".", $ini_arr[$i]['Left'])."'".","			//	position_col
+		."'".str_replace(",", ".", $ini_arr[$i]['Top'])."'"					//	position_row
+		."),";	
+	}
+
+    /*foreach ($termoServerINI as $key => $value) {
 		if( preg_match('/Silos([0-9]+)/',$key,$matches) ){
 			$currSilo_id=($matches[1]-1);
 			$query.="(".$currSilo_id.","																	//	silo_id
@@ -373,9 +447,8 @@ function ddl_init_Prodtypesbysilo($dbh, $termoClientINI, $termoServerINI){
 				."'".str_replace(",", ".", $termoClientINI['Silos'.($currSilo_id+1)]['Size'])."'".","		//	size
 				."'".str_replace(",", ".", $termoClientINI['Silos'.($currSilo_id+1)]['Left'])."'".","		//	position_col
 				."'".str_replace(",", ".", $termoClientINI['Silos'.($currSilo_id+1)]['Top'])."'"			//	position_row
-				."),";			
-		}
-	}
+				."),";		
+		}	*/
 
 	$query = substr($query,0,-1).";";
 
@@ -385,11 +458,26 @@ function ddl_init_Prodtypesbysilo($dbh, $termoClientINI, $termoServerINI){
 	return;
 }
 
-function ddl_init_Sensors($dbh, $termoServerINI,$serverDate){
+function ddl_init_Sensors($dbh, $termoClientINI, $termoServerINI, $serverDate){
 
 	$query="INSERT INTO sensors (sensor_id, silo_id, podv_id, sensor_num, current_temperature, current_speed, server_date) VALUES ";
 
-    $sensor_id = 0;
+	$ini_arr = getTermoServerIniSortedBySiloName($termoClientINI,$termoServerINI);
+
+	$sensor_id = 0;
+	for($i=0; $i<count($ini_arr); $i++){
+		$sensorsArr = preg_split('/,/',$ini_arr[$i]['SensorsStr'],-1,PREG_SPLIT_NO_EMPTY);
+		$podv_id=0;
+		foreach($sensorsArr as $podvSensorsNumber){
+			for($j=0;$j<$podvSensorsNumber;$j++){
+				$query .= "(".$sensor_id.",".$i.",".$podv_id.",".$j.","."0".","."0".","."STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s')"."),";
+				$sensor_id++;
+			}
+			$podv_id++;
+		}
+	}
+
+    /*$sensor_id = 0;
     foreach ($termoServerINI as $key => $value) {
 		if(preg_match('/Silos([0-9]+)/',$key,$matches)){
             $silo_id=$matches[1]-1;
@@ -405,7 +493,7 @@ function ddl_init_Sensors($dbh, $termoServerINI,$serverDate){
                 $podv_id++;
             }
 		}
-	}
+	}*/
 
 	$query = substr($query,0,-1).";";
 	

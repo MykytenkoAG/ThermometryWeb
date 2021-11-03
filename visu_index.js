@@ -1,11 +1,9 @@
 function init_index() {
     document.getElementById("hdr-href-index.php").setAttribute("class", "nav-link text-primary");
-    getConf_ArrayOfSiloNames();
     vIndRedrawSiloStatus();
 
     lastSiloID = "silo-0";
     lastParamSelectButtonID = "btn-temperatures";
-    vIndOnClickOnValsSelectBtn(lastParamSelectButtonID);
 
     return;
 }
@@ -137,6 +135,7 @@ function vIndRedrawSiloStatus() {
             for (let i = 0; i < silo_status_arr.length; i++) {
                 arr_silo_status.push(silo_status_arr[i]);
             }
+            
         }
     });
 
@@ -157,6 +156,8 @@ function vIndOnClickOnSilo(silo_id) {
     }
     //  Перерисовка таблицы с параметрами продукта для текущего силоса
     vIndredrawTblProdParameters(silo_id);
+    vIndRedrawTableCurrentAlarms();         //  Перерисовываем таблицу с текущими алармами
+    vIndRedrawSiloStatus();                 //  Показываем текущий статус каждого силоса
 
     lastSiloID = silo_id;
 
@@ -180,21 +181,27 @@ function vIndredrawTblProdParameters(silo_id) {
         dataType: 'html',
         success: function(fromPHP) {
 
-            //console.log(fromPHP);
-            document.getElementById("ind-prod-tbl-1-prodtype").innerHTML = JSON.parse(fromPHP)[0];
-            document.getElementById("ind-prod-tbl-1-t-max").innerHTML = JSON.parse(fromPHP)[1];
-            document.getElementById("ind-prod-tbl-1-v-max").innerHTML = JSON.parse(fromPHP)[2];
-            document.getElementById("ind-prod-tbl-3-t-min").innerHTML = JSON.parse(fromPHP)[3];
-            document.getElementById("ind-prod-tbl-3-t-avg").innerHTML = JSON.parse(fromPHP)[4];
-            document.getElementById("ind-prod-tbl-3-t-max").innerHTML = JSON.parse(fromPHP)[5];
-            document.getElementById("ind-prod-tbl-5-v-min").innerHTML = JSON.parse(fromPHP)[6];
-            document.getElementById("ind-prod-tbl-5-v-avg").innerHTML = JSON.parse(fromPHP)[7];
-            document.getElementById("ind-prod-tbl-5-v-max").innerHTML = JSON.parse(fromPHP)[8];
-            document.getElementById("ind-prod-tbl-6-rng-t-min").innerHTML = JSON.parse(fromPHP)[9];
-            document.getElementById("ind-prod-tbl-6-rng-t-max").innerHTML = JSON.parse(fromPHP)[10];
-            document.getElementById("ind-prod-tbl-6-v-max").innerHTML = JSON.parse(fromPHP)[11];
+            try {
+                
+                document.getElementById("ind-prod-tbl-1-prodtype").innerHTML = JSON.parse(fromPHP)[0];
+                document.getElementById("ind-prod-tbl-1-t-max").innerHTML = JSON.parse(fromPHP)[1];
+                document.getElementById("ind-prod-tbl-1-v-max").innerHTML = JSON.parse(fromPHP)[2];
+                document.getElementById("ind-prod-tbl-3-t-min").innerHTML = JSON.parse(fromPHP)[3];
+                document.getElementById("ind-prod-tbl-3-t-avg").innerHTML = JSON.parse(fromPHP)[4];
+                document.getElementById("ind-prod-tbl-3-t-max").innerHTML = JSON.parse(fromPHP)[5];
+                document.getElementById("ind-prod-tbl-5-v-min").innerHTML = JSON.parse(fromPHP)[6];
+                document.getElementById("ind-prod-tbl-5-v-avg").innerHTML = JSON.parse(fromPHP)[7];
+                document.getElementById("ind-prod-tbl-5-v-max").innerHTML = JSON.parse(fromPHP)[8];
+                document.getElementById("ind-prod-tbl-6-rng-t-min").innerHTML = JSON.parse(fromPHP)[9];
+                document.getElementById("ind-prod-tbl-6-rng-t-max").innerHTML = JSON.parse(fromPHP)[10];
+                document.getElementById("ind-prod-tbl-6-v-max").innerHTML = JSON.parse(fromPHP)[11];
 
-            document.getElementById("current-silo-name").innerHTML = "Силос " + silo_names_array[silo_id.split("-").pop()];
+                document.getElementById("current-silo-name").innerHTML = "Силос " + silo_names_array[silo_id.split("-").pop()];
+                
+            } catch (e) {
+                return;
+            }
+
         }
     });
     return;

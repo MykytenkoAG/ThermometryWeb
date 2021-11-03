@@ -1,33 +1,14 @@
-let curr_user;
 const current_page = window.location.pathname.split("/").pop() === "" ? "index.php" : window.location.pathname.split("/").pop();
 const mainTimerPeriod = 10000;
-const mainTimer = setInterval(periodicActions, mainTimerPeriod);
-let alarmsNACKNumber = 0;
+const mainTimer = setInterval(()=>{getNewAlarmsNumber();}, mainTimerPeriod);    //  Действия, которые выполняются каждые десять секунд
+let curr_user;
 let serverDateTime;
-let silo_names_array = [];
+let alarmsNACKNumber = 0;
 let project_conf_array = [];
-let silo_name_with_id_0;
+let silo_names_array = [];
 let silo_name_with_max_podv_number;
 
-//  Действия при загрузке каждой страницы -------------------------------------------------------------------------------------------------------------------
-document.addEventListener("DOMContentLoaded", () => {
-    authGetCurrentUser();                               //  Запрашиваем текущего пользователя из сессии
-    getNewAlarmsNumber();                               //  Проверяем наличие новых алармов, чтобы в случае необходимости включить звук
-    if (current_page === "index.php") {
-        init_index();
-    } else if (current_page === "report.php"){
-        getConf_ProjectConfArr();                       //  Если мы на странице с множеством выпадающих элементов, сначала получаем конфигурационные массивы
-    } else if (current_page === "debug_page.php") {
-        getConf_ProjectConfArr();
-    } else if (current_page === "silo_config.php") {
-        init_silo_config();
-    } else if (current_page === "instruction.php") {
-        init_instruction();
-    }
-
-});
-
-//  Работа с cookie
+//  Работа с cookie -----------------------------------------------------------------------------------------------------------------------------------------
 function getCookie(cname) {
     let name = cname + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
@@ -48,24 +29,21 @@ function deleteCookie(name) {
     document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 };
 
+//  Действия при загрузке каждой страницы -------------------------------------------------------------------------------------------------------------------
+document.addEventListener("DOMContentLoaded", () => {
+    //  Если произошло обновление проекта
+    const project_was_updated = getCookie("popupProjectWasUpdated");
+    if (project_was_updated === "OK") {
+        document.getElementById("modal-info-body-message").innerText = "Проект успешно обновлен. Приятного пользования!";
+        $("#modal-info").modal('show');
+        document.cookie = 'popupProjectWasUpdated=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+    authGetCurrentUser();                               //  Запрашиваем текущего пользователя из сессии
+    getNewAlarmsNumber();                               //  Проверяем наличие новых алармов, чтобы в случае необходимости включить звук
+    getConf_ProjectConfArr();                           //  Последовательно запрашиваем конфигурационные массивы из PHP
+});
+
 //  Получение массивов с конфигурациями для повышения интерактивности ---------------------------------------------------------------------------------------
-//  Получение массива с именами силосов для быстрого отображения названия силоса на главной странице
-function getConf_ArrayOfSiloNames() {
-    $.ajax({
-        url: '/webTermometry/currValsFromTS.php',
-        type: 'POST',
-        cache: false,
-        data: { 'POST_currValsFromTS_get_silo_names_array': 1 },
-        dataType: 'html',
-        success: function(fromPHP) {
-            //  массив с названиями силосов, в котором индекс - это silo_id, а значение - название силоса
-            silo_names_array = (JSON.parse(fromPHP));
-            //  делаем активным силос с silo_id==0
-            document.getElementById("current-silo-name").innerHTML = "Силос " + silo_names_array[0];
-        }
-    });
-    return;
-}
 //  Получение главного конфигурационного массива [[массив с именами (при этом индекс элемента - это id силоса)],[массив с подвесками],[массив с датчиками]]
 function getConf_ProjectConfArr() {
     $.ajax({
@@ -75,27 +53,43 @@ function getConf_ProjectConfArr() {
         data: { 'POST_currValsFromTS_get_project_conf_array': 1 },
         dataType: 'html',
         success: function(fromPHP) {
+            //console.log(fromPHP);
             project_conf_array = (JSON.parse(fromPHP));
-            console.log(project_conf_array);
-            getConf_SiloNameWithID0();
+            //console.log("project conf arr");
+            //console.log(project_conf_array);
+            //console.log("\n");
+            //console.log("keys"+Object.keys(project_conf_array));
+            getConf_ArrayOfSiloNames();
         }
     });
 }
-//  Получение названия силоса с id==0. Необходимо для страницы "Отчет" в сайтбаре для построения графиков
-function getConf_SiloNameWithID0() {
+
+//  Получение массива с именами силосов для быстрого отображения названия силоса на главной странице
+function getConf_ArrayOfSiloNames() {
     $.ajax({
-        url: '/webTermometry/currValsFromTS.php',
+        url: 'currValsFromTS.php',
         type: 'POST',
         cache: false,
-        data: { 'POST_currValsFromTS_get_silo_name_with_id_0': 1 },
+        data: { 'POST_currValsFromTS_get_silo_names_array': 1 },
         dataType: 'html',
         success: function(fromPHP) {
-            silo_name_with_id_0 = (JSON.parse(fromPHP));
+
+            //console.log("Silo Names Array: "+fromPHP);
+            //  массив с названиями силосов, в котором индекс - это silo_id, а значение - название силоса
+            silo_names_array = JSON.parse(fromPHP);
+
+            if (current_page === "index.php") {
+                //  делаем активным силос с silo_id==0
+                document.getElementById("current-silo-name").innerHTML = "Силос " + silo_names_array[0];
+            }
+
             getConf_SiloNameWithMaxPodvNumber();
+
         }
     });
     return;
 }
+
 //  Получение массива с максимальным количеством подвесок. Необходимо для страницы "Отчет" в сайтбаре с печатными формами
 function getConf_SiloNameWithMaxPodvNumber() {
     $.ajax({
@@ -105,12 +99,22 @@ function getConf_SiloNameWithMaxPodvNumber() {
         data: { 'POST_currValsFromTS_get_silo_number_with_max_podv_number': 1 },
         dataType: 'html',
         success: function(fromPHP) {
-            silo_name_with_max_podv_number = (JSON.parse(fromPHP));
-            if (current_page === "report.php") {                        //  после получения всех необходимых массивов можно переходить к инициализации
+            silo_name_with_max_podv_number = fromPHP;
+
+            //  После того, как все необходимые данные получены, переходим к секции инициализации в зависимости от того,
+            //  на какой странице находимся
+            if (current_page === "index.php") {
+                init_index();
+            } else if (current_page === "report.php"){
                 init_report();
             } else if (current_page === "debug_page.php") {
                 init_debug_page();
+            } else if (current_page === "silo_config.php") {
+                init_silo_config();
+            } else if (current_page === "instruction.php") {
+                init_instruction();
             }
+
         }
     });
     return;
@@ -220,8 +224,6 @@ function getNewAlarmsNumber() {
             alarmsNACKNumber = fromPHP;
 
             if (current_page === "index.php") {
-                vIndRedrawTableCurrentAlarms();         //  Перерисовываем таблицу с текущими алармами
-                vIndRedrawSiloStatus();                 //  Показываем текущий статус каждого силоса
                 vIndOnClickOnSilo(lastSiloID);          //  Перерисовываем таблицу с текущими показаниями
             }
             
@@ -244,8 +246,4 @@ function alarmsAck() {
         }
     });
     return;
-}
-
-function periodicActions() {
-    getNewAlarmsNumber();           //  Проверяем появление новых алармов, а заодно выполняем считывание текущих показаний и занесение их в БД
 }

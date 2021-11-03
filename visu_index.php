@@ -357,7 +357,7 @@ function vInd_getSiloProductParams($dbh, $silo_id){
 
 //  Отрисовка текущих значений параметров силоса
 if( isset($_POST['POST_vInd_silo_id_for_product_parameters']) ) {
-    echo json_encode(vInd_getSiloProductParams($dbh, $_POST['POST_vInd_silo_id_for_product_parameters']));
+    echo json_encode( vInd_getSiloProductParams($dbh, $_POST['POST_vInd_silo_id_for_product_parameters']) );
 }
 
 //  Функции для отрисовки таблиц с измеренными значениями

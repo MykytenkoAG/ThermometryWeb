@@ -116,76 +116,82 @@
 </div>
 
 <div class="modal fade" id="modal-ts-connection-settings" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+
     <div class="modal-dialog modal-dialog-centered">
+        <form action="visu_silo_config.php" id="form_ts_settings" method="post" enctype="multipart/form-data">
         <div class="modal-content">
             <div class="modal-header" style="background-color: #4046ff;">
                 <h5 class="modal-title" id="" style="color: #ffffff;">Настройки подключения к ПО Термосервер</h5>
                 <button type="button" id="modal-ts-connection-settings-btn-close" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body col" style="margin-left: auto; margin-right: auto; text-align:center;">
-                <div class="col-12" style="margin-left: auto; margin-right: auto; text-align:center;">
-                    <h6 class="modal-title" id="">Введите IP-адрес и порт термосервера.
-                                                  Если программа установлена на этом же компьютере, в качестве IP-адреса введите "127.0.0.1".
-                                                  Номер порта был выбран при установке.</h5>
+
+                <div class="modal-body col" style="margin-left: auto; margin-right: auto; text-align:center;">
+                    <div class="col-12" style="margin-left: auto; margin-right: auto; text-align:center;">
+                        <h6 class="modal-title" id="">Введите IP-адрес и порт термосервера.
+                                                    Если программа установлена на этом же компьютере, в качестве IP-адреса введите "127.0.0.1".
+                                                    Номер порта был выбран при установке.</h5>
+                        <br>
+                    </div>
+
+                    <div class="col-12">
+                        <table style="margin-left: auto; margin-right: auto; text-align:center;">
+                            <tr>
+                                <td style="padding-right: 10px;">IP:</td>
+                                <td>
+                                    <input type="text" id="modal-ts-connection-settings-ip" name="POST_ts_connection_settings_ip" value="" oninput="vSConf_checkIP()" class="form-control mx-auto" style="width: 200px;" value=""></input>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding-right: 10px;">Порт:</td>
+                                <td>
+                                    <input type="number" id="modal-ts-connection-settings-port" name="POST_ts_connection_settings_port" value="" onchange="" class="form-control mx-auto" style="width: 200px;" value=""></input>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
                     <br>
-                </div>
-                <div class="col-12">
-                    <table style="margin-left: auto; margin-right: auto; text-align:center;">
-                        <tr>
-                            <td style="padding-right: 10px;">IP:</td>
-                            <td>
-                                <input type="text" id="modal-ts-connection-settings-ip" value="" oninput="vSConf_checkIP()" class="form-control mx-auto" style="width: 200px;" value=""></input>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="padding-right: 10px;">Порт:</td>
-                            <td>
-                                <input type="number" id="modal-ts-connection-settings-port" value="" onchange="" class="form-control mx-auto" style="width: 200px;" value=""></input>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+                    <h6 class="modal-title" id="">В случае, если была обновлена конфигурация проекта, загрузите новые файлы TermoServer.ini и TermoClient.ini.</h5>
+                    <br>
 
-                <br>
-                <h6 class="modal-title" id="">В случае, если была обновлена конфигурация проекта, скопируйте файлы TermoServer.ini и TermoClient.ini.</h5>
-                <br>
+                    <div class="row" style="margin-left: auto; margin-right: auto; width: 100%;">
 
-                <div class="row" style="margin-left: auto; margin-right: auto; width: 100%;">
+                        <div class="col g-1" style="display: block; margin: auto;">
+                            <label  class="btn btn-light w-100">
+                                <i class="">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16">
+                                        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                        <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                                    </svg>
+                                </i>TermoServer.ini<input type="file" style="display: none;"  name="POST_termoServerIniFile">
+                            </label>
+                        </div>
 
-                    <div class="col g-1" style="display: block; margin: auto;">
-                        <label  class="btn btn-light w-100">
-                            <i class="">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16">
-                                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                                    <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
-                                </svg>
-                            </i>TermoServer.ini<input type="file" style="display: none;"  name="databaseBackupFile">
-                        </label>
-                    </div>
+                        <div class="col g-1" style="display: block; margin: auto;">
+                            <label  class="btn btn-light w-100">
+                                <i class="">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16">
+                                        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                                        <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                                    </svg>
+                                </i>TermoClient.ini<input type="file" style="display: none;"  name="POST_termoClientIniFile">
+                            </label>
+                        </div>
 
-                        
-                    <div class="col g-1" style="display: block; margin: auto;">
-                        <label  class="btn btn-light w-100">
-                            <i class="">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16">
-                                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                                    <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
-                                </svg>
-                            </i>TermoClient.ini<input type="file" style="display: none;"  name="databaseBackupFile">
-                        </label>
                     </div>
 
                 </div>
-
-            </div>
+            
             <div class="modal-footer">
                 <div style="margin: auto;">
-                    <button type="button" id="modal-ts-connection-settings-btn-ok" onclick="vSConf_ts_connection_settings_Save()" class="btn btn-primary" data-bs-dismiss="modal" style="width: 100px;">Сохранить</button>
+                    <input id="modal-ts-connection-settings-btn-ok"  type="submit" value="Сохранить" class="btn btn-primary" style="width: 100px;"></input>
                     <button type="button" id="modal-ts-connection-settings-btn-cancel" class="btn btn-secondary" data-bs-dismiss="modal" style="width: 100px;">Отмена</button>
                 </div>
             </div>
         </div>
+        </form>
     </div>
+    
 </div>
 
 <div class="modal fade" id="modal-db-operations" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">

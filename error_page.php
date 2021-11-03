@@ -20,6 +20,8 @@
 
          <div class="d-flex mt-3 mb-3 justify-content-center">
                <?php
+
+               // 
                   echo $error;
                ?>
          </div>

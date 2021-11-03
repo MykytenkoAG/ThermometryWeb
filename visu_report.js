@@ -4,23 +4,18 @@ function init_report() {
     //  Блокировка кнопок "Скачать PDF" и "Скачать XLSX"
     vRep_rprtprf_checkDatesAndBlockDownloadButtons();
     //  Инициализация элементов select печатных форм
-    setSelectOptions(document.getElementById("rprtprf_silo_1"), ["all"].concat(Object.keys(project_conf_array)));
-    setSelectOptions(document.getElementById("rprtprf_podv_1"), ["all"].concat(Object.keys(project_conf_array[silo_name_with_max_podv_number])));
-    setSelectOptions(document.getElementById("rprtprf_layer_1"), ["all"].concat(Object.keys(project_conf_array[silo_name_with_max_podv_number][1])));
+    setSelectOptions(document.getElementById("rprtprf_silo_1"),   ["all"].concat(silo_names_array));
+    setSelectOptions(document.getElementById("rprtprf_podv_1"),   ["all"].concat(Object.keys(project_conf_array[silo_name_with_max_podv_number])));
+    setSelectOptions(document.getElementById("rprtprf_layer_1"),  ["all"].concat(Object.keys(project_conf_array[silo_name_with_max_podv_number][1])));
     setSelectOptions(document.getElementById("rprtprf_sensor_1"), ["all"].concat(Object.keys(project_conf_array[silo_name_with_max_podv_number][1])));
 
     vRep_prfSelectsDisable();
 
     //  Инициализация элементов select графика температуры
     let selects = document.getElementById("rep-chart-time-temperature").getElementsByTagName('select');
-
     let chart_silo_1 = selects.item(selects.length - 4);
-    let chart_podv_1 = selects.item(selects.length - 3);
-    let chart_sensor_1 = selects.item(selects.length - 2);
-
-    setSelectOptions(chart_silo_1, Object.keys(project_conf_array));
-    setSelectOptions(chart_podv_1, Object.keys(project_conf_array[silo_name_with_id_0]));
-    setSelectOptions(chart_sensor_1, Object.keys(project_conf_array[silo_name_with_id_0][1]));
+    setSelectOptions(chart_silo_1, silo_names_array);
+    redrawRowOfSelects(chart_silo_1.id);
 
     //  Построение графика, в случае если мы попали на эту страницу из главной
     const chart_silo_name = getCookie("chart_silo_name");
@@ -529,7 +524,8 @@ function vRep_create2dTableForCurrDate(JSONObj, field, tableHeader, col1Header, 
     outArr.push( [col1Header, col2Header] );
 
     for(let i=0; i<JSONObj[field].length; i++){
-        outArr.push( [i+1, JSONObj[field][i][i+1]] );
+        const currKey = Object.keys(JSONObj[field][i])[0];
+        outArr.push( [currKey, JSONObj[field][i][currKey]] );
     }
 
     return outArr;
@@ -576,9 +572,8 @@ function createPrintedFormPDF(JSONObj, field1, field2, field3, field4, sheetHead
             pdfProp.content.push( {pageBreak: 'after', layout: 'noBorders', table: {} } );
             pdfProp.content[j].table = {body:[[  ]]};
 
-            pdfProp.content[j].table.body[0] = [ { table:{ body: vRep_create2dTableForCurrDate(currJSONObj, field, tableHeader, col1Header, col2Header) } } ];
-
-            continue;
+            //pdfProp.content[j].table.body[0] = [ { table:{ body: vRep_create2dTableForCurrDate(currJSONObj, field, tableHeader, col1Header, col2Header) } } ];
+            //continue;
         }
         pdfProp.content[j].table.body[0].push(   { table:{ body: vRep_create2dTableForCurrDate(currJSONObj, field, tableHeader, col1Header, col2Header) } } );
         if(i==JSONObj.length-1){

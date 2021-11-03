@@ -214,6 +214,8 @@ if( isset($_POST['POST_vRep_getSensorTemperByLayer_arrayOfSilos']) && isset($_PO
     echo json_encode( vRep_getSensorTemperByLayer($dbh, $_POST['POST_vRep_getSensorTemperByLayer_arrayOfSilos'], $_POST['POST_vRep_getSensorTemperByLayer_arrayOfLayers'], $_POST['POST_vRep_getSensorTemperByLayer_arrayOfDates']) );
 }
 
+vRep_getSensorTemperByLayer($dbh, array('1'), array('1'), array('2021-10-31 22:05:26'));
+
 //  Температуры каждого датчика в подвеске
 function vRep_getSensorTemperByPodv($dbh, $arrayOfSilos, $arrayOfPodv, $arrayOfSensors, $arrayOfDates){
 

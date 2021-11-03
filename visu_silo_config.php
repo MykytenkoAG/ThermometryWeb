@@ -322,6 +322,46 @@ if( isset($_POST['POST_vSConf_prodtypesbysilo_update_list']) ) {
 }
 
 //  Настройка параметров подключения к Термосервер
+if( isset($_POST['POST_ts_connection_settings_ip']) && isset($_POST['POST_ts_connection_settings_port']) ) {
+
+    echo ($_POST['POST_ts_connection_settings_ip']);
+    echo "<br>";
+    echo ($_POST['POST_ts_connection_settings_port']);
+    echo "<br>";
+
+    if(         (  file_exists($_FILES['POST_termoServerIniFile']['tmp_name']) &&  is_uploaded_file($_FILES['POST_termoServerIniFile']['tmp_name']) ) &&
+                ( !file_exists($_FILES['POST_termoClientIniFile']['tmp_name']) || !is_uploaded_file($_FILES['POST_termoClientIniFile']['tmp_name']) )    ) {
+            echo "Файл TermoClient.ini не был загружен.";
+    } else if ( (  file_exists($_FILES['POST_termoClientIniFile']['tmp_name']) &&  is_uploaded_file($_FILES['POST_termoClientIniFile']['tmp_name']) ) &&
+                ( !file_exists($_FILES['POST_termoServerIniFile']['tmp_name']) || !is_uploaded_file($_FILES['POST_termoServerIniFile']['tmp_name']) ) ) {
+            echo "Файл TermoServer.ini не был загружен.";
+    } else if ( ( file_exists($_FILES['POST_termoClientIniFile']['tmp_name']) &&  is_uploaded_file($_FILES['POST_termoClientIniFile']['tmp_name']) ) &&
+                ( file_exists($_FILES['POST_termoServerIniFile']['tmp_name']) &&  is_uploaded_file($_FILES['POST_termoServerIniFile']['tmp_name']) )) {
+
+        $uploadedTermoServerINI  =	@parse_ini_string(replaceForbiddenChars(file_get_contents($_FILES['POST_termoServerIniFile']['tmp_name'])), true);
+        $uploadedTermoClientINI  =	@parse_ini_string(replaceForbiddenChars(file_get_contents($_FILES['POST_termoClientIniFile']['tmp_name'])), true);
+
+        if(is_array($uploadedTermoServerINI) && is_array($uploadedTermoClientINI)){
+            if( count($uploadedTermoServerINI)>0 && count($uploadedTermoClientINI)>0){
+                if(doINIFilesMatchEachOther($uploadedTermoServerINI,$uploadedTermoClientINI)){
+                    echo "Файлы прошли проверку. Выполняется обновление конфигурации проекта.";
+                    //  Перемещаем файлы в папку Settings
+                    move_uploaded_file($_FILES['POST_termoServerIniFile']['tmp_name'], "settings/TermoServer.ini");
+                    move_uploaded_file($_FILES['POST_termoClientIniFile']['tmp_name'], "settings/TermoClient.ini");
+
+                    header('Location: index.php');
+
+                } else {
+                    echo "Файлы TermoServer.ini и TermoClient.exe не соответствуют друг другу или имеют неподдерживаемый формат;";
+                }
+            }
+        } else {
+            echo "Файлы TermoServer.ini и TermoClient.exe не соответствуют друг другу или имеют неподдерживаемый формат;";
+        }
+    }
+
+}
+
 if( isset($_POST['POST_vSConf_get_ts_connection_settings']) ) {
     echo json_encode(array($IPAddr,$port));
 }
@@ -339,6 +379,7 @@ if( isset($_POST['POST_vSConf_ts_connection_settings_save_ip']) && isset($_POST[
     echo vSConf_ts_connection_settings_save($dbh, $_POST['POST_vSConf_ts_connection_settings_save_ip'], $_POST['POST_vSConf_ts_connection_settings_save_port']);
 }
 
+//  Операции с Базой Данных --------------------------------------------------------------------------------------------------------------------------------
 //  Резервное копирование БД
 //  Отправка AJAX запроса, который должен вернуть ссылку на файл
 if( isset($_POST['POST_vSConf_db_create_backup']) ) {
@@ -368,7 +409,8 @@ if(isset($_POST["POST_sconf_db_restore_from_backup"])) {
             echo "Вы выбрали файл неподдерживаемого формата!";
         } else {
             vSConf_db_restore_from_backup($dbh, file_get_contents($target_file));   //  Файл прошел проверку на тип. Пробуем восстановить состояние БД
-            require_once('silo_config.php');
+            setcookie("dbRestoredSuccessfully", "OK", time()+3600);
+            header('Location: silo_config.php');                                    //  Перенаправление на ту же страницу, но чтобы произошло событие "DOMContentLoaded"
         }
     } else {
         echo "Ошибка при загрузке файла на сервер";
