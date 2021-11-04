@@ -22,7 +22,7 @@
                <?php
 
                // 
-                  echo $error;
+                  print_r($errors);
                ?>
          </div>
 

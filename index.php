@@ -142,7 +142,7 @@
               <div class="card-body">
 
                 <div class="d-flex justify-content-center">
-                  <h5 class="card-title justify-content-center" id="current-silo-name" style="font-family: Arial, Helvetica, sans-serif; font-size: 28px;">Силос 1</h5>
+                  <h5 class="card-title justify-content-center" id="current-silo-name" style="font-family: Arial, Helvetica, sans-serif; font-size: 28px;">Силос</h5>
                 </div>
 
                 <div class="col mt-3">

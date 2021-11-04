@@ -1,9 +1,11 @@
 function init_index() {
     document.getElementById("hdr-href-index.php").setAttribute("class", "nav-link text-primary");
+
     vIndRedrawSiloStatus();
 
     lastSiloID = "silo-0";
     lastParamSelectButtonID = "btn-temperatures";
+    vIndOnClickOnValsSelectBtn(lastParamSelectButtonID);
 
     return;
 }

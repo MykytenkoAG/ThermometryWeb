@@ -18,7 +18,7 @@ function ddl_debug_drop_all($dbh){
     Поля:
     silo_id, grain_level
 */
-function ddl_debug_create_Silo($dbh, $termoServerINI){
+function ddl_debug_create_Silo($dbh){
 	
 	$sql = "CREATE TABLE IF NOT EXISTS zernoib.debug_silo
 			 (silo_id INT NOT NULL,
@@ -29,13 +29,27 @@ function ddl_debug_create_Silo($dbh, $termoServerINI){
 	$stmt = $dbh->prepare($sql);
 	$stmt->execute();
 
+    $sql = "SELECT silo_id, grain_level FROM prodtypesbysilo;";
+
+    $sth = $dbh->query($sql);
+
+    if($sth==false){
+        return false;
+    }
+
+    $prodtypesbysiloRows = $sth->fetchAll();
+
     $sql = "INSERT INTO debug_silo (silo_id, grain_level) VALUES ";
 
-    foreach ($termoServerINI as $key => $value) {
+    foreach($prodtypesbysiloRows as $prodtypesbysiloRow){
+        $sql .= "(" . $prodtypesbysiloRow['silo_id'] . "," . "0" . "),";
+    }
+
+    /*foreach ($termoServerINI as $key => $value) {
 		if( preg_match('/Silos([0-9]+)/',$key,$matches) ){
             $sql .= "(" . ($matches[1]-1) . "," . "0" . "),";
 		}
-	}
+	}*/
 
 	$sql = substr($sql,0,-1).";";
 
@@ -48,7 +62,7 @@ function ddl_debug_create_Silo($dbh, $termoServerINI){
     Поля:
     sensor_id, silo_id, podv_id, sensor_num, current_temperature, current_temperature_speed
 */
-function ddl_debug_create_Sensors($dbh, $termoServerINI){
+function ddl_debug_create_Sensors($dbh){
 
 	$sql = "CREATE TABLE IF NOT EXISTS zernoib.debug_sensors
 			 (sensor_id INT NOT NULL,
@@ -64,9 +78,25 @@ function ddl_debug_create_Sensors($dbh, $termoServerINI){
 	$stmt = $dbh->prepare($sql);
 	$stmt->execute();
 
+
+    $sql = "SELECT sensor_id, silo_id, podv_id, sensor_num, current_temperature, current_speed FROM sensors;";
+
+    $sth = $dbh->query($sql);
+
+    if($sth==false){
+        return false;
+    }
+
+    $sensorsRows = $sth->fetchAll();
+
+
     $sql = "INSERT INTO debug_sensors (sensor_id, silo_id, podv_id, sensor_num, current_temperature, current_temperature_speed) VALUES ";
 
-    $sensor_id = 0;
+    foreach($sensorsRows as $sensorsRow){
+        $sql .= "(".$sensorsRow['sensor_id'].",".$sensorsRow['silo_id'].",".$sensorsRow['podv_id'].",".$sensorsRow['sensor_num'].","."0".","."0"."),";
+    }
+
+    /*$sensor_id = 0;
     foreach ($termoServerINI as $key => $value) {
 		if(preg_match('/Silos([0-9]+)/',$key,$matches)){
             $silo_id=$matches[1]-1;
@@ -82,7 +112,7 @@ function ddl_debug_create_Sensors($dbh, $termoServerINI){
                 $podv_id++;
             }
 		}
-	}
+	}*/
 
 	$sql = substr($sql,0,-1).";";
 

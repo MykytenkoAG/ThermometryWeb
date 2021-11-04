@@ -78,11 +78,6 @@ function getConf_ArrayOfSiloNames() {
             //  массив с названиями силосов, в котором индекс - это silo_id, а значение - название силоса
             silo_names_array = JSON.parse(fromPHP);
 
-            if (current_page === "index.php") {
-                //  делаем активным силос с silo_id==0
-                document.getElementById("current-silo-name").innerHTML = "Силос " + silo_names_array[0];
-            }
-
             getConf_SiloNameWithMaxPodvNumber();
 
         }
@@ -207,31 +202,6 @@ function controlAudio(OnOff){
     return;
 }
 
-function getNewAlarmsNumber() {
-
-    $.ajax({
-        url: '/webTermometry/currValsFromTS.php',
-        type: 'POST',
-        cache: false,
-        data: { 'POST_currValsFromTS_get_number_of_new_alarms': 1 },
-        dataType: 'html',
-        success: function(fromPHP) {
-
-            if (fromPHP > alarmsNACKNumber) {           //  Если появились неквитированные алармы
-                controlAudio(1);                        //  Включаем звук
-            }
-
-            alarmsNACKNumber = fromPHP;
-
-            if (current_page === "index.php") {
-                vIndOnClickOnSilo(lastSiloID);          //  Перерисовываем таблицу с текущими показаниями
-            }
-            
-        }
-    });
-    return;
-}
-
 function alarmsAck() {
 
     $.ajax({
@@ -243,6 +213,33 @@ function alarmsAck() {
         success: function(fromPHP) {
             controlAudio(0);            //  Выключаем звук
             getNewAlarmsNumber();       //  Проверяем появление новых алармов
+        }
+    });
+    return;
+}
+
+function getNewAlarmsNumber() {
+
+    $.ajax({
+        url: '/webTermometry/currValsFromTS.php',
+        type: 'POST',
+        cache: false,
+        data: { 'POST_currValsFromTS_get_number_of_new_alarms': 1 },
+        dataType: 'html',
+        success: function(fromPHP) {
+
+            console.log(fromPHP);
+            console.log("Number.isInteger(fromPHP) " + Number.isInteger(fromPHP));
+
+            if (fromPHP > alarmsNACKNumber) {           //  Если появились неквитированные алармы
+                controlAudio(1);                        //  Включаем звук
+            }
+            alarmsNACKNumber = fromPHP;
+
+            if (current_page === "index.php") {
+                vIndOnClickOnSilo(lastSiloID);          //  Перерисовываем таблицу с текущими показаниями
+            }
+            
         }
     });
     return;

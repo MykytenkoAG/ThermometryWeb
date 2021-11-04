@@ -25,65 +25,250 @@ require_once ('dbAlarms.php');				//	Работа с сигналами АПС
 											Войдите под учетной записью технолога и загрузите актуальную версию конфигурационных файлов."
 		ОТЛАДОЧНЫЙ РЕЖИМ. -> Автоматическая инициализация отладочных таблиц
 
-	1.	Проверка таблицы sensors. Если она не существует, или  пустая, проверка наличия файлов TermoClient.ini и TermoServer.ini в папке settings проекта. Если нету => выход
-	2.	Проверка соответствия TermoServer.ini и TermoClient.ini. Если нет => Выдача предупреждающего сообщения и выход
-	3.	Проверка TermoServer.ini тому, что шлет TermoServer. Если нет соответствия =>	Выдача предупреждающего сообщения с просьбой обновить файл и выход
-		DEBUG. 	Проверка TermoServer.ini тому, что записано в таблицах debug_sensors и debug_silo. Если нет соответствия => автоматическая инициализация таблиц
-	4.	Проверка содержимого TermoServer.ini тому, что записано в sensors и prodtypesbysilo. Если нет соответствия => предупреждающее сообщение и
-			автоматическая инициализация таблиц
 */
 
-$error="";
+$configOK=true;
+$errors=array();
+$arrayOfTemperatures=array(); $arrayOfTempSpeeds=array(); $arrayOfLevels=array(); $serverDate="";
+
+//	ПРОЦЕДУРА ПРОВЕРКИ
+
+//	Проверка существования таблицы sensors в базе данных проекта
+if( isTableExistAndNotEmpty($dbh,"zernoib.sensors") ){
+	goto tableSensorsOK;
+}
+
+//	Таблицы не существует, или она пустая
+//	Выполняем проверку ini-файлов
+$termoServerINI  =	@parse_ini_string(replaceForbiddenChars(file_get_contents('settings/TermoServer.ini')), true);
+if( count($termoServerINI)==0 ){
+	$configOK=false;
+	array_push($errors, "NoTermoServer.ini");				//	Файла TermoServer.ini нет в папке settings
+}
+
+$termoClientINI  =	@parse_ini_string(replaceForbiddenChars(file_get_contents('settings/TermoClient.ini')), true);
+if( count($termoClientINI)==0 ){
+	$configOK=false;
+	array_push($errors, "NoTermoClient.ini");				//	Файла TermoClient.ini нет в папке settings
+}
+
+if(count($errors)>0){
+	goto exit_from_script;
+}
+
+if(!isIniFileTermoServerOK($termoServerINI)){
+	$configOK=false;
+	array_push($errors, "DamagedTermoServer.ini");			//	Файл TermoServer.ini поврежден
+}
+
+if(!isIniFileTermoClientOK($termoClientINI)){
+	$configOK=false;
+	array_push($array, "DamagedTermoClient.ini");			//	Файл TermoClient.ini поврежден
+}
+
+if(count($errors)>0){
+	goto exit_from_script;
+}
+
+if(!areIniFilesConsistent($termoServerINI,$termoClientINI)){
+	$configOK=false;
+	array_push($errors, "IniFilesInconsistent");				//	Файлы TermoServer.ini и TermoClient.ini не соответствуют друг другу
+}
+
+if(count($errors)>0){
+	goto exit_from_script;
+}
+
+//	Если прошли проверку
+//	Создаем все необходимые таблицы в Базе Данных исходя из их содержимого
+ddl_drop_all($dbh);
+
+ddl_create_Users($dbh);				
+ddl_create_Errors($dbh);			
+ddl_create_Dates($dbh);				
+ddl_create_Prodtypes($dbh);			
+ddl_create_Prodtypesbysilo($dbh);	
+ddl_create_Sensors($dbh);			
+ddl_create_Measurements($dbh);
+
+date_default_timezone_set('Europe/Kiev'); $date = date('d.m.Y H:i:s', time()); $serverDate = $date;
+
+ddl_init_Users($dbh);
+ddl_init_Errors($dbh);
+ddl_init_Dates($dbh, $serverDate);
+ddl_init_Prodtypes($dbh);
+ddl_init_Prodtypesbysilo($dbh, $termoClientINI, $termoServerINI);
+ddl_init_Sensors($dbh, $termoClientINI, $termoServerINI, $serverDate);
+
+ddl_debug_drop_all($dbh);
+ddl_debug_create_Silo($dbh);
+ddl_debug_create_Sensors($dbh);
+
+tableSensorsOK:
+
+//	Таблицы существуют и заполнены данными
+//	Заполнение массивов $arrayOfTemperatures; $arrayOfTempSpeed; $arrayOfLevels и переменной $serverDate
+//	РАБОЧИЙ РЕЖИМ:	значения шлет Термосервер
+//	РЕЖИМ ОТЛАДКИ:	значения вычитываются из БД (запись значений производится из отладочной страницы визуализации)
+if( ! $simulation_mode) {
+
+	$inputValsArr		 = getFromTS_inputArray ( getFromTS_inputString($IPAddr, $port) );	//	[температуры][скорости][уровни][дата]
+	$arrayOfTemperatures = getFromTS_arrayOfValues3d($inputValsArr[0]);
+	$arrayOfTempSpeeds   = getFromTS_arrayOfValues3d($inputValsArr[1]);
+	$arrayOfLevels       = getFromTS_grainLevels($inputValsArr[2]);
+	$serverDate			 = $inputValsArr[3];
+
+} else {
+
+	//	Если включен режим отладки
+	$arrayOfTemperatures = db_debug_update_temperatures($dbh);
+	$arrayOfTempSpeeds   = db_debug_update_temperatureSpeeds($dbh);
+	$arrayOfLevels       = db_debug_update_grainLevels($dbh);
+	date_default_timezone_set('Europe/Kiev');
+	$date = date('d.m.Y H:i:s', time());
+	$serverDate			 = $date;
+
+}
+
+//	Данные вычитаны
+//	Необходимо проверить их соотетствие таблицам в Базе Данных
+if(!checkReadValsToDBSensors($dbh, $arrayOfTemperatures)){
+	if(!$simulation_mode){
+		$configOK = false;
+		array_push($errors, "ProjectIsOutOfDate");						//	Значения, вычитанные из Термосервера не соответствуют текущим настройкам. Обновите проект
+	} else {
+		ddl_debug_drop_all($dbh);										//	Выполняем инициализацию отладочных таблиц исходя из текущего состояния таблицы sensors
+		ddl_debug_create_Silo($dbh);
+		ddl_debug_create_Sensors($dbh);
+		goto tableSensorsOK;											//	Вычитываем данные заново
+	}
+}
+
+//	Данные в порядке. Теперь необходимо занести новые показания в БД и выполнить проверку на алармы
+if($configOK){
+	db_update_grainLevels($dbh, $arrayOfLevels);
+	db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate);
+
+	alarms_set  ($dbh, $serverDate);
+	alarms_reset($dbh, $serverDate);
+}
+
+exit_from_script:
+
+//	Функция проверки таблицы sensors. Если она существует и не пуста => true
+function isTableExistAndNotEmpty($dbh, $tableName){
+
+	$sql = "SELECT * FROM $tableName;";
+	$sth = $dbh->query($sql);
+
+	if($sth==false){
+		return false;
+	}
+	$rows = $sth->fetchAll();
+	if(count($rows)==0){
+		return false;
+	}
+
+	return true;
+}
 //	Функция для замены символов "(", ")", "off". Необходима для корректной работы функции parse_ini_string()
 function replaceForbiddenChars($str){
 	$str = str_replace("(", "_", $str);	$str = str_replace(")", "_", $str);	$str = str_replace("off", "off_", $str);
 	return $str;
 }
-
-
-
-//	Чтение главных конфигурационных файлов проекта
-$termoServerINI  =	@parse_ini_string(replaceForbiddenChars(file_get_contents('settings/TermoServer.ini')), true);
-if( count($termoServerINI)==0 ){	$error .= "Файл TermoServer.ini отсутствует в каталоге webTermometry/settings;".getcwd();}
-$termoClientINI  =	@parse_ini_string(replaceForbiddenChars(file_get_contents('settings/TermoClient.ini')), true);
-if( count($termoClientINI)==0 ){	$error .= "Файл TermoClient.ini отсутствует в каталоге webTermometry/settings;".getcwd();}
-
-/*	Проверка соответствия файлов TermoServer.ini и TermoClient.ini
-	Функция производит проверку наличия всех силосов из TermoServer.ini в TermoClient.ini
-*/
-function doINIFilesMatchEachOther($termoServerINI,$termoClientINI){
-	$termoServerSiloArray=array();$termoClientSiloArray=array();
+//	Проверка файла TermoServer.ini на наличие всех необходимых ключей
+function isIniFileTermoServerOK($termoServerINI){
 	foreach ($termoServerINI as $key => $value) {
 		if(preg_match('/Silos[0-9]+/',$key)){
-			array_push($termoServerSiloArray, $key);
+			if( !isset($termoServerINI[$key]['SilosName'])		||
+				!isset($termoServerINI[$key]['PodvCount'])		||
+				!isset($termoServerINI[$key]['SensorsStr'])		||
+				!isset($termoServerINI[$key]['DeviceAddress'])	||
+				!isset($termoServerINI[$key]['FirstPodvShift'])	||
+				!isset($termoServerINI[$key]['off_']) ){
+				return false;
+			}			
+		}
+	}
+	return true;
+}
+//	Проверка файла TermoClient.ini на наличие всех необходимых ключей
+function isIniFileTermoClientOK($termoClientINI){
+	foreach ($termoClientINI as $key => $value) {
+		if(preg_match('/Silos[0-9]+/',$key)){
+			if( !isset($termoClientINI[$key]['Left'])	||
+				!isset($termoClientINI[$key]['Top'])	||
+				!isset($termoClientINI[$key]['Size'])	||
+				!isset($termoClientINI[$key]['sType'])	||
+				!isset($termoClientINI[$key]['Group'])	){
+				return false;
+			}			
+		}
+	}
+	return true;
+}
+//	Проверка ini-файлов на соответствие друг другу
+function areIniFilesConsistent($termoServerINI,$termoClientINI){
+	foreach ($termoServerINI as $key => $value) {
+		if(preg_match('/Silos[0-9]+/',$key)){
+			if(!isset($termoClientINI[$key])){
+				return false;
+			}
 		}
 	}
 	foreach ($termoClientINI as $key => $value) {
 		if(preg_match('/Silos[0-9]+/',$key)){
-			array_push($termoClientSiloArray, $key);
-		}
-	}
-	foreach($termoServerSiloArray as $currSilo){
-		if(!in_array($currSilo, $termoClientSiloArray)){
-			return false;
+			if(!isset($termoServerINI[$key])){
+				return false;
+			}
 		}
 	}
 	return true;
 }
 
-//	Если обнаружено несоответствие => Выход
-if( ! doINIFilesMatchEachOther($termoServerINI,$termoClientINI) ){
-	$error .= "Файлы TermoServer.ini и TermoClient.exe не соответствуют друг другу;";
-}
+//	Проверка содержимого таблицы sensors конфигурации файла TermoServer.ini
+//$sortedIniArr = getTermoServerIniSortedBySiloName($termoClientINI,$termoServerINI);
+function areIniFilesConsistentToDB($dbh, $tableSensors, $sortedIniArr){
 
-if($error!=""){	die(require_once('error_page.php'));}
+	$sql = "SELECT s.silo_id, pbs.silo_name, podv_id, count(sensor_num)
+				FROM $tableSensors AS s inner JOIN prodtypesbysilo AS pbs ON s.silo_id=pbs.silo_id
+				GROUP BY silo_id, podv_id
+				ORDER BY CAST(pbs.silo_name AS unsigned), podv_id;";
+	$sth = $dbh->query($sql);
+
+	if($sth==false){
+		return false;
+	}
+	$rows = $sth->fetchAll();
+
+	$sensorsNumberCounter = 0;
+	foreach($sortedIniArr as $currIniString){
+		$sensorsArr = preg_split('/,/',$currIniString['SensorsStr'],-1,PREG_SPLIT_NO_EMPTY);
+		foreach($sensorsArr as $currSensorsNumber){
+			if(!isset($rows[$sensorsNumberCounter])){
+				return false;
+			}
+			if( ($rows[$sensorsNumberCounter]['silo_name'] != $currIniString['SilosName']) ||
+				($rows[$sensorsNumberCounter]['count(sensor_num)'] != $currSensorsNumber) ){
+				return false;
+			}
+			$sensorsNumberCounter++;
+		}
+	}
+
+	if( $sensorsNumberCounter != count($rows) ){
+		return false;
+	}
+
+	return true;
+}
 
 //	Функции для работы с программой TermoServer -----------------------------------------------------------------------------------------------------
 //	Функция для получения строки с текущими значениями
-//	В случае, если термосервер не запущен, происходит запись в глобальную переменную $error
+//	В случае, если термосервер не запущен, происходит запись в глобальную переменную $errors
 function getFromTS_inputString($IPAddr, $port){
-	global $error;
-	$error = "Проверьте, запущен ли термосервер $IPAddr, $port";
+	global $errors;
+	array_push($errors, "TermoServerIsOff");
 	//http://docs.php.net/fsockopen
 	$fp = @fsockopen($IPAddr, $port, $errno, $errstr, 30)
 		or die(require_once('error_page.php'));	//	Перенаправление на страницу с описанием ошибки
@@ -105,7 +290,7 @@ function getFromTS_inputString($IPAddr, $port){
 		}
 		fclose($fp);
 	}
-	$error = "";
+	array_pop($errors);
 	return $inputStr;
 }
 //	Функция для преобразования строки с текущими значениями в массив
@@ -131,167 +316,64 @@ function getFromTS_grainLevels($inputArray){
 	$arrayOfLevels = preg_split('/:/', $inputArray, -1, PREG_SPLIT_NO_EMPTY);
 	return $arrayOfLevels;
 }
+//	Проверка вычитанных из Термосервера или отладочных таблиц значений содержимому таблицы sensors
+function checkReadValsToDBSensors($dbh, $arrayOfTemperatures){
 
-//	Функции для создания ассоциативных массивов для выявления соответствия значений, которые шлет Термосервер ini-файлу конфигурации -----------------
-function createAssocArr_TermoServer($termoServerINI){
-	$outArr=array();
-	foreach ($termoServerINI as $key => $value) {
-		if(preg_match('/Silos[0-9]+/',$key)){
-			$sensorsArr = preg_split('/,/',$termoServerINI[$key]['SensorsStr'],-1,PREG_SPLIT_NO_EMPTY);
-			$outArr[$key]=$sensorsArr;
-		}
-	}
-	return $outArr;
-}
-
-function createAssocArr_ArrayOfTemperatures($arrayOfTemperatures){
-	$outArr=array();
-	for($i=0; $i<count($arrayOfTemperatures); $i++){
-		$outArr["Silos".($i+1)]=array();
-		for($j=0; $j<count($arrayOfTemperatures[$i]); $j++){
-			$outArr["Silos".($i+1)][$j]=count($arrayOfTemperatures[$i][$j]);
-		}
-	}
-	return $outArr;
-}
-//	В случае проблем с БД возвращаем пустой массив
-function createAssocArr_dbTable($dbh, $dbTable){
-	$outArr=array();
-	
 	$sql = "SELECT sensor_id, silo_id, podv_id, count(sensor_num)
-			FROM $dbTable
-			GROUP BY silo_id, podv_id;";
+			FROM sensors
+			GROUP BY silo_id, podv_id
+			ORDER BY silo_id;";
 	$sth = $dbh->query($sql);
+
 	if($sth==false){
-		return $outArr;
+		return false;
 	}
+
 	$rows = $sth->fetchAll();
-
 	if(count($rows)==0){
-		return $outArr;
+		return false;
 	}
 
-	$currentSilo=$rows[0]['silo_id']; $sensorsArr=array();
+	if(!is_array($arrayOfTemperatures)){
+		return false;
+	}
 
-	for($i=0; $i<count($rows); $i++){
-		if($rows[$i]['silo_id']!=$currentSilo){
-			$currentSilo=$rows[$i]['silo_id'];
-			$outArr["Silos".($rows[$i]['silo_id'])]=$sensorsArr;
-			$sensorsArr=array();
+	$arrayOfTemperaturesSize=0; $rowsShift=0;
+	for($i=0; $i<count($arrayOfTemperatures); $i++){
+		if($i>0){
+			$rowsShift += count($arrayOfTemperatures[$i-1]);
 		}
-		array_push($sensorsArr,$rows[$i]['count(sensor_num)']);
-	}
-	$outArr["Silos".($rows[count($rows)-1]['silo_id']+1)]=$sensorsArr;
+		if(!isset($arrayOfTemperatures[$i])){
+			return false;
+		}
+		if(!is_array($arrayOfTemperatures[$i])){
+			return false;
+		}
+		for($j=0; $j<count($arrayOfTemperatures[$i]); $j++){
 
-	return $outArr;
-}
-//	Функция для сравнения ассоциативных массивов
-function arrayRecursiveDiff($aArray1, $aArray2) {
-    $aReturn = array();
-  
-    foreach ($aArray1 as $mKey => $mValue) {
-        if (array_key_exists($mKey, $aArray2)) {
-            if (is_array($mValue)) {
-                $aRecursiveDiff = arrayRecursiveDiff($mValue, $aArray2[$mKey]);
-                if (count($aRecursiveDiff)) { $aReturn[$mKey] = $aRecursiveDiff; }
-            } else {
-                if ($mValue != $aArray2[$mKey]) {
-                    $aReturn[$mKey] = $mValue;
-                }
-            }
-        } else {
-            $aReturn[$mKey] = $mValue;
-        }
-    }
-  
-    return $aReturn;
-}
+			if(!isset($rows[$rowsShift+$j]['count(sensor_num)'])){
+				return false;
+			}
 
-$arrayOfTemperatures=array();$arrayOfTempSpeeds=array();$arrayOfLevels=array();$serverDate="";
-
-//	Заполнение массивов $arrayOfTemperatures; $arrayOfTempSpeed; $arrayOfLevels и переменной $serverDate
-//	РАБОЧИЙ РЕЖИМ:	значения шлет Термосервер
-//	РЕЖИМ ОТЛАДКИ:	значения вычитываются из БД (запись значений производится из отладочной страницы визуализации)
-if( ! $simulation_mode) {
-	//	Файлы прошли проверку, можно считывать значения из термосервера
-	$inputValsArr		 = getFromTS_inputArray ( getFromTS_inputString($IPAddr, $port) );	//	[температуры][скорости][уровни][дата]
-	$arrayOfTemperatures = getFromTS_arrayOfValues3d($inputValsArr[0]);
-	$arrayOfTempSpeeds   = getFromTS_arrayOfValues3d($inputValsArr[1]);
-	$arrayOfLevels       = getFromTS_grainLevels($inputValsArr[2]);
-	$serverDate			 = $inputValsArr[3];
-	//	Проверка содержимого TermoServer.ini тому, что шлет сам Термосервер
-	if( ! ( count( arrayRecursiveDiff( createAssocArr_TermoServer($termoServerINI) , createAssocArr_ArrayOfTemperatures($arrayOfTemperatures)   ) )==0 &&
-		    count( arrayRecursiveDiff( createAssocArr_ArrayOfTemperatures($arrayOfTemperatures) , createAssocArr_TermoServer($termoServerINI)   ) )==0 )  ){
-		$error = "Текущий файл TermoServer.ini не соответствует настрокам термосервера. Скопируйте актуальный файл TermoServer.ini в папку settings;";
-		die(require_once('error_page.php'));
+			if(count($arrayOfTemperatures[$i][$j]) != $rows[$rowsShift+$j]['count(sensor_num)'] ){
+				return false;
+			}
+			$arrayOfTemperaturesSize++;
+		}
 	}
 
- } else {
-	//	Если включен режим отладки
-	if( ! ( count( arrayRecursiveDiff( createAssocArr_TermoServer($termoServerINI) , createAssocArr_dbTable($dbh, "zernoib.debug_sensors")   ) )==0 &&
-			count( arrayRecursiveDiff( createAssocArr_dbTable($dbh, "zernoib.debug_sensors") , createAssocArr_TermoServer($termoServerINI)   ) )==0 ) ){
-			//	Создаем новые отладочные таблицы исходя из значений в ini-файле
-			ddl_debug_drop_all($dbh);
-			ddl_debug_create_Silo($dbh, $termoServerINI);
-			ddl_debug_create_Sensors($dbh, $termoServerINI);
+	if($arrayOfTemperaturesSize!=count($rows)){
+		return false;
 	}
-	//	Считывание парметров температур, скоростей и уровней в виде, аналогичном тому, который видает термосервер
-	$arrayOfTemperatures = db_debug_update_temperatures($dbh);
-	$arrayOfTempSpeeds   = db_debug_update_temperatureSpeeds($dbh);
-	$arrayOfLevels       = db_debug_update_grainLevels($dbh);
-	date_default_timezone_set('Europe/Kiev');
-	$date = date('d.m.Y H:i:s', time());
-	$serverDate			 = $date;
+
+	return true;
+
 }
-
-//	Проверка таблицы dbSensors содержимому TermoServer.ini
-/*if( ! ( count( arrayRecursiveDiff( createAssocArr_TermoServer($termoServerINI) , createAssocArr_dbTable($dbh, "zernoib.sensors")   ) )==0 &&
-		count( arrayRecursiveDiff( createAssocArr_dbTable($dbh, "zernoib.sensors") , createAssocArr_TermoServer($termoServerINI)   ) )==0 ) ){
-
-	//echo "Файл TermoServer.ini был обновлен. Выполняем автоматическую инициализацию всех таблиц в БД";
-	//print_r(createAssocArr_dbTable($dbh, "zernoib.sensors"));
-	
-	//print_r("<br>");
-	//print_r("<br>");
-	//print_r("<br>");
-	//print_r(createAssocArr_TermoServer($termoServerINI));
-
-	//setcookie("popupProjectWasUpdated", "OK", time()+3600);
-
-	ddl_drop_all($dbh);
-
-	ddl_create_Users($dbh);				
-	ddl_create_Errors($dbh);			
-	ddl_create_Dates($dbh);				
-	ddl_create_Prodtypes($dbh);			
-	ddl_create_Prodtypesbysilo($dbh);	
-	ddl_create_Sensors($dbh);			
-	ddl_create_Measurements($dbh);
-
-	ddl_init_Users($dbh);
-	ddl_init_Errors($dbh);
-	ddl_init_Dates($dbh, $serverDate);
-	ddl_init_Prodtypes($dbh);
-	ddl_init_Prodtypesbysilo($dbh, $termoClientINI,$termoServerINI);
-	ddl_init_Sensors($dbh, $termoClientINI, $termoServerINI,$serverDate);
-
-	//header('Location: index.php');
-
-}*/
-
-
-//  После успешного прохождения всех проверочных операций необходимо записать текущие измеренные значения в Базу Данных
-db_update_grainLevels($dbh, $arrayOfLevels);
-db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate);
-
-//  После записи всех измеренных значений в БД необходимо выполнить проверку на повление новых сигналов АПС и сброс уже существующих
-alarms_set  ($dbh, $serverDate);
-alarms_reset($dbh, $serverDate);
 
 //	Перечень функций для выдачи конфигурационных массивов в JavaScript для повышения интерактивности.------------------------------------------------------------
 //  Вызываются при переходе на новую страницу
-//	Выход: трехмерный массив [массив имен силосов][массив подвесок][массив датчиков]
 
+//	Выход: трехмерный массив [массив имен силосов][массив подвесок][массив датчиков]
 //getConfForVisu_ProjectConfig($dbh);
 function getConfForVisu_ProjectConfig($dbh){
 
@@ -348,23 +430,6 @@ function getConfForVisu_SiloNames($dbh){
 
     return $arrayOfSiloNames;
 }
-//	Выход: название силоса с id==0. Необходимо для страницы "Отчет" (формирование графиков)
-function getConfForVisu_SiloNameWith_id_0($dbh){
-
-    $sql = "SELECT silo_name
-            FROM prodtypesbysilo
-            WHERE silo_id=0";
-
-    $sth = $dbh->query($sql);
-
-    if($sth==false){
-        return false;
-    }
-
-    $rows = $sth->fetchAll();
-    
-    return $rows[0]['silo_name'];
-}
 //	Выход: название силоса с максимальным количеством подвесок. Необходимо для страницы "Отчет" (печатные формы)
 function getConfForVisu_SiloNameWithMaxPodvNumber($dbh){
 
@@ -385,6 +450,10 @@ function getConfForVisu_SiloNameWithMaxPodvNumber($dbh){
 }
 
 //  AJAX --------------------------------------------------------------------------------------------------------------------------------------------------------
+if( isset($_POST['POST_check_config_errors']) ){
+	echo json_encode( $errors );
+}
+
 if( isset($_POST['POST_currValsFromTS_get_number_of_new_alarms']) ) {
     echo alarms_get_nack_number($dbh);
 }
@@ -412,13 +481,8 @@ if( isset($_POST['POST_currValsFromTS_get_silo_names_array']) ) {
     echo json_encode( getConfForVisu_SiloNames($dbh) ) ;
 }
 
-if( isset($_POST['POST_currValsFromTS_get_silo_name_with_id_0']) ) {
-    echo getConfForVisu_SiloNameWith_id_0($dbh);
-}
-
 if( isset($_POST['POST_currValsFromTS_get_silo_number_with_max_podv_number']) ) {
     echo getConfForVisu_SiloNameWithMaxPodvNumber($dbh);
 }
-
 
 ?>
