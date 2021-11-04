@@ -5,10 +5,8 @@ function init_report() {
     vRep_rprtprf_checkDatesAndBlockDownloadButtons();
     //  Инициализация элементов select печатных форм
     setSelectOptions(document.getElementById("rprtprf_silo_1"),   ["all"].concat(silo_names_array));
-    setSelectOptions(document.getElementById("rprtprf_podv_1"),   ["all"].concat(Object.keys(project_conf_array[silo_name_with_max_podv_number])));
-    setSelectOptions(document.getElementById("rprtprf_layer_1"),  ["all"].concat(Object.keys(project_conf_array[silo_name_with_max_podv_number][1])));
-    setSelectOptions(document.getElementById("rprtprf_sensor_1"), ["all"].concat(Object.keys(project_conf_array[silo_name_with_max_podv_number][1])));
-
+    redrawRowOfSelects("rprtprf_silo_1");
+    //  Отключены элементов select в зависимости от положения радиокнопки
     vRep_prfSelectsDisable();
 
     //  Инициализация элементов select графика температуры
@@ -643,13 +641,22 @@ function creatPrintedFormXLSX(JSONObj, field1, field2, field3, field4, sheetHead
         if( currentSheet != ("Силос " + currJSONObj[field2]) ){
             if(i>0){
                 wb.Sheets[currentSheet] = ws;
+                //console.log(getXLSXLastColNumber(ws));
+                //console.log(Object.keys(ws));
             }
             currentSheet = ("Силос " + currJSONObj[field2]);
-            //  Создание нового листа
-            wb.SheetNames.push(currentSheet);
-            //  Инициализация нового листа
-            ws = XLSX.utils.json_to_sheet([ { A: "" } ], {header: ["A"], skipHeader: true});
-            currentCol = 0; currentRow = 0;
+            if(wb.SheetNames.indexOf(currentSheet)==-1){
+                //  Создание нового листа
+                wb.SheetNames.push(currentSheet);
+                //  Инициализация нового листа
+                ws = XLSX.utils.json_to_sheet([ { A: "" } ], {header: ["A"], skipHeader: true});
+                currentCol = 0; currentRow = 0;
+            } else {
+                ws = wb.Sheets[currentSheet];
+                currentCol = getXLSXLastColNumber(wb.Sheets[currentSheet]) + 5;
+                currentRow = 0;
+            }
+            
         }
 
         if (sheetHeader==="Данные о средних температурах по слоям") {
@@ -722,6 +729,8 @@ function creatPrintedFormXLSX(JSONObj, field1, field2, field3, field4, sheetHead
 
         currentCol +=3; currentRow = 0;
 
+        
+
         if(i==JSONObj.length-1){
             wb.Sheets[currentSheet] = ws;
         }
@@ -732,3 +741,38 @@ function creatPrintedFormXLSX(JSONObj, field1, field2, field3, field4, sheetHead
 
     return;
 }
+
+function getXLSXLastColNumber(ws){
+
+    const XLSXCells = Object.keys(ws);
+
+    let lastColNumber = 0;
+
+    for(let i=0; i<XLSXCells.length; i++){
+
+        if(XLSXCells[i][0]==="!"){
+            continue;
+        }
+
+        const currColNumber = alphaToNum(XLSXCells[i].match(/[A-Za-z]+/)[0]);
+        if(currColNumber > lastColNumber){
+            lastColNumber = currColNumber;
+        }
+
+    }
+
+    return lastColNumber;
+}
+
+function alphaToNum(alpha) {
+
+    var i = 0,
+        num = 0,
+        len = alpha.length;
+  
+    for (; i < len; i++) {
+      num = num * 26 + alpha.charCodeAt(i) - 0x40;
+    }
+  
+    return num - 1;
+  }

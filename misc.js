@@ -56,7 +56,7 @@ function getConf_ProjectConfArr() {
             //console.log(fromPHP);
             project_conf_array = (JSON.parse(fromPHP));
             //console.log("project conf arr");
-            //console.log(project_conf_array);
+            console.log(project_conf_array);
             //console.log("\n");
             //console.log("keys"+Object.keys(project_conf_array));
             getConf_ArrayOfSiloNames();
@@ -219,7 +219,7 @@ function alarmsAck() {
 }
 
 function getNewAlarmsNumber() {
-
+    
     $.ajax({
         url: '/webTermometry/currValsFromTS.php',
         type: 'POST',
@@ -228,19 +228,40 @@ function getNewAlarmsNumber() {
         dataType: 'html',
         success: function(fromPHP) {
 
-            console.log(fromPHP);
-            console.log("Number.isInteger(fromPHP) " + Number.isInteger(fromPHP));
+            if(!isJson(fromPHP)){
+                
+                if (fromPHP > alarmsNACKNumber) {           //  Если появились неквитированные алармы
+                    controlAudio(1);                        //  Включаем звук
+                }
+                alarmsNACKNumber = fromPHP;
 
-            if (fromPHP > alarmsNACKNumber) {           //  Если появились неквитированные алармы
-                controlAudio(1);                        //  Включаем звук
-            }
-            alarmsNACKNumber = fromPHP;
+                if (current_page === "index.php") {
+                    vIndOnClickOnSilo(lastSiloID);          //  Перерисовываем таблицу с текущими показаниями
+                }
 
-            if (current_page === "index.php") {
-                vIndOnClickOnSilo(lastSiloID);          //  Перерисовываем таблицу с текущими показаниями
+            } else if(current_page!=="error_page.php" && current_page!=="silo_config.php") {
+                document.location.href = "error_page.php";
             }
             
         }
     });
     return;
+}
+
+function isJson(item) {
+    item = typeof item !== "string"
+        ? JSON.stringify(item)
+        : item;
+
+    try {
+        item = JSON.parse(item);
+    } catch (e) {
+        return false;
+    }
+
+    if (typeof item === "object" && item !== null) {
+        return true;
+    }
+
+    return false;
 }
