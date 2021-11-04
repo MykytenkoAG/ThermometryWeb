@@ -97,7 +97,7 @@
                       Работа с ПО Термосервер
                     </div>
                     
-                    <button type="submit" id="sconf-ts-connection-settings" class="btn btn-light mb-3">
+                    <button type="submit" id="sconf-ts-connection-settings" class="btn btn-light mb-3" <?php $ts_setting_btn_dis = $accessLevel>1 ? "": "disabled"; echo $ts_setting_btn_dis; ?>>
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sliders" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3h9.05zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8h2.05zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1h9.05z"/>
                       </svg>
@@ -108,7 +108,7 @@
                         Работа с БД
                     </div>
 
-                    <button type="submit" id="sconf-db-operations" class="btn btn-light mb-3">
+                    <button type="submit" id="sconf-db-operations" class="btn btn-light mb-3" <?php $db_operations_btn_dis = $accessLevel>1 ? "": "disabled"; echo $db_operations_btn_dis; ?>>
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-server" viewBox="0 0 16 16">
                         <path d="M1.333 2.667C1.333 1.194 4.318 0 8 0s6.667 1.194 6.667 2.667V4c0 1.473-2.985 2.667-6.667 2.667S1.333 5.473 1.333 4V2.667z"/>
                         <path d="M1.333 6.334v3C1.333 10.805 4.318 12 8 12s6.667-1.194 6.667-2.667V6.334a6.51 6.51 0 0 1-1.458.79C11.81 7.684 9.967 8 8 8c-1.966 0-3.809-.317-5.208-.876a6.508 6.508 0 0 1-1.458-.79z"/>

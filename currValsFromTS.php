@@ -60,28 +60,9 @@ if(count($errors)>0){
 
 //	Если прошли проверку
 //	Создаем все необходимые таблицы в Базе Данных исходя из их содержимого
-ddl_drop_all($dbh);
-
-ddl_create_Users($dbh);				
-ddl_create_Errors($dbh);			
-ddl_create_Dates($dbh);				
-ddl_create_Prodtypes($dbh);			
-ddl_create_Prodtypesbysilo($dbh);	
-ddl_create_Sensors($dbh);			
-ddl_create_Measurements($dbh);
-
-date_default_timezone_set('Europe/Kiev'); $date = date('d.m.Y H:i:s', time()); $serverDate = $date;
-
-ddl_init_Users($dbh);
-ddl_init_Errors($dbh);
-ddl_init_Dates($dbh, $serverDate);
-ddl_init_Prodtypes($dbh);
-ddl_init_Prodtypesbysilo($dbh, $termoClientINI, $termoServerINI);
-ddl_init_Sensors($dbh, $termoClientINI, $termoServerINI, $serverDate);
-
-ddl_debug_drop_all($dbh);
-ddl_debug_create_Silo($dbh);
-ddl_debug_create_Sensors($dbh);
+if($configOK){
+	projectUpdate($dbh, $termoClientINI, $termoServerINI);
+}
 
 tableSensorsOK:
 
@@ -202,6 +183,38 @@ function areIniFilesConsistent($termoServerINI,$termoClientINI){
 		}
 	}
 	return true;
+}
+
+//	Обновление проекта. Инициализация всех таблиц в Базе Данных
+function projectUpdate($dbh, $termoClientINI, $termoServerINI){
+
+	ddl_drop_all($dbh);
+
+	ddl_create_Users($dbh);				
+	ddl_create_Errors($dbh);			
+	ddl_create_Dates($dbh);				
+	ddl_create_Prodtypes($dbh);			
+	ddl_create_Prodtypesbysilo($dbh);	
+	ddl_create_Sensors($dbh);			
+	ddl_create_Measurements($dbh);
+
+	date_default_timezone_set('Europe/Kiev'); $date = date('d.m.Y H:i:s', time()); $serverDate = $date;
+
+	ddl_init_Users($dbh);
+	ddl_init_Errors($dbh);
+	ddl_init_Dates($dbh, $serverDate);
+	ddl_init_Prodtypes($dbh);
+	ddl_init_Prodtypesbysilo($dbh, $termoClientINI, $termoServerINI);
+	ddl_init_Sensors($dbh, $termoClientINI, $termoServerINI, $serverDate);
+
+	ddl_debug_drop_all($dbh);
+	ddl_debug_create_Silo($dbh);
+	ddl_debug_create_Sensors($dbh);
+
+	setcookie("popupProjectWasUpdated", "OK", time()+60);
+
+	return;
+	
 }
 
 //	Проверка содержимого таблицы sensors конфигурации файла TermoServer.ini

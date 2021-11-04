@@ -29,8 +29,7 @@ function deleteCookie(name) {
     document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
 };
 
-//  Действия при загрузке каждой страницы -------------------------------------------------------------------------------------------------------------------
-document.addEventListener("DOMContentLoaded", () => {
+function modalWindows(){
     //  Если произошло обновление проекта
     const project_was_updated = getCookie("popupProjectWasUpdated");
     if (project_was_updated === "OK") {
@@ -38,6 +37,54 @@ document.addEventListener("DOMContentLoaded", () => {
         $("#modal-info").modal('show');
         document.cookie = 'popupProjectWasUpdated=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     }
+    //  Файл TermoClient.ini не был загружен из страницы настроек
+    const popupTermoClientIniWasNotUploaded = getCookie("popupTermoClientIniWasNotUploaded");
+    if (popupTermoClientIniWasNotUploaded === "OK") {
+        document.getElementById("modal-info-body-message").innerText = "Файл TermoClient.ini не был загружен.";
+        $("#modal-info").modal('show');
+        document.cookie = 'popupTermoClientIniWasNotUploaded=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+    //  Файл TermoServer.ini не был загружен из страницы настроек
+    const popupTermoServerIniWasNotUploaded = getCookie("popupTermoServerIniWasNotUploaded");
+    if (popupTermoServerIniWasNotUploaded === "OK") {
+        document.getElementById("modal-info-body-message").innerText = "Файл TermoServer.ini не был загружен.";
+        $("#modal-info").modal('show');
+        document.cookie = 'popupTermoServerIniWasNotUploaded=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+    //  Файлы TermoClient.ini и TermoServer.ini не совместимы друг с другом
+    const popupIniFilesAreNotConsistent = getCookie("popupIniFilesAreNotConsistent");
+    if (popupIniFilesAreNotConsistent === "OK") {
+        document.getElementById("modal-info-body-message").innerText = "Файлы TermoServer.ini и TermoClient.ini не совместимы друг с другом.";
+        $("#modal-info").modal('show');
+        document.cookie = 'popupIniFilesAreNotConsistent=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+    //  Настройки подключения к ПО Термосервер успшено применены
+    const popupTSConnSettingsChanged = getCookie("popupTSConnSettingsChanged");
+    if (popupTSConnSettingsChanged === "OK") {
+        document.getElementById("modal-info-body-message").innerText = "Настройки подключения к ПО Термосервер успешно применены.";
+        $("#modal-info").modal('show');
+        document.cookie = 'popupTSConnSettingsChanged=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+    //  База данных успешно восстановлена из страницы настроек
+    const db_successfully_restored = getCookie("dbRestoredSuccessfully");
+    if (db_successfully_restored === "OK") {
+        document.getElementById("modal-info-body-message").innerText = "База данных успешно восстановлена";
+        $("#modal-info").modal('show');
+        document.cookie = 'dbRestoredSuccessfully=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+    //  Ошибка при загрузке файла на сервер
+    const errorUploadingFile = getCookie("errorUploadingFile");
+    if (errorUploadingFile === "OK") {
+        document.getElementById("modal-info-body-message").innerText = "Ошибка при загрузке файла на сервер";
+        $("#modal-info").modal('show');
+        document.cookie = 'errorUploadingFile=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+    return;
+}
+
+//  Действия при загрузке каждой страницы -------------------------------------------------------------------------------------------------------------------
+document.addEventListener("DOMContentLoaded", () => {
+    modalWindows();
     authGetCurrentUser();                               //  Запрашиваем текущего пользователя из сессии
     getNewAlarmsNumber();                               //  Проверяем наличие новых алармов, чтобы в случае необходимости включить звук
     getConf_ProjectConfArr();                           //  Последовательно запрашиваем конфигурационные массивы из PHP
@@ -47,7 +94,7 @@ document.addEventListener("DOMContentLoaded", () => {
 //  Получение главного конфигурационного массива [[массив с именами (при этом индекс элемента - это id силоса)],[массив с подвесками],[массив с датчиками]]
 function getConf_ProjectConfArr() {
     $.ajax({
-        url: '/webTermometry/currValsFromTS.php',
+        url: '/Thermometry/currValsFromTS.php',
         type: 'POST',
         cache: false,
         data: { 'POST_currValsFromTS_get_project_conf_array': 1 },
@@ -56,7 +103,7 @@ function getConf_ProjectConfArr() {
             //console.log(fromPHP);
             project_conf_array = (JSON.parse(fromPHP));
             //console.log("project conf arr");
-            console.log(project_conf_array);
+            //console.log(project_conf_array);
             //console.log("\n");
             //console.log("keys"+Object.keys(project_conf_array));
             getConf_ArrayOfSiloNames();
@@ -88,7 +135,7 @@ function getConf_ArrayOfSiloNames() {
 //  Получение массива с максимальным количеством подвесок. Необходимо для страницы "Отчет" в сайтбаре с печатными формами
 function getConf_SiloNameWithMaxPodvNumber() {
     $.ajax({
-        url: '/webTermometry/currValsFromTS.php',
+        url: '/Thermometry/currValsFromTS.php',
         type: 'POST',
         cache: false,
         data: { 'POST_currValsFromTS_get_silo_number_with_max_podv_number': 1 },
@@ -205,7 +252,7 @@ function controlAudio(OnOff){
 function alarmsAck() {
 
     $.ajax({
-        url: '/webTermometry/currValsFromTS.php',
+        url: '/Thermometry/currValsFromTS.php',
         type: 'POST',
         cache: false,
         data: { 'POST_currValsFromTS_acknowledge_alarms': 1 },
@@ -221,7 +268,7 @@ function alarmsAck() {
 function getNewAlarmsNumber() {
     
     $.ajax({
-        url: '/webTermometry/currValsFromTS.php',
+        url: '/Thermometry/currValsFromTS.php',
         type: 'POST',
         cache: false,
         data: { 'POST_currValsFromTS_get_number_of_new_alarms': 1 },

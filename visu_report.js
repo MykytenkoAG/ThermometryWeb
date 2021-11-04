@@ -222,9 +222,8 @@ function vRep_addNewTableRow() {
     tbody.appendChild(row);
 
     //  Производим инициализацию элементов select
-    setSelectOptions(input_silo_num, Object.keys(project_conf_array));
-    setSelectOptions(input_podv_num, Object.keys(project_conf_array[silo_name_with_id_0]));
-    setSelectOptions(input_sensor_num, Object.keys(project_conf_array[silo_name_with_id_0][1]));
+    setSelectOptions(input_silo_num, silo_names_array);
+    redrawRowOfSelects(input_silo_num.id);
 
     return;
 }
@@ -255,8 +254,6 @@ const config = {
 let temperatureGraph = new Chart(document.getElementById('temperatureGraph'), config);
 
 
-//  !!!!!
-//  !   Следует заменить на библиотеку PDF Make
 //  Функции для сохранения графика в PDF
 function vRep_Convert() {
     //По нажатию на кнопку получаем канвас
@@ -268,9 +265,27 @@ function vRep_Convert() {
         height: canvas.height,
         width: canvas.width
     };
+
+    let pdfProp = vRep_createBasicPDFPropStructure();
+    //console.log(pdfProp);
+    pdfProp.pageMargins=[20,60,20,20];
+    pdfProp.content.push(
+        {
+            image: canvas.toDataURL("img/silo_round_alarm.png"),
+            width: 800
+        }
+     );
+    createPdf( pdfProp ).open();
+
     // теперь из картинки делаем PDF
-    vRep_createPDF(myImage);
+    //vRep_createPDF(myImage);
 }
+
+
+
+
+
+/*
 //image - должен иметь свойста height,width и data - хранит картинку в base64
 function vRep_createPDF(image) {
     let w = vRep_ConvertPxToMM(image.width);
@@ -284,13 +299,15 @@ function vRep_createPDF(image) {
     docPDF.addImage(image.data, 'PNG', 0, 0);
 
 
+
+
     //Сохраням полученный файл
     //Возможные значения : dataurl, datauristring, bloburl, blob, arraybuffer, ('save', filename)
     docPDF.output('save', 'График температуры.pdf');
 }
 function vRep_ConvertPxToMM(pixels) {
     return Math.floor(pixels * 0.264583);
-}
+}*/
 
 //  Печатные формы ---------------------------------------------------------------------------------------------------------------------------------------
 function vRep_rprtprf_checkDatesAndBlockDownloadButtons(){
@@ -641,8 +658,6 @@ function creatPrintedFormXLSX(JSONObj, field1, field2, field3, field4, sheetHead
         if( currentSheet != ("Силос " + currJSONObj[field2]) ){
             if(i>0){
                 wb.Sheets[currentSheet] = ws;
-                //console.log(getXLSXLastColNumber(ws));
-                //console.log(Object.keys(ws));
             }
             currentSheet = ("Силос " + currJSONObj[field2]);
             if(wb.SheetNames.indexOf(currentSheet)==-1){
@@ -741,7 +756,7 @@ function creatPrintedFormXLSX(JSONObj, field1, field2, field3, field4, sheetHead
 
     return;
 }
-
+//  Получение номера последнего заполненного столбца в текущем листе
 function getXLSXLastColNumber(ws){
 
     const XLSXCells = Object.keys(ws);
@@ -775,4 +790,5 @@ function alphaToNum(alpha) {
     }
   
     return num - 1;
-  }
+
+}

@@ -1,7 +1,7 @@
 <?php
 
-require_once ('auth.php');
-require_once ('currValsFromTS.php');
+require_once ("auth.php");
+require_once ("currValsFromTS.php");
 
 //  Отрисовка таблицы "Типы продукта"
 function vSConf_draw_Prodtypes($dbh, $accessLevel){
@@ -324,17 +324,16 @@ if( isset($_POST['POST_vSConf_prodtypesbysilo_update_list']) ) {
 //  Настройка параметров подключения к Термосервер
 if( isset($_POST['POST_ts_connection_settings_ip']) && isset($_POST['POST_ts_connection_settings_port']) ) {
 
-    echo ($_POST['POST_ts_connection_settings_ip']);
-    echo "<br>";
-    echo ($_POST['POST_ts_connection_settings_port']);
-    echo "<br>";
+    vSConf_ts_connection_settings_save($dbh, $_POST['POST_ts_connection_settings_ip'], $_POST['POST_ts_connection_settings_port']);
 
     if(         (  file_exists($_FILES['POST_termoServerIniFile']['tmp_name']) &&  is_uploaded_file($_FILES['POST_termoServerIniFile']['tmp_name']) ) &&
                 ( !file_exists($_FILES['POST_termoClientIniFile']['tmp_name']) || !is_uploaded_file($_FILES['POST_termoClientIniFile']['tmp_name']) )    ) {
-            echo "Файл TermoClient.ini не был загружен.";
+            setcookie("popupTermoClientIniWasNotUploaded", "OK", time()+60);
+            header('Location: silo_config.php');
     } else if ( (  file_exists($_FILES['POST_termoClientIniFile']['tmp_name']) &&  is_uploaded_file($_FILES['POST_termoClientIniFile']['tmp_name']) ) &&
                 ( !file_exists($_FILES['POST_termoServerIniFile']['tmp_name']) || !is_uploaded_file($_FILES['POST_termoServerIniFile']['tmp_name']) ) ) {
-            echo "Файл TermoServer.ini не был загружен.";
+            setcookie("popupTermoServerIniWasNotUploaded", "OK", time()+60);
+            header('Location: silo_config.php');
     } else if ( ( file_exists($_FILES['POST_termoClientIniFile']['tmp_name']) &&  is_uploaded_file($_FILES['POST_termoClientIniFile']['tmp_name']) ) &&
                 ( file_exists($_FILES['POST_termoServerIniFile']['tmp_name']) &&  is_uploaded_file($_FILES['POST_termoServerIniFile']['tmp_name']) )) {
 
@@ -343,24 +342,34 @@ if( isset($_POST['POST_ts_connection_settings_ip']) && isset($_POST['POST_ts_con
 
         if(is_array($uploadedTermoServerINI) && is_array($uploadedTermoClientINI)){
             if( count($uploadedTermoServerINI)>0 && count($uploadedTermoClientINI)>0){
-                if(doINIFilesMatchEachOther($uploadedTermoServerINI,$uploadedTermoClientINI)){
-                    echo "Файлы прошли проверку. Выполняется обновление конфигурации проекта.";
+                if(areIniFilesConsistent($termoServerINI,$termoClientINI)){
                     //  Перемещаем файлы в папку Settings
                     move_uploaded_file($_FILES['POST_termoServerIniFile']['tmp_name'], "settings/TermoServer.ini");
                     move_uploaded_file($_FILES['POST_termoClientIniFile']['tmp_name'], "settings/TermoClient.ini");
 
+                    $termoServerINI  =	@parse_ini_string(replaceForbiddenChars(file_get_contents('settings/TermoServer.ini')), true);
+                    $termoClientINI  =	@parse_ini_string(replaceForbiddenChars(file_get_contents('settings/TermoClient.ini')), true);
+
+                    projectUpdate($dbh, $termoClientINI, $termoServerINI);
                     header('Location: index.php');
 
                 } else {
-                    echo "Файлы TermoServer.ini и TermoClient.exe не соответствуют друг другу или имеют неподдерживаемый формат;";
+                    setcookie("popupIniFilesAreNotConsistent", "OK", time()+60);
+                    header('Location: silo_config.php');
                 }
             }
         } else {
-            echo "Файлы TermoServer.ini и TermoClient.exe не соответствуют друг другу или имеют неподдерживаемый формат;";
+            setcookie("popupIniFilesAreNotConsistent", "OK", time()+60);
+            header('Location: silo_config.php');
         }
+    } else {
+        setcookie("popupTSConnSettingsChanged", "OK", time()+60);
+        header('Location: silo_config.php');
     }
 
 }
+
+
 
 if( isset($_POST['POST_vSConf_get_ts_connection_settings']) ) {
     echo json_encode(array($IPAddr,$port));
@@ -372,11 +381,7 @@ function vSConf_ts_connection_settings_save($dbh, $ts_ip, $ts_port){
     $stmt = $dbh->prepare($query);
     $stmt->execute();
 
-    return "Настройки подключения к ПО Термосервер успешно применены";
-}
-
-if( isset($_POST['POST_vSConf_ts_connection_settings_save_ip']) && isset($_POST['POST_vSConf_ts_connection_settings_save_port']) ) {
-    echo vSConf_ts_connection_settings_save($dbh, $_POST['POST_vSConf_ts_connection_settings_save_ip'], $_POST['POST_vSConf_ts_connection_settings_save_port']);
+    return;
 }
 
 //  Операции с Базой Данных --------------------------------------------------------------------------------------------------------------------------------
@@ -413,7 +418,8 @@ if(isset($_POST["POST_sconf_db_restore_from_backup"])) {
             header('Location: silo_config.php');                                    //  Перенаправление на ту же страницу, но чтобы произошло событие "DOMContentLoaded"
         }
     } else {
-        echo "Ошибка при загрузке файла на сервер";
+        setcookie("errorUploadingFile", "OK", time()+3600);
+        header('Location: silo_config.php');
     }
 }
 

@@ -2,8 +2,6 @@
 /*
     При наличии активных АПС обе таблицы должны блокироваться
 
-    Добавить возможность загружать файлы TermoClient.ini и TermoServer.ini
-
 */
 
 let arrayOfLevels = [];
@@ -21,19 +19,12 @@ function init_silo_config() {
     SConf_prodtypes_changes_queue.length = 0;
     SConf_prodtypesbysilo_update_list.length = 0;
 
-    const db_successfully_restored = getCookie("dbRestoredSuccessfully");
-    if (db_successfully_restored === "OK") {
-        document.getElementById("modal-info-body-message").innerText = "База данных успешно восстановлена";
-        $("#modal-info").modal('show');
-        document.cookie = 'dbRestoredSuccessfully=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-    }
-
 }
 
 //  Получение массива с текущими уровнями для установки уровня в автоматическом режиме для таблицы "Загрузка силосов"
 function vSConf_getArrayOfLevels() {
     $.ajax({
-        url: '/webTermometry/currValsFromTS.php',
+        url: '/Thermometry/currValsFromTS.php',
         type: 'POST',
         cache: false,
         data: { 'POST_currValsFromTS_get_array_of_levels': 1 },
