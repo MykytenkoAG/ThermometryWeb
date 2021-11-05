@@ -342,7 +342,7 @@ if( isset($_POST['POST_ts_connection_settings_ip']) && isset($_POST['POST_ts_con
 
         if(is_array($uploadedTermoServerINI) && is_array($uploadedTermoClientINI)){
             if( count($uploadedTermoServerINI)>0 && count($uploadedTermoClientINI)>0){
-                if(areIniFilesConsistent($termoServerINI,$termoClientINI)){
+                if(areIniFilesConsistent($uploadedTermoServerINI,$uploadedTermoClientINI)){
                     //  Перемещаем файлы в папку Settings
                     move_uploaded_file($_FILES['POST_termoServerIniFile']['tmp_name'], "settings/TermoServer.ini");
                     move_uploaded_file($_FILES['POST_termoClientIniFile']['tmp_name'], "settings/TermoClient.ini");

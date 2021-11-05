@@ -4,7 +4,7 @@ function init_report() {
     //  Блокировка кнопок "Скачать PDF" и "Скачать XLSX"
     vRep_rprtprf_checkDatesAndBlockDownloadButtons();
     //  Инициализация элементов select печатных форм
-    setSelectOptions(document.getElementById("rprtprf_silo_1"),   ["all"].concat(silo_names_array));
+    setSelectOptions(document.getElementById("rprtprf_silo_1"), ["all"].concat(silo_names_array));
     redrawRowOfSelects("rprtprf_silo_1");
     //  Отключены элементов select в зависимости от положения радиокнопки
     vRep_prfSelectsDisable();
@@ -103,10 +103,12 @@ function vRep_addNewLineOnChart() {
         url: 'visu_report.php',
         type: 'POST',
         cache: false,
-        data: { 'POST_vRep_getTableForChart_silo_name': silo_name,
-                'POST_vRep_getTableForChart_podv_id': podv_id - 1,
-                'POST_vRep_getTableForChart_sensor_num': sensor_num - 1,
-                'POST_vRep_getTableForChart_period': period },
+        data: {
+            'POST_vRep_getTableForChart_silo_name': silo_name,
+            'POST_vRep_getTableForChart_podv_id': podv_id - 1,
+            'POST_vRep_getTableForChart_sensor_num': sensor_num - 1,
+            'POST_vRep_getTableForChart_period': period
+        },
         dataType: 'html',
         success: function(fromPHP) {
 
@@ -258,61 +260,21 @@ let temperatureGraph = new Chart(document.getElementById('temperatureGraph'), co
 function vRep_Convert() {
     //По нажатию на кнопку получаем канвас
     var canvas = document.getElementById('temperatureGraph');
-    // И создаем из него картиику в base64
-    var quality = 1; // качество от 0 до 1, заодно и сжать можно
-    var myImage = {
-        data: canvas.toDataURL('image/png', quality),
-        height: canvas.height,
-        width: canvas.width
-    };
 
     let pdfProp = vRep_createBasicPDFPropStructure();
     //console.log(pdfProp);
-    pdfProp.pageMargins=[20,60,20,20];
-    pdfProp.content.push(
-        {
-            image: canvas.toDataURL("img/silo_round_alarm.png"),
-            width: 800
-        }
-     );
-    createPdf( pdfProp ).open();
-
-    // теперь из картинки делаем PDF
-    //vRep_createPDF(myImage);
+    pdfProp.pageMargins = [20, 60, 20, 20];
+    pdfProp.content.push({
+        image: canvas.toDataURL("img/silo_round_alarm.png"),
+        width: 800
+    });
+    createPdf(pdfProp).open();
 }
-
-
-
-
-
-/*
-//image - должен иметь свойста height,width и data - хранит картинку в base64
-function vRep_createPDF(image) {
-    let w = vRep_ConvertPxToMM(image.width);
-    let h = vRep_ConvertPxToMM(image.height);
-    var orientation = w > h ? 'l' : 'p';
-
-    //Создаем документ PDF размером с нашу картинку
-    var docPDF = new jsPDF(orientation, 'mm', [w, h]);
-    //рисуем картинку на всю страницу
-
-    docPDF.addImage(image.data, 'PNG', 0, 0);
-
-
-
-
-    //Сохраням полученный файл
-    //Возможные значения : dataurl, datauristring, bloburl, blob, arraybuffer, ('save', filename)
-    docPDF.output('save', 'График температуры.pdf');
-}
-function vRep_ConvertPxToMM(pixels) {
-    return Math.floor(pixels * 0.264583);
-}*/
 
 //  Печатные формы ---------------------------------------------------------------------------------------------------------------------------------------
-function vRep_rprtprf_checkDatesAndBlockDownloadButtons(){
+function vRep_rprtprf_checkDatesAndBlockDownloadButtons() {
 
-    if(vRep_rprtprf_getArrayOfDates().length==0){
+    if (vRep_rprtprf_getArrayOfDates().length == 0) {
         document.getElementById("rprtprf-btn-download-PDF").disabled = true;
         document.getElementById("rprtprf-btn-download-XLS").disabled = true;
     } else {
@@ -325,7 +287,7 @@ function vRep_rprtprf_checkDatesAndBlockDownloadButtons(){
 
 //  Получение массивов входных данных для создания печатных форм
 //  Получение массива дат
-function vRep_rprtprf_getArrayOfDates(){
+function vRep_rprtprf_getArrayOfDates() {
 
     let arrayOfDates = [];
 
@@ -343,7 +305,7 @@ function vRep_rprtprf_getArrayOfDates(){
     return arrayOfDates;
 }
 //  Получение массива силосов
-function vRep_rprtprf_getArrayOfSilo(){
+function vRep_rprtprf_getArrayOfSilo() {
 
     let arrayOfSilo = [];
     let currSilo = document.getElementById("rprtprf_silo_1");
@@ -362,7 +324,7 @@ function vRep_rprtprf_getArrayOfSilo(){
     return arrayOfSilo;
 }
 //  Получение массива подвесок
-function vRep_rprtprf_getArrayOfPodv(){
+function vRep_rprtprf_getArrayOfPodv() {
 
     let arrayOfPodvs = [];
     let currPodv = document.getElementById("rprtprf_podv_1");
@@ -381,7 +343,7 @@ function vRep_rprtprf_getArrayOfPodv(){
     return arrayOfPodvs;
 }
 //  Получение массива датчиков
-function vRep_rprtprf_getArrayOfSensors(){
+function vRep_rprtprf_getArrayOfSensors() {
 
     let arrayOfSensors = [];
     let currSensor = document.getElementById("rprtprf_sensor_1");
@@ -400,8 +362,8 @@ function vRep_rprtprf_getArrayOfSensors(){
     return arrayOfSensors;
 }
 //  Получение массива слоев
-function vRep_rprtprf_getArrayOfLayers(){
-    
+function vRep_rprtprf_getArrayOfLayers() {
+
     let arrayOfLayers = [];
     let currLayer = document.getElementById("rprtprf_layer_1");
 
@@ -421,7 +383,7 @@ function vRep_rprtprf_getArrayOfLayers(){
 
 //  Функции для сохранения печатных форм в формате PDF и XLSX
 //  Функиця для получение JSON-объекта из PHP
-function vRep_getJSONForPrintedForms(fileFormat){
+function vRep_getJSONForPrintedForms(fileFormat) {
 
     const arrayOfDates = vRep_rprtprf_getArrayOfDates();
 
@@ -434,9 +396,11 @@ function vRep_getJSONForPrintedForms(fileFormat){
             url: 'visu_report.php',
             type: 'POST',
             cache: false,
-            data: { 'POST_vRep_getAvgTemperByLayer_arrayOfSilos': arrayOfSilo,
-                    'POST_vRep_getAvgTemperByLayer_arrayOfLayers': arrayOfLayers,
-                    'POST_vRep_getAvgTemperByLayer_arrayOfDates': arrayOfDates },
+            data: {
+                'POST_vRep_getAvgTemperByLayer_arrayOfSilos': arrayOfSilo,
+                'POST_vRep_getAvgTemperByLayer_arrayOfLayers': arrayOfLayers,
+                'POST_vRep_getAvgTemperByLayer_arrayOfDates': arrayOfDates
+            },
             dataType: 'html',
             success: function(fromPHP) {
                 const field1 = 'date';
@@ -444,9 +408,9 @@ function vRep_getJSONForPrintedForms(fileFormat){
                 const field3 = '';
                 const field4 = 'layerTemperatures';
                 const sheetHeader = 'Данные о средних температурах по слоям';
-                if(fileFormat==="PDF"){
+                if (fileFormat === "PDF") {
                     createPrintedFormPDF(JSON.parse(fromPHP), field1, field2, field3, field4, sheetHeader);
-                } else if (fileFormat==="XLSX"){
+                } else if (fileFormat === "XLSX") {
                     creatPrintedFormXLSX(JSON.parse(fromPHP), field1, field2, field3, field4, sheetHeader);
                 }
             }
@@ -461,9 +425,11 @@ function vRep_getJSONForPrintedForms(fileFormat){
             url: 'visu_report.php',
             type: 'POST',
             cache: false,
-            data: { 'POST_vRep_getSensorTemperByLayer_arrayOfSilos': arrayOfSilo,
-                    'POST_vRep_getSensorTemperByLayer_arrayOfLayers': arrayOfLayers,
-                    'POST_vRep_getSensorTemperByLayer_arrayOfDates': arrayOfDates },
+            data: {
+                'POST_vRep_getSensorTemperByLayer_arrayOfSilos': arrayOfSilo,
+                'POST_vRep_getSensorTemperByLayer_arrayOfLayers': arrayOfLayers,
+                'POST_vRep_getSensorTemperByLayer_arrayOfDates': arrayOfDates
+            },
             dataType: 'html',
             success: function(fromPHP) {
                 const field1 = 'date';
@@ -471,9 +437,9 @@ function vRep_getJSONForPrintedForms(fileFormat){
                 const field3 = 'layer';
                 const field4 = 'sensorTemperatures';
                 const sheetHeader = 'Данные о температуре каждого датчика в слоях';
-                if(fileFormat==="PDF"){
+                if (fileFormat === "PDF") {
                     createPrintedFormPDF(JSON.parse(fromPHP), field1, field2, field3, field4, sheetHeader);
-                } else if (fileFormat==="XLSX"){
+                } else if (fileFormat === "XLSX") {
                     creatPrintedFormXLSX(JSON.parse(fromPHP), field1, field2, field3, field4, sheetHeader);
                 }
             }
@@ -489,10 +455,12 @@ function vRep_getJSONForPrintedForms(fileFormat){
             url: 'visu_report.php',
             type: 'POST',
             cache: false,
-            data: { 'POST_vRep_getSensorTemperByPodv_arrayOfSilos': arrayOfSilo,
-                    'POST_vRep_getSensorTemperByPodv_arrayOfPodv': arrayOfPodvs,
-                    'POST_vRep_getSensorTemperByPodv_arrayOfSensors': arrayOfSensors,
-                    'POST_vRep_getSensorTemperByPodv_arrayOfDates': arrayOfDates },
+            data: {
+                'POST_vRep_getSensorTemperByPodv_arrayOfSilos': arrayOfSilo,
+                'POST_vRep_getSensorTemperByPodv_arrayOfPodv': arrayOfPodvs,
+                'POST_vRep_getSensorTemperByPodv_arrayOfSensors': arrayOfSensors,
+                'POST_vRep_getSensorTemperByPodv_arrayOfDates': arrayOfDates
+            },
             dataType: 'html',
             success: function(fromPHP) {
                 const field1 = 'date';
@@ -500,9 +468,9 @@ function vRep_getJSONForPrintedForms(fileFormat){
                 const field3 = 'podv';
                 const field4 = 'sensorTemperatures';
                 const sheetHeader = 'Данные о температурах каждого датчика в подвеске';
-                if(fileFormat==="PDF"){
+                if (fileFormat === "PDF") {
                     createPrintedFormPDF(JSON.parse(fromPHP), field1, field2, field3, field4, sheetHeader);
-                } else if (fileFormat==="XLSX"){
+                } else if (fileFormat === "XLSX") {
                     creatPrintedFormXLSX(JSON.parse(fromPHP), field1, field2, field3, field4, sheetHeader);
                 }
             }
@@ -514,217 +482,228 @@ function vRep_getJSONForPrintedForms(fileFormat){
 }
 
 //  Создание объекта с базовыми свойствами PDF-документа
-function vRep_createBasicPDFPropStructure(){
+function vRep_createBasicPDFPropStructure() {
 
     let pdfProp = {};
     pdfProp.pageSize = "a4";
     pdfProp.pageOrientation = "landscape";
-    pdfProp.pageMargins = [20,30,20,20];
+    pdfProp.pageMargins = [20, 30, 20, 20];
     pdfProp.styles = {};
     pdfProp.styles.header = {};
     pdfProp.styles.header.fontSize = 18;
     pdfProp.styles.header.bold = true;
     pdfProp.styles.header.alignment = "center";
-    pdfProp.styles.header.margin = [0,0,0,10];
+    pdfProp.styles.header.margin = [0, 0, 0, 10];
     pdfProp.content = [];
 
     return pdfProp;
 }
 
 //  Функция создания двухмерного массива для текущей даты, который можно будет вставить в PDF и XLSX документ
-function vRep_create2dTableForCurrDate(JSONObj, field, tableHeader, col1Header, col2Header){
+function vRep_create2dTableForCurrDate(JSONObj, field, tableHeader, col1Header, col2Header) {
 
-    let outArr=[];
-    outArr[0]=[{text:  tableHeader, style: 'tableHeader', colSpan: 2, alignment: 'center'},{}];
-    outArr.push( [col1Header, col2Header] );
+    let outArr = [];
+    outArr[0] = [{ text: tableHeader, style: 'tableHeader', colSpan: 2, alignment: 'center' }, {}];
+    outArr.push([col1Header, col2Header]);
 
-    for(let i=0; i<JSONObj[field].length; i++){
+    for (let i = 0; i < JSONObj[field].length; i++) {
         const currKey = Object.keys(JSONObj[field][i])[0];
-        outArr.push( [currKey, JSONObj[field][i][currKey]] );
+        outArr.push([currKey, JSONObj[field][i][currKey]]);
     }
 
     return outArr;
 }
 
-function createPrintedFormPDF(JSONObj, field1, field2, field3, field4, sheetHeader){
+function createPrintedFormPDF(JSONObj, field1, field2, field3, field4, sheetHeader) {
 
     //  console.log(JSONObj);
 
     let pdfProp = vRep_createBasicPDFPropStructure();
-    let field; let col1Header; let col2Header; let tableHeader;
+    let field;
+    let col1Header;
+    let col2Header;
+    let tableHeader;
 
-    if (sheetHeader==="Данные о средних температурах по слоям") {
+    if (sheetHeader === "Данные о средних температурах по слоям") {
         field = field4;
         col1Header = "Слой №";
         col2Header = "Средняя\nтемпература";
-    } else if (sheetHeader==="Данные о температуре каждого датчика в слоях"){
+    } else if (sheetHeader === "Данные о температуре каждого датчика в слоях") {
         field = field4;
         col1Header = "Подв. №";
         col2Header = "Температура";
-    } else if (sheetHeader==="Данные о температурах каждого датчика в подвеске"){
+    } else if (sheetHeader === "Данные о температурах каждого датчика в подвеске") {
         field = field4;
         col1Header = "Дат. №";
         col2Header = "Температура";
     }
 
-    let j=-1;
-    for(let i=0; i<JSONObj.length; i++){
+    let j = -1;
+    for (let i = 0; i < JSONObj.length; i++) {
 
         const currJSONObj = JSONObj[i];
 
-        if (sheetHeader==="Данные о средних температурах по слоям") {
-            tableHeader = "Силос " + currJSONObj[field2]+"\n"+ "Дата: " + currJSONObj[field1].split(" ")[0] + "\n" + currJSONObj[field1].split(" ")[1];
-        } else if (sheetHeader==="Данные о температуре каждого датчика в слоях"){
-            tableHeader = "Силос " + currJSONObj[field2]+"\n"+ "Дата: " + currJSONObj[field1].split(" ")[0] + "\n" + currJSONObj[field1].split(" ")[1] + "\n" + "Слой " + currJSONObj[field3];
-        } else if (sheetHeader==="Данные о температурах каждого датчика в подвеске"){
-            tableHeader = "Силос " + currJSONObj[field2]+"\n"+ "Дата: " + currJSONObj[field1].split(" ")[0] + "\n" + currJSONObj[field1].split(" ")[1] + "\n" + "Подвеска " + currJSONObj[field3];
+        if (sheetHeader === "Данные о средних температурах по слоям") {
+            tableHeader = "Силос " + currJSONObj[field2] + "\n" + "Дата: " + currJSONObj[field1].split(" ")[0] + "\n" + currJSONObj[field1].split(" ")[1];
+        } else if (sheetHeader === "Данные о температуре каждого датчика в слоях") {
+            tableHeader = "Силос " + currJSONObj[field2] + "\n" + "Дата: " + currJSONObj[field1].split(" ")[0] + "\n" + currJSONObj[field1].split(" ")[1] + "\n" + "Слой " + currJSONObj[field3];
+        } else if (sheetHeader === "Данные о температурах каждого датчика в подвеске") {
+            tableHeader = "Силос " + currJSONObj[field2] + "\n" + "Дата: " + currJSONObj[field1].split(" ")[0] + "\n" + currJSONObj[field1].split(" ")[1] + "\n" + "Подвеска " + currJSONObj[field3];
         }
-        
-        if(i==0 || (i%6==0)){
+
+        if (i == 0 || (i % 6 == 0)) {
             j++;
-            pdfProp.content.push( {text: sheetHeader, style: 'header', alignment: 'center'} );
+            pdfProp.content.push({ text: sheetHeader, style: 'header', alignment: 'center' });
             j++;
-            pdfProp.content.push( {pageBreak: 'after', layout: 'noBorders', table: {} } );
-            pdfProp.content[j].table = {body:[[  ]]};
+            pdfProp.content.push({ pageBreak: 'after', layout: 'noBorders', table: {} });
+            pdfProp.content[j].table = { body: [
+                    []
+                ] };
 
             //pdfProp.content[j].table.body[0] = [ { table:{ body: vRep_create2dTableForCurrDate(currJSONObj, field, tableHeader, col1Header, col2Header) } } ];
             //continue;
         }
-        pdfProp.content[j].table.body[0].push(   { table:{ body: vRep_create2dTableForCurrDate(currJSONObj, field, tableHeader, col1Header, col2Header) } } );
-        if(i==JSONObj.length-1){
+        pdfProp.content[j].table.body[0].push({ table: { body: vRep_create2dTableForCurrDate(currJSONObj, field, tableHeader, col1Header, col2Header) } });
+        if (i == JSONObj.length - 1) {
             pdfProp.content[j].pageBreak = "";
         }
     }
 
-    createPdf( pdfProp ).open();
+    createPdf(pdfProp).open();
 
     return;
 }
 
 //  Сохранение XLSX-файла
-function vRep_saveXLSX(wb, sheetHeader){
+function vRep_saveXLSX(wb, sheetHeader) {
 
-    var wbout = XLSX.write(wb, {bookType:'xlsx',  type: 'binary'});
+    var wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
     function s2ab(s) {
-            var buf = new ArrayBuffer(s.length);
-            var view = new Uint8Array(buf);
-            for (var i=0; i<s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
-            return buf;
+        var buf = new ArrayBuffer(s.length);
+        var view = new Uint8Array(buf);
+        for (var i = 0; i < s.length; i++) view[i] = s.charCodeAt(i) & 0xFF;
+        return buf;
     }
 
-    saveAs(new Blob([s2ab(wbout)],{type:"application/octet-stream"}), (sheetHeader+'.xlsx'));
+    saveAs(new Blob([s2ab(wbout)], { type: "application/octet-stream" }), (sheetHeader + '.xlsx'));
 
     return;
 }
 
-function creatPrintedFormXLSX(JSONObj, field1, field2, field3, field4, sheetHeader){
+function creatPrintedFormXLSX(JSONObj, field1, field2, field3, field4, sheetHeader) {
 
     var wb = XLSX.utils.book_new();
     wb.Props = {
-            Title: "Printed forms",
-            Subject: "Printed form",
-            Author: "NE",
-            CreatedDate: new Date(2021,10,31)
+        Title: "Printed forms",
+        Subject: "Printed form",
+        Author: "NE",
+        CreatedDate: new Date(2021, 10, 31)
     };
 
     //  Координаты текущей ячейки
-    let currentCol = 0; let currentRow = 0;
+    let currentCol = 0;
+    let currentRow = 0;
 
     //  Заголовок таблицы
     let ws;
 
-    let field; let col1Header; let col2Header; let tableHeader;
+    let field;
+    let col1Header;
+    let col2Header;
+    let tableHeader;
     let currentSheet;
 
     //  Переменные для функции vRep_create2dTableForCurrDate()
-    if (sheetHeader==="Данные о средних температурах по слоям") {
+    if (sheetHeader === "Данные о средних температурах по слоям") {
         field = field4;
         col1Header = "Слой №";
         col2Header = "Средняя\nтемпература";
-    } else if (sheetHeader==="Данные о температуре каждого датчика в слоях"){
+    } else if (sheetHeader === "Данные о температуре каждого датчика в слоях") {
         field = field4;
         col1Header = "Подв. №";
         col2Header = "Температура";
-    } else if (sheetHeader==="Данные о температурах каждого датчика в подвеске"){
+    } else if (sheetHeader === "Данные о температурах каждого датчика в подвеске") {
         field = field4;
         col1Header = "Дат. №";
         col2Header = "Температура";
     }
 
-    for(let i=0; i<JSONObj.length; i++ ){
+    for (let i = 0; i < JSONObj.length; i++) {
 
         const currJSONObj = JSONObj[i];
 
-        if( currentSheet != ("Силос " + currJSONObj[field2]) ){
-            if(i>0){
+        if (currentSheet != ("Силос " + currJSONObj[field2])) {
+            if (i > 0) {
                 wb.Sheets[currentSheet] = ws;
             }
             currentSheet = ("Силос " + currJSONObj[field2]);
-            if(wb.SheetNames.indexOf(currentSheet)==-1){
+            if (wb.SheetNames.indexOf(currentSheet) == -1) {
                 //  Создание нового листа
                 wb.SheetNames.push(currentSheet);
                 //  Инициализация нового листа
-                ws = XLSX.utils.json_to_sheet([ { A: "" } ], {header: ["A"], skipHeader: true});
-                currentCol = 0; currentRow = 0;
+                ws = XLSX.utils.json_to_sheet([{ A: "" }], { header: ["A"], skipHeader: true });
+                currentCol = 0;
+                currentRow = 0;
             } else {
                 ws = wb.Sheets[currentSheet];
                 currentCol = getXLSXLastColNumber(wb.Sheets[currentSheet]) + 5;
                 currentRow = 0;
             }
-            
+
         }
 
-        if (sheetHeader==="Данные о средних температурах по слоям") {
-            
+        if (sheetHeader === "Данные о средних температурах по слоям") {
+
             XLSX.utils.sheet_add_json(ws, [
                 ["Дата: " + currJSONObj[field1].split(" ")[0]]
-            ], {skipHeader: true, origin: {c:currentCol, r:currentRow} });
+            ], { skipHeader: true, origin: { c: currentCol, r: currentRow } });
 
             currentRow++;
 
             XLSX.utils.sheet_add_json(ws, [
                 [currJSONObj[field1].split(" ")[1]]
-            ], {skipHeader: true, origin: {c:currentCol, r:currentRow} });
+            ], { skipHeader: true, origin: { c: currentCol, r: currentRow } });
 
             currentRow++;
 
-        } else if (sheetHeader==="Данные о температуре каждого датчика в слоях"){
-            
+        } else if (sheetHeader === "Данные о температуре каждого датчика в слоях") {
+
             XLSX.utils.sheet_add_json(ws, [
                 ["Дата: " + currJSONObj[field1].split(" ")[0]]
-            ], {skipHeader: true, origin: {c:currentCol, r:currentRow} });
+            ], { skipHeader: true, origin: { c: currentCol, r: currentRow } });
 
             currentRow++;
 
             XLSX.utils.sheet_add_json(ws, [
                 [currJSONObj[field1].split(" ")[1]]
-            ], {skipHeader: true, origin: {c:currentCol, r:currentRow} });
+            ], { skipHeader: true, origin: { c: currentCol, r: currentRow } });
 
             currentRow++;
 
             XLSX.utils.sheet_add_json(ws, [
                 ["Слой " + currJSONObj[field3]]
-            ], {skipHeader: true, origin: {c:currentCol, r:currentRow} });
+            ], { skipHeader: true, origin: { c: currentCol, r: currentRow } });
 
             currentRow++;
 
-        } else if (sheetHeader==="Данные о температурах каждого датчика в подвеске"){
-            
+        } else if (sheetHeader === "Данные о температурах каждого датчика в подвеске") {
+
             XLSX.utils.sheet_add_json(ws, [
                 ["Дата: " + currJSONObj[field1].split(" ")[0]]
-            ], {skipHeader: true, origin: {c:currentCol, r:currentRow} });
+            ], { skipHeader: true, origin: { c: currentCol, r: currentRow } });
 
             currentRow++;
 
             XLSX.utils.sheet_add_json(ws, [
                 [currJSONObj[field1].split(" ")[1]]
-            ], {skipHeader: true, origin: {c:currentCol, r:currentRow} });
+            ], { skipHeader: true, origin: { c: currentCol, r: currentRow } });
 
             currentRow++;
 
             XLSX.utils.sheet_add_json(ws, [
                 ["Подвеска " + currJSONObj[field3]]
-            ], {skipHeader: true, origin: {c:currentCol, r:currentRow} });
+            ], { skipHeader: true, origin: { c: currentCol, r: currentRow } });
 
             currentRow++;
 
@@ -732,21 +711,22 @@ function creatPrintedFormXLSX(JSONObj, field1, field2, field3, field4, sheetHead
 
         const currDateTemperatures = vRep_create2dTableForCurrDate(currJSONObj, field, "", col1Header, col2Header);
 
-        for(let j=1; j<currDateTemperatures.length; j++){
+        for (let j = 1; j < currDateTemperatures.length; j++) {
 
             XLSX.utils.sheet_add_json(ws, [
                 currDateTemperatures[j]
-            ], {skipHeader: true, origin: {c:currentCol, r:currentRow} });
+            ], { skipHeader: true, origin: { c: currentCol, r: currentRow } });
 
             currentRow++;
 
         }
 
-        currentCol +=3; currentRow = 0;
+        currentCol += 3;
+        currentRow = 0;
 
-        
 
-        if(i==JSONObj.length-1){
+
+        if (i == JSONObj.length - 1) {
             wb.Sheets[currentSheet] = ws;
         }
 
@@ -757,20 +737,20 @@ function creatPrintedFormXLSX(JSONObj, field1, field2, field3, field4, sheetHead
     return;
 }
 //  Получение номера последнего заполненного столбца в текущем листе
-function getXLSXLastColNumber(ws){
+function getXLSXLastColNumber(ws) {
 
     const XLSXCells = Object.keys(ws);
 
     let lastColNumber = 0;
 
-    for(let i=0; i<XLSXCells.length; i++){
+    for (let i = 0; i < XLSXCells.length; i++) {
 
-        if(XLSXCells[i][0]==="!"){
+        if (XLSXCells[i][0] === "!") {
             continue;
         }
 
         const currColNumber = alphaToNum(XLSXCells[i].match(/[A-Za-z]+/)[0]);
-        if(currColNumber > lastColNumber){
+        if (currColNumber > lastColNumber) {
             lastColNumber = currColNumber;
         }
 
@@ -784,11 +764,11 @@ function alphaToNum(alpha) {
     var i = 0,
         num = 0,
         len = alpha.length;
-  
+
     for (; i < len; i++) {
-      num = num * 26 + alpha.charCodeAt(i) - 0x40;
+        num = num * 26 + alpha.charCodeAt(i) - 0x40;
     }
-  
+
     return num - 1;
 
 }

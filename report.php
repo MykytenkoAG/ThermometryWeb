@@ -7,9 +7,11 @@
       require_once "head.php";
       require_once('visu_report.php');
     ?>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.2/pdfmake.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.2/vfs_fonts.min.js"></script>
-    <script src="node_modules/xlsx/dist/xlsx.full.min.js"></script>
+
+    <script src="libs/pdfmake.min.js"></script>
+    <script src="libs/vfs_fonts.js"></script>
+    <script src="libs/xlsx.full.min.js"></script>
+
   </head>
   <body>
       <?php
@@ -154,8 +156,9 @@
                 </div>
                 <canvas id="temperatureGraph"></canvas>
 
-                <script type="text/javascript" src="node_modules/chart.js/dist/chart.js"></script>
-                <script src="node_modules/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.js"></script>
+                <script type="text/javascript" src="libs/chart.js"></script>
+                <script src="libs/chartjs-adapter-date-fns.bundle.js"></script>
+
                 <script type="text/javascript" src="visu_report.js"></script>               
 
               </div>
@@ -247,14 +250,6 @@
         </div>
       </main>
       
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.8.0/html2pdf.bundle.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.5/jspdf.debug.js"></script>
-
-
-      
-      
-      <script src="node_modules/html2pdf.js/dist/html2pdf.js"></script>
-      <script src="node_modules/html2canvas/dist/html2canvas.min.js"></script>
   </body>
 
 </html>
