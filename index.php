@@ -121,7 +121,7 @@
 
                 <div class="row row-cols-2">
 
-                  <div class="col-1 col-sm-1 col-md-0 col-lg-0 col-xl-0 col-xxl-0" style="height: 20vh;"></div>
+                  <div class="col-1 col-sm-1 col-md-0 col-lg-0 col-xl-0 col-xxl-0" style="height: 10vh;"></div>
 
                   <div class="col-10 col-sm-10 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
                     <?php

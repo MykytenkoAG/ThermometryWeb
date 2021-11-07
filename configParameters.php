@@ -2,10 +2,11 @@
 
 $simulation_mode = true;
 $debugPageDisableElements = $simulation_mode ? "" : "disabled";
+mb_internal_encoding("UTF-8");
 //	Необходимые параметры для подключения к БД
 const servername = "localhost"; const username = "root"; const password = ""; const dbname = "zernoib";
 //	Создание объекта PDO для работы с Базой Данных
-$dbh = new PDO("mysql:host=".servername.";dbname=".dbname, username, password/*, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]*/);
+$dbh = new PDO("mysql:host=".servername.";dbname=".dbname.";charset=utf8;", username, password/*, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]*/);
 
 //	Подключение к TermoServer
 $IPAddr; $port;

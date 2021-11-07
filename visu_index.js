@@ -168,6 +168,10 @@ function vIndOnClickOnSilo(silo_id) {
     vIndRedrawTableCurrentAlarms();         //  Перерисовываем таблицу с текущими алармами
     vIndRedrawSiloStatus();                 //  Показываем текущий статус каждого силоса
 
+    if (typeof silo_id !== 'undefined') {
+        document.getElementById("current-silo-name").innerHTML = "Силос " + silo_names_array[silo_id.split("-").pop()];
+    }
+
     lastSiloID = silo_id;
 
 }
@@ -204,8 +208,6 @@ function vIndredrawTblProdParameters(silo_id) {
                 document.getElementById("ind-prod-tbl-6-rng-t-min").innerHTML = JSON.parse(fromPHP)[9];
                 document.getElementById("ind-prod-tbl-6-rng-t-max").innerHTML = JSON.parse(fromPHP)[10];
                 document.getElementById("ind-prod-tbl-6-v-max").innerHTML = JSON.parse(fromPHP)[11];
-
-                document.getElementById("current-silo-name").innerHTML = "Силос " + silo_names_array[silo_id.split("-").pop()];
                 
             } catch (e) {
                 return;

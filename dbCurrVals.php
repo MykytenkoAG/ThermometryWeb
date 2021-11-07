@@ -5,33 +5,62 @@ require_once('currValsFromTS.php');
 
 //	Функция для записи значений из массива $arrayOfLevels в Базу Данных
 function db_update_grainLevels($dbh, $arrayOfLevels){
-	//	Определяем, есть ли силоса с автоматическим определением уровня
-	$query = "SELECT count(silo_id) FROM prodtypesbysilo WHERE grain_level_fromTS=1";
-	$sth = $dbh->query($query);
 
-	if($sth->fetch()['count(silo_id)']==0){				
-		return;
-	}
-	//	Если есть, обновляем значения из $arrayOfLevels
-	$query = "SELECT silo_id, grain_level_fromTS
-				FROM prodtypesbysilo;";
+	$query = "	SELECT	silo_id, silo_name, bs_addr, product_id,
+						grain_level_fromTS, grain_level,
+						is_square, size, position_col, position_row, silo_group
+					FROM zernoib.prodtypesbysilo;";
 
 	$sth = $dbh->query($query);
 	$rows = $sth->fetchAll();
 
-	$silo_id_arr=array();
+	$query = "INSERT INTO zernoib.prodtypesbysilo
+			   		(silo_id, silo_name, bs_addr, product_id,
+					 grain_level_fromTS, grain_level,
+					 is_square, size, position_col, position_row, silo_group)
+			  VALUES ";
 
-	$query="UPDATE prodtypesbysilo SET grain_level = (CASE ";
-
-	for($i=0;$i<count($rows);$i++){
-		if($rows[$i]['grain_level_fromTS']==1){
-			$query.="WHEN silo_id = ".$i." THEN ".$arrayOfLevels[$i]." ";
-			array_push($silo_id_arr,$i);
-		}
+	for($i=0; $i<count($arrayOfLevels); $i++){
+				//	silo_id
+		$query .= "(".$rows[$i]['silo_id'].", ";
+				//	silo_name
+				$query .= "'".$rows[$i]['silo_name']."', ";
+				//	bs_addr
+				$query .= "'".$rows[$i]['bs_addr']."', ";
+				//	product_id
+				$query .= "'".$rows[$i]['product_id']."', ";
+				//	grain_level_fromTS
+				$query .= "'".$rows[$i]['grain_level_fromTS']."', ";
+				//	grain_level
+				if($rows[$i]['grain_level_fromTS']==1){
+					$query .= "'".$arrayOfLevels[$i]."', ";
+				} else {
+					$query .= "'".$rows[$i]['grain_level']."', ";
+				}				
+				//	is_square
+				$query .= "'".$rows[$i]['is_square']."', ";
+				//	size
+				$query .= "'".$rows[$i]['size']."', ";
+				//	position_col
+				$query .= "'".$rows[$i]['position_col']."', ";
+				//	position_row
+				$query .= "'".$rows[$i]['position_row']."', ";
+				//	silo_group
+				$query .= "'".$rows[$i]['silo_group']."'),";
 	}
 
-	$query.=" END) WHERE silo_id IN (".implode(",", $silo_id_arr).");";
-
+	$query = substr($query,0,-1)
+	." ON DUPLICATE KEY UPDATE	silo_id=VALUES(silo_id),
+								silo_name=VALUES(silo_name),
+								bs_addr=VALUES(bs_addr),
+								product_id=VALUES(product_id),
+								grain_level_fromTS=VALUES(grain_level_fromTS),
+								grain_level=VALUES(grain_level),
+								is_square=VALUES(is_square),
+								size=VALUES(size),
+								position_col=VALUES(position_col),
+								position_row=VALUES(position_row),
+								silo_group=VALUES(silo_group);";
 	$stmt = $dbh->prepare($query);
 	$stmt->execute();
 	
@@ -90,7 +119,8 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 
 				if($rows[$sensor_id]['is_enabled']==0){
 
-					$curr_t_text = "'off'";
+					$curr_t_text = "'откл.'";
+					//$curr_t_text = "'off.'";
 
 				} else if ($arrayOfTemperatures[$i][$j][$k] < 850 ){
 
@@ -105,7 +135,8 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 
 				if($rows[$sensor_id]['is_enabled']==0){
 
-					$curr_v_text = "'off'";
+					$curr_v_text = "'откл.'";
+					//$curr_v_text = "'off.'";
 
 				} else if($arrayOfTemperatures[$i][$j][$k] < 850 ){
 

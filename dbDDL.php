@@ -154,8 +154,8 @@ function ddl_create_Sensors($dbh){
 			  is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
 			  current_temperature FLOAT NOT NULL,
 			  current_speed FLOAT NOT NULL,
-			  curr_t_text VARCHAR(7) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0.0',
-			  curr_v_text VARCHAR(7) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0.0',
+			  curr_t_text VARCHAR(16) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0.0',
+			  curr_v_text VARCHAR(16) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '0.0',
 			  curr_t_colour VARCHAR(7) NOT NULL DEFAULT '#FFFFFF',
 			  curr_v_colour VARCHAR(7) NOT NULL DEFAULT '#FFFFFF',
 			  server_date TIMESTAMP NULL DEFAULT NULL,
@@ -183,7 +183,7 @@ function ddl_create_Measurements($dbh){
 	$query = "CREATE TABLE IF NOT EXISTS zernoib.measurements
 			 (date_id INT NOT NULL,
 			  sensor_id INT NOT NULL,
-			  temperature FLOAT NOT NULL,
+			  temperature FLOAT NULL,
 			  INDEX (date_id),
 			  CONSTRAINT measurements_fk_date_id FOREIGN KEY (date_id) REFERENCES dates(date_id) ON DELETE RESTRICT ON UPDATE RESTRICT,
 			  CONSTRAINT measurements_fk_sensor_id FOREIGN KEY (sensor_id) REFERENCES sensors(sensor_id) ON DELETE RESTRICT ON UPDATE RESTRICT)
