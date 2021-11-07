@@ -1,6 +1,7 @@
 <?php
 
 require_once ('configParameters.php');
+require_once('currValsFromTS.php');
 
 //	Функция для записи значений из массива $arrayOfLevels в Базу Данных
 function db_update_grainLevels($dbh, $arrayOfLevels){
@@ -36,24 +37,15 @@ function db_update_grainLevels($dbh, $arrayOfLevels){
 	
 	return;
 }
+
 //	Функция для записи значений из массивов $arrayOfTemperatures и $arrayOfTempSpeeds в Базу Данных от времени $serverDate
 function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate){
 
-	/*
-		Реализуем запись типа:
-			UPDATE sensors
-					SET current_temperature = (CASE WHEN sensor_id=0 THEN 18.5
-													WHEN sensor_id=1 THEN 19
-													...
-													END),
-							current_speed = (CASE WHEN sensor_id=0 THEN 1
-													WHEN sensor_id=1 THEN 2
-													...
-													END),
-						server_date = STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s') WHERE sensor_id BETWEEN 0 AND $sensor_id;
-	*/
-
-	$query = "	SELECT s.sensor_id, s.is_enabled, pbs.grain_level, s.current_temperature, pr.t_min, pr.t_max, pr.v_min, pr.v_max, e.error_desc_short
+	$query = "	SELECT  s.sensor_id, s.silo_id, s.podv_id, s.sensor_num, s.is_enabled, s.current_temperature, s.current_speed,
+						s.curr_t_text, s.curr_v_text, s.curr_t_colour, s.curr_v_colour, s.server_date,
+						s.NACK_Tmax, s.TIME_NACK_Tmax, s.ACK_Tmax, s.TIME_ACK_Tmax, s.NACK_Vmax, s.TIME_NACK_Vmax, s.ACK_Vmax, s.TIME_ACK_Vmax,
+						s.NACK_err, s.TIME_NACK_err, s.ACK_err, s.TIME_ACK_err, s.error_id,
+						pbs.grain_level, pr.t_min, pr.t_max, pr.v_min, pr.v_max, e.error_desc_short
 					FROM sensors AS s
 					JOIN prodtypesbysilo AS pbs
 						ON s.silo_id = pbs.silo_id
@@ -66,36 +58,34 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 	$sth = $dbh->query($query);
 	$rows = $sth->fetchAll();
 
-	$query="UPDATE sensors SET current_temperature = ( CASE ";
+	$query = "INSERT INTO zernoib.sensors
+			   (sensor_id, silo_id, podv_id, sensor_num, is_enabled, current_temperature, current_speed,
+				curr_t_text, curr_v_text, curr_t_colour, curr_v_colour, server_date,
+				NACK_Tmax, TIME_NACK_Tmax, ACK_Tmax, TIME_ACK_Tmax, NACK_Vmax, TIME_NACK_Vmax, ACK_Vmax, TIME_ACK_Vmax,
+				NACK_err, TIME_NACK_err, ACK_err, TIME_ACK_err, error_id)
+			  VALUES ";
 
 	$sensor_id = 0;
 	for($i = 0; $i < count($arrayOfTemperatures); $i++){
 		for($j = 0; $j < count($arrayOfTemperatures[$i]); $j++){
 			for($k = 0; $k < count($arrayOfTemperatures[$i][$j]); $k++){
-						$query.="WHEN sensor_id = ".$sensor_id." THEN ".$arrayOfTemperatures[$i][$j][$k] * 0.1 ." ";
-						$sensor_id++;
-			}
-		}
-	}
 
-	$query.=" END), current_speed = ( CASE ";
-	$sensor_id = 0;
-	for($i = 0; $i < count($arrayOfTempSpeeds); $i++){
-		for($j = 0; $j < count($arrayOfTempSpeeds[$i]); $j++){
-			for($k = 0; $k < count($arrayOfTempSpeeds[$i][$j]); $k++){
-						$current_temperature_speed = str_replace(",", ".", $arrayOfTempSpeeds[$i][$j][$k]);
-						$query.="WHEN sensor_id = ".$sensor_id." THEN '".$current_temperature_speed."' ";
-						$sensor_id++;
-			}
-		}
-	}
-	//	Текст, отображаемый в ячейке
-	$query.=" END), curr_t_text = ( CASE ";
-	$sensor_id = 0;
-	for($i = 0; $i < count($arrayOfTemperatures); $i++){
-		for($j = 0; $j < count($arrayOfTemperatures[$i]); $j++){
-			for($k = 0; $k < count($arrayOfTemperatures[$i][$j]); $k++){
-
+				//	sensor_id
+				$query .= "(".$rows[$sensor_id]['sensor_id'].", ";
+				//	silo_id
+				$query .= "'".$rows[$sensor_id]['silo_id']."', ";
+				//	podv_id
+				$query .= "'".$rows[$sensor_id]['podv_id']."', ";
+				//	sensor_num
+				$query .= "'".$rows[$sensor_id]['sensor_num']."', ";
+				//	is_enabled
+				$query .= "'".$rows[$sensor_id]['is_enabled']."', ";
+				//	current_temperature
+				$query .= "'". ($arrayOfTemperatures[$i][$j][$k] * 0.1) ."', ";
+				//	current_speed
+				$current_temperature_speed = str_replace(",", ".", $arrayOfTempSpeeds[$i][$j][$k]);
+				$query .= "'". $current_temperature_speed ."', ";
+				//	curr_t_text
 				$curr_t_text = "''";
 
 				if($rows[$sensor_id]['is_enabled']==0){
@@ -109,20 +99,8 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 				} else {
 					$curr_t_text = "'".$rows[$sensor_id]['error_desc_short']."'";
 				}
-
-				$query.="WHEN sensor_id = ".$sensor_id." THEN "
-				."$curr_t_text"." ";
-				$sensor_id++;
-			}
-		}
-	}
-
-	$query.=" END), curr_v_text = ( CASE ";
-	$sensor_id = 0;
-	for($i = 0; $i < count($arrayOfTempSpeeds); $i++){
-		for($j = 0; $j < count($arrayOfTempSpeeds[$i]); $j++){
-			for($k = 0; $k < count($arrayOfTempSpeeds[$i][$j]); $k++){
-
+				$query .= $curr_t_text .", ";
+				//	curr_v_text
 				$curr_v_text = "''";
 
 				if($rows[$sensor_id]['is_enabled']==0){
@@ -136,22 +114,8 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 				} else {
 					$curr_v_text = "'".$rows[$sensor_id]['error_desc_short']."'";
 				}
-				
-
-				$query.="WHEN sensor_id = ".$sensor_id." THEN "
-				.$curr_v_text." ";
-				$sensor_id++;
-			}
-		}
-	}
-
-	//	Определение цвета для ячейки с текущей температурой
-	$query.=" END), curr_t_colour = ( CASE ";
-	$sensor_id = 0;
-	for($i = 0; $i < count($arrayOfTemperatures); $i++){
-		for($j = 0; $j < count($arrayOfTemperatures[$i]); $j++){
-			for($k = 0; $k < count($arrayOfTemperatures[$i][$j]); $k++){
-
+				$query .= $curr_v_text.", ";
+				//	curr_t_colour
 				$curr_t_colour="'#E5E5E5'";
 
 				if($rows[$sensor_id]['is_enabled']==0){
@@ -181,20 +145,8 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 					$curr_t_colour="'#FF0000'";
 
 				}
-
-				$query.="WHEN sensor_id = ".$sensor_id." THEN "
-				.$curr_t_colour." ";
-				$sensor_id++;
-			}
-		}
-	}
-
-	$query.=" END), curr_v_colour = ( CASE ";
-	$sensor_id = 0;
-	for($i = 0; $i < count($arrayOfTempSpeeds); $i++){
-		for($j = 0; $j < count($arrayOfTempSpeeds[$i]); $j++){
-			for($k = 0; $k < count($arrayOfTempSpeeds[$i][$j]); $k++){
-
+				$query .= $curr_t_colour.", ";
+				//	curr_v_colour
 				$curr_v_colour="'#E5E5E5'";
 
 				if($rows[$sensor_id]['is_enabled']==0){
@@ -222,21 +174,83 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 				} else if( in_array($arrayOfTemperatures[$i][$j][$k],array(850,1270,2510,2520,2530,2540))){
 					$curr_v_colour="'#FF0000'";
 				}
+				$query .= $curr_v_colour.", ";
+				//	server_date
+				$query .= "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
+				//	NACK_Tmax
+				$query_NACK_Tmax = is_null($rows[$sensor_id]['NACK_Tmax']) ? "NULL, " : "'".$rows[$sensor_id]['NACK_Tmax']."', ";
+				$query .= $query_NACK_Tmax;
+				//	TIME_NACK_Tmax
+				$query_TIME_NACK_Tmax = is_null($rows[$sensor_id]['TIME_NACK_Tmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_NACK_Tmax']."', ";
+				$query .= $query_TIME_NACK_Tmax;
+				//	ACK_Tmax
+				$query_ACK_Tmax = is_null($rows[$sensor_id]['ACK_Tmax']) ? "NULL, " : "'".$rows[$sensor_id]['ACK_Tmax']."', ";
+				$query .= $query_ACK_Tmax;
+				//	TIME_ACK_Tmax
+				$query_TIME_ACK_Tmax = is_null($rows[$sensor_id]['TIME_ACK_Tmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_ACK_Tmax']."', ";
+				$query .= $query_TIME_ACK_Tmax;
+				//	NACK_Vmax
+				$query_TIME_NACK_Vmax = is_null($rows[$sensor_id]['NACK_Vmax']) ? "NULL, " : "'".$rows[$sensor_id]['NACK_Vmax']."', ";
+				$query .= $query_TIME_NACK_Vmax;
+				//	TIME_NACK_Vmax
+				$query_TIME_NACK_Vmax = is_null($rows[$sensor_id]['TIME_NACK_Vmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_NACK_Vmax']."', ";
+				$query .= $query_TIME_NACK_Vmax;
+				//	ACK_Vmax
+				$query_ACK_Vmax = is_null($rows[$sensor_id]['ACK_Vmax']) ? "NULL, " : "'".$rows[$sensor_id]['ACK_Vmax']."', ";
+				$query .= $query_ACK_Vmax;
+				//	TIME_ACK_Vmax
+				$query_TIME_ACK_Vmax = is_null($rows[$sensor_id]['TIME_ACK_Vmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_ACK_Vmax']."', ";
+				$query .= $query_TIME_ACK_Vmax;
+				//	NACK_err
+				$query_NACK_err = is_null($rows[$sensor_id]['NACK_err']) ? "NULL, " : "'".$rows[$sensor_id]['NACK_err']."', ";
+				$query .= $query_NACK_err;
+				//	TIME_NACK_err
+				$query_TIME_NACK_err = is_null($rows[$sensor_id]['TIME_NACK_err']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_NACK_err']."', ";
+				$query .= $query_TIME_NACK_err;
+				//	ACK_err
+				$query_ACK_err = is_null($rows[$sensor_id]['ACK_err']) ? "NULL, " : "'".$rows[$sensor_id]['ACK_err']."', ";
+				$query .= $query_ACK_err;
+				//	TIME_ACK_err
+				$query_TIME_ACK_err = is_null($rows[$sensor_id]['TIME_ACK_err']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_ACK_err']."', ";
+				$query .= $query_TIME_ACK_err;
+				//	error_id
+				$query_error_id = is_null($rows[$sensor_id]['error_id']) ? "NULL)," : "'".$rows[$sensor_id]['error_id']."'),";
+				$query .= $query_error_id;
 
-				$query.="WHEN sensor_id = ".$sensor_id." THEN "
-				.$curr_v_colour." ";
 				$sensor_id++;
 			}
 		}
 	}
 
-	$sensor_id--;
-	$query.=" END), server_date = STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s') WHERE sensor_id BETWEEN 0 AND $sensor_id;";
-
+	$query = substr($query,0,-1)
+			." ON DUPLICATE KEY UPDATE	sensor_id=VALUES(sensor_id),
+										silo_id=VALUES(silo_id),
+										podv_id=VALUES(podv_id),
+										sensor_num=VALUES(sensor_num),
+										is_enabled=VALUES(is_enabled),
+										current_temperature=VALUES(current_temperature),
+										current_speed=VALUES(current_speed),
+										curr_t_text=VALUES(curr_t_text),
+										curr_v_text=VALUES(curr_v_text),
+										curr_t_colour=VALUES(curr_t_colour),
+										curr_v_colour=VALUES(curr_v_colour),
+										server_date=VALUES(server_date),
+										NACK_Tmax=VALUES(NACK_Tmax),
+										TIME_NACK_Tmax=VALUES(TIME_NACK_Tmax),
+										ACK_Tmax=VALUES(ACK_Tmax),
+										TIME_ACK_Tmax=VALUES(TIME_ACK_Tmax),
+										NACK_Vmax=VALUES(NACK_Vmax),
+										TIME_NACK_Vmax=VALUES(TIME_NACK_Vmax),
+										ACK_Vmax=VALUES(ACK_Vmax),
+										TIME_ACK_Vmax=VALUES(TIME_ACK_Vmax),
+										NACK_err=VALUES(NACK_err),
+										TIME_NACK_err=VALUES(TIME_NACK_err),
+										ACK_err=VALUES(ACK_err),
+										TIME_ACK_err=VALUES(TIME_ACK_err),
+										error_id=VALUES(error_id);";
 	$stmt = $dbh->prepare($query);
 	$stmt->execute();
 
-	return $query;
 	return;
 }
 

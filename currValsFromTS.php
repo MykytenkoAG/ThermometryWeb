@@ -10,17 +10,15 @@ $configOK=true;
 $errors=array();
 $arrayOfTemperatures=array(); $arrayOfTempSpeeds=array(); $arrayOfLevels=array(); $serverDate="";
 
-$termoServerINI  =	@parse_ini_string(replaceForbiddenChars(mb_convert_encoding(file_get_contents('settings/TermoServer.ini'), "UTF-8", "WINDOWS-1251")), true);
-$termoClientINI  =	@parse_ini_string(replaceForbiddenChars(mb_convert_encoding(file_get_contents('settings/TermoClient.ini'), "UTF-8", "WINDOWS-1251")), true);
-
-//print_r($termoServerINI);
-
 //	ПРОЦЕДУРА ПРОВЕРКИ
 
 //	Проверка существования таблицы sensors в базе данных проекта
 if( isTableExistAndNotEmpty($dbh,"zernoib.sensors") ){
 	goto tableSensorsOK;
 }
+
+$termoServerINI  =	@parse_ini_string(replaceForbiddenChars(mb_convert_encoding(file_get_contents('settings/TermoServer.ini'), "UTF-8", "WINDOWS-1251")), true);
+$termoClientINI  =	@parse_ini_string(replaceForbiddenChars(mb_convert_encoding(file_get_contents('settings/TermoClient.ini'), "UTF-8", "WINDOWS-1251")), true);
 
 //	Таблицы не существует, или она пустая
 //	Выполняем проверку ini-файлов
@@ -376,7 +374,7 @@ function checkReadValsToDBSensors($dbh, $arrayOfTemperatures){
 //print_r($projectConfArr);
 //print_r(getConfForVisu_ProjectConfig($dbh));
 
-getConfForVisu_ProjectConfig($dbh);
+//print_r(getConfForVisu_ProjectConfig($dbh));
 function getConfForVisu_ProjectConfig($dbh){
 
     $projectConfArr = array();

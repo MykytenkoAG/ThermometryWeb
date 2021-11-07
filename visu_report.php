@@ -272,12 +272,16 @@ if( isset($_POST['POST_vRep_getSensorTemperByPodv_arrayOfSilos']) && isset($_POS
 }
 
 //  Получение таблицы температур для графика -----------------------------------------------------------------------------------------------------------------------------
+/*$dateEnd = DateTime::createFromFormat('d.m.Y H:i:s', $serverDate);
+$dateStart = DateTime::createFromFormat('d.m.Y H:i:s', $serverDate);
+$dateStart->modify("-1 day");
+vRep_getTableForChart( $dbh, 'э403', '1', '1', $dateStart->format('Y-m-d H:i:s'), $dateEnd->format('Y-m-d H:i:s') );*/
 function vRep_getTableForChart($dbh, $silo_name, $podv_id, $sens_num, $dateStart, $dateEnd){
     
     $sql = "SELECT d.date, m.temperature
             FROM sensors AS s INNER JOIN measurements AS m ON s.sensor_id=m.sensor_id
             INNER JOIN dates AS d ON m.date_id=d.date_id
-            WHERE (s.silo_id = (select silo_id from prodtypesbysilo where silo_name=$silo_name) AND s.podv_id = $podv_id AND s.sensor_num = $sens_num AND
+            WHERE (s.silo_id = (select silo_id from prodtypesbysilo where silo_name='$silo_name') AND s.podv_id = $podv_id AND s.sensor_num = $sens_num AND
                                 d.date BETWEEN '$dateStart' AND '$dateEnd')";
     
     $sth = $dbh->query($sql);

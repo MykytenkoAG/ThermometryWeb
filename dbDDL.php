@@ -1,7 +1,7 @@
 <?php
 
-require_once ('currValsFromTS.php');
-//require_once ('configParameters.php');
+//require_once ('currValsFromTS.php');
+require_once ('configParameters.php');
 
 //	Удаление/очистка таблиц
 function ddl_drop_all($dbh){

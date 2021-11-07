@@ -161,7 +161,10 @@ function vIndOnClickOnSilo(silo_id) {
         vIndredrawTblTemperatureSpeeds(silo_id);
     }
     //  Перерисовка таблицы с параметрами продукта для текущего силоса
-    vIndredrawTblProdParameters(silo_id);
+    if(silo_id!==lastSiloID){
+        vIndredrawTblProdParameters(silo_id);
+    }
+    
     vIndRedrawTableCurrentAlarms();         //  Перерисовываем таблицу с текущими алармами
     vIndRedrawSiloStatus();                 //  Показываем текущий статус каждого силоса
 

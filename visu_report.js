@@ -112,6 +112,10 @@ function vRep_addNewLineOnChart() {
         dataType: 'html',
         success: function(fromPHP) {
 
+            //console.log(silo_name);
+
+            //console.log(fromPHP);
+
             let newDataset = {
                 label: '',
                 data: [],
