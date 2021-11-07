@@ -10,6 +10,11 @@ $configOK=true;
 $errors=array();
 $arrayOfTemperatures=array(); $arrayOfTempSpeeds=array(); $arrayOfLevels=array(); $serverDate="";
 
+$termoServerINI  =	@parse_ini_string(replaceForbiddenChars(mb_convert_encoding(file_get_contents('settings/TermoServer.ini'), "UTF-8", "WINDOWS-1251")), true);
+$termoClientINI  =	@parse_ini_string(replaceForbiddenChars(mb_convert_encoding(file_get_contents('settings/TermoClient.ini'), "UTF-8", "WINDOWS-1251")), true);
+
+//print_r($termoServerINI);
+
 //	ПРОЦЕДУРА ПРОВЕРКИ
 
 //	Проверка существования таблицы sensors в базе данных проекта
@@ -19,13 +24,11 @@ if( isTableExistAndNotEmpty($dbh,"zernoib.sensors") ){
 
 //	Таблицы не существует, или она пустая
 //	Выполняем проверку ini-файлов
-$termoServerINI  =	@parse_ini_string(replaceForbiddenChars(file_get_contents('settings/TermoServer.ini')), true);
 if( count($termoServerINI)==0 ){
 	$configOK=false;
 	array_push($errors, "NoTermoServer.ini");				//	Файла TermoServer.ini нет в папке settings
 }
 
-$termoClientINI  =	@parse_ini_string(replaceForbiddenChars(file_get_contents('settings/TermoClient.ini')), true);
 if( count($termoClientINI)==0 ){
 	$configOK=false;
 	array_push($errors, "NoTermoClient.ini");				//	Файла TermoClient.ini нет в папке settings
@@ -130,9 +133,9 @@ function isTableExistAndNotEmpty($dbh, $tableName){
 
 	return true;
 }
-//	Функция для замены символов "(", ")", "off". Необходима для корректной работы функции parse_ini_string()
+//	Функция для замены символов "(", ")", "off", ";". Необходима для корректной работы функции parse_ini_string()
 function replaceForbiddenChars($str){
-	$str = str_replace("(", "_", $str);	$str = str_replace(")", "_", $str);	$str = str_replace("off", "off_", $str);
+	$str = str_replace("(", "_", $str);	$str = str_replace(")", "_", $str);	$str = str_replace("off", "off_", $str); $str = str_replace(";", "%", $str);
 	return $str;
 }
 //	Проверка файла TermoServer.ini на наличие всех необходимых ключей
@@ -193,7 +196,8 @@ function projectUpdate($dbh, $termoClientINI, $termoServerINI){
 	ddl_create_Users($dbh);				
 	ddl_create_Errors($dbh);			
 	ddl_create_Dates($dbh);				
-	ddl_create_Prodtypes($dbh);			
+	ddl_create_Prodtypes($dbh);
+	ddl_create_SilosesGroups($dbh);
 	ddl_create_Prodtypesbysilo($dbh);	
 	ddl_create_Sensors($dbh);			
 	ddl_create_Measurements($dbh);
@@ -204,6 +208,7 @@ function projectUpdate($dbh, $termoClientINI, $termoServerINI){
 	ddl_init_Errors($dbh);
 	ddl_init_Dates($dbh, $serverDate);
 	ddl_init_Prodtypes($dbh);
+	ddl_init_SilosesGroups($dbh, $termoClientINI);
 	ddl_init_Prodtypesbysilo($dbh, $termoClientINI, $termoServerINI);
 	ddl_init_Sensors($dbh, $termoClientINI, $termoServerINI, $serverDate);
 
@@ -365,6 +370,12 @@ function checkReadValsToDBSensors($dbh, $arrayOfTemperatures){
 //  Вызываются при переходе на новую страницу
 
 //	Выход: трехмерный массив [массив имен силосов][массив подвесок][массив датчиков]
+//$projectConfArr = getConfForVisu_ProjectConfig($dbh) ;
+//$projectConfArr = json_encode ($projectConfArr);
+//print_r(json_last_error_msg());
+//print_r($projectConfArr);
+//print_r(getConfForVisu_ProjectConfig($dbh));
+
 getConfForVisu_ProjectConfig($dbh);
 function getConfForVisu_ProjectConfig($dbh){
 

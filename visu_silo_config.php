@@ -369,8 +369,6 @@ if( isset($_POST['POST_ts_connection_settings_ip']) && isset($_POST['POST_ts_con
 
 }
 
-
-
 if( isset($_POST['POST_vSConf_get_ts_connection_settings']) ) {
     echo json_encode(array($IPAddr,$port));
 }

@@ -8,8 +8,9 @@
       require_once('visu_report.php');
     ?>
 
-    <script src="libs/pdfmake.min.js"></script>
-    <script src="libs/vfs_fonts.js"></script>
+    <script src="bower_components/pdfmake/build/pdfmake.min.js"></script>
+    <script src="bower_components/pdfmake/build/vfs_fonts.js"></script>
+
     <script src="libs/xlsx.full.min.js"></script>
 
   </head>
@@ -155,7 +156,7 @@
                   <h5 class="card-title justify-content-center" style="font-family: Arial, Helvetica, sans-serif; font-size: 28px;">График температуры</h5>
                 </div>
                 <canvas id="temperatureGraph"></canvas>
-
+                
                 <script type="text/javascript" src="libs/chart.js"></script>
                 <script src="libs/chartjs-adapter-date-fns.bundle.js"></script>
 

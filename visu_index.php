@@ -152,11 +152,16 @@ if( isset($_POST['POST_vInd_enable_auto_lvl_mode_on_all_silo']) ) {
 function vInd_drawSiloPlan($dbh){ 
 
     $sql = "SELECT  pbs.silo_id, pbs.silo_name, pbs.grain_level_fromTS, pbs.grain_level,
-                    pbs.is_square, pbs.size, pbs.position_col, pbs.position_row,
-                    pt.product_name, pt.t_max, pt.t_min, pt.v_max, pt.v_min,
-                    MAX(s.current_temperature), MIN(s.current_temperature), MAX(s.current_speed)
-            FROM prodtypesbysilo AS pbs INNER JOIN prodtypes AS pt ON pbs.product_id=pt.product_id INNER JOIN sensors AS s ON pbs.silo_id=s.silo_id
-            GROUP BY s.silo_id;";
+                pbs.is_square, pbs.size, pbs.position_col, pbs.position_row,
+                pt.product_name, pt.t_max, pt.t_min, pt.v_max, pt.v_min,
+                MAX(s.current_temperature), MIN(s.current_temperature), MAX(s.current_speed),
+                pbs.silo_group, sg.silo_group_name, sg.silo_group_col, sg.silo_group_row, sg.silo_group_size,
+                (pbs.position_col + sg.silo_group_col) AS table_pos_col, (pbs.position_row + sg.silo_group_row) AS table_pos_row
+            FROM prodtypesbysilo AS pbs INNER JOIN prodtypes AS pt ON pbs.product_id=pt.product_id
+            INNER JOIN sensors AS s ON pbs.silo_id = s.silo_id
+            INNER JOIN silosesgroups AS sg ON pbs.silo_group = sg.silo_group 
+            GROUP BY s.silo_id
+            ORDER BY silo_group, position_row, position_col;";
 
     $sth = $dbh->query($sql);
     
@@ -165,24 +170,22 @@ function vInd_drawSiloPlan($dbh){
     }
     $siloConfigRows = $sth->fetchAll();
     //  Определяем количество строк таблицы
-    $sql = "SELECT  MAX(position_row)
-                    FROM prodtypesbysilo;";
+    $sql = "SELECT MAX(pbs.position_row + sg.silo_group_row) FROM prodtypesbysilo AS pbs INNER JOIN silosesgroups AS sg ON pbs.silo_group = sg.silo_group;";
     $sth = $dbh->query($sql);
-    $rowsNumber = $sth->fetch()['MAX(position_row)'];
+    $rowsNumber = $sth->fetch()['MAX(pbs.position_row + sg.silo_group_row)'];
     //  Определяем количество столбцов таблицы
-    $sql = "SELECT  MAX(position_col)
-                    FROM prodtypesbysilo;";
+    $sql = "SELECT MAX(pbs.position_col + sg.silo_group_col) FROM prodtypesbysilo AS pbs INNER JOIN silosesgroups AS sg ON pbs.silo_group = sg.silo_group;";
     $sth = $dbh->query($sql);
-    $colsNumber = $sth->fetch()['MAX(position_col)'];
+    $colsNumber = $sth->fetch()['MAX(pbs.position_col + sg.silo_group_col)'];
 
-    $outStr = "<table>";
+    $outStr = "<table style=\"width:100%;\">";
 
     for($i = 0; $i <= $rowsNumber; $i++){
         $outStr .= "<tr>";
         for($j = 0; $j <= $colsNumber; $j++){
             $outStr .= "<td class=\"silo\">";
             foreach($siloConfigRows as $siloConfigRow){
-                if($siloConfigRow['position_col']==($j+1) and $siloConfigRow['position_row']==$i){
+                if($siloConfigRow['table_pos_col']==($j+1) and $siloConfigRow['table_pos_row']==$i){
 
                     //  Всплывающая подсказка
                     $siloTooltip = " Тип продукта : ".$siloConfigRow['product_name']."; 

@@ -88,6 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
     authGetCurrentUser();                               //  Запрашиваем текущего пользователя из сессии
     getNewAlarmsNumber();                               //  Проверяем наличие новых алармов, чтобы в случае необходимости включить звук
     getConf_ProjectConfArr();                           //  Последовательно запрашиваем конфигурационные массивы из PHP
+    //getConf_ArrayOfSiloNames();
 });
 
 //  Получение массивов с конфигурациями для повышения интерактивности ---------------------------------------------------------------------------------------
@@ -100,7 +101,7 @@ function getConf_ProjectConfArr() {
         data: { 'POST_currValsFromTS_get_project_conf_array': 1 },
         dataType: 'html',
         success: function(fromPHP) {
-            //console.log(fromPHP);
+            console.log(fromPHP);
             project_conf_array = (JSON.parse(fromPHP));
             //console.log("project conf arr");
             //console.log(project_conf_array);

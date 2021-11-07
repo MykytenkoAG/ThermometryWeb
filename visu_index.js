@@ -108,16 +108,23 @@ const img_arr_silo_status = [
         ["img/silo_square_OK.png", "img/silo_square_OK.png"]
     ]
 ];
-let arr_silo_status = [];
-let curr_NACK_state = 0;
+let arr_silo_status_new = [];                                               //  массив новых состояний силосов, который ми принимаем от PHP
+let arr_silo_status_curr = [];                                              //  массив состояний силосов, полученный на предыдущем шаге
+let curr_NACK_state = 0;                                                    //  переменная для создания мерация. Изменяет свое значение от 0 до 1 на каждом цикле
 
-const silo_blink_period = 1000;
+const silo_blink_period = 1000;                                             //  период мерцания
+
 const timer_silo_blink = setInterval(() => {
-    for (let i = 0; i < arr_silo_status.length; i++) {
-        document.getElementById("silo-" + i).setAttribute("src", img_arr_silo_status[arr_silo_status[i][0]][arr_silo_status[i][1]][curr_NACK_state]);
-    }
-    curr_NACK_state = 1 - curr_NACK_state;      //  мерцание в случае активных АПС
+    for (let i = 0; i < arr_silo_status_new.length; i++) {
+        //  Перерисовывать картинки следует только при необходимости
+        if( JSON.stringify(arr_silo_status_new[i]) !== JSON.stringify(arr_silo_status_curr[i]) || arr_silo_status_new[i][0]===2 || arr_silo_status_new[i][1]===2 ){
 
+            document.getElementById("silo-" + i).setAttribute("src", img_arr_silo_status [arr_silo_status_new[i][0]] [arr_silo_status_new[i][1]] [curr_NACK_state]);
+
+        }
+        arr_silo_status_curr[i]=arr_silo_status_new[i];
+    }
+    curr_NACK_state = 1 - curr_NACK_state;
 }, silo_blink_period);
 
 //  Функция отображения текущего состояния силосов
@@ -131,13 +138,8 @@ function vIndRedrawSiloStatus() {
         data: { 'POST_vInd_get_curr_silo_status': 1 },
         dataType: 'html',
         success: function(fromPHP) {
-            const silo_status_arr = JSON.parse(fromPHP);        //  Получаем массив, в котором индекс - это id силоса, а значение - код состояния
-                                                                //  каждому коду состояния соответствует своя картинка в массиве картинок
-            arr_silo_status.length = 0;
-            for (let i = 0; i < silo_status_arr.length; i++) {
-                arr_silo_status.push(silo_status_arr[i]);
-            }
-            
+            arr_silo_status_new.length = 0;
+            arr_silo_status_new = JSON.parse(fromPHP);
         }
     });
 
@@ -149,6 +151,8 @@ let lastParamSelectButtonID; //  Кнопка для выбора отображ
 let lastSiloID;
 
 function vIndOnClickOnSilo(silo_id) {
+
+    //alert(silo_id);
 
     //  Перерисовка таблиц с измеренными значениями
     if (lastParamSelectButtonID === "btn-temperatures") {

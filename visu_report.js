@@ -112,7 +112,7 @@ function vRep_addNewLineOnChart() {
         dataType: 'html',
         success: function(fromPHP) {
 
-            const newDataset = {
+            let newDataset = {
                 label: '',
                 data: [],
                 backgroundColor: [
@@ -231,7 +231,7 @@ function vRep_addNewTableRow() {
 }
 //  Chart JS
 //  setup
-const data = {
+let data = {
     datasets: []
 };
 //  config
@@ -556,9 +556,11 @@ function createPrintedFormPDF(JSONObj, field1, field2, field3, field4, sheetHead
             pdfProp.content.push({ text: sheetHeader, style: 'header', alignment: 'center' });
             j++;
             pdfProp.content.push({ pageBreak: 'after', layout: 'noBorders', table: {} });
-            pdfProp.content[j].table = { body: [
+            pdfProp.content[j].table = {
+                body: [
                     []
-                ] };
+                ]
+            };
 
             //pdfProp.content[j].table.body[0] = [ { table:{ body: vRep_create2dTableForCurrDate(currJSONObj, field, tableHeader, col1Header, col2Header) } } ];
             //continue;
