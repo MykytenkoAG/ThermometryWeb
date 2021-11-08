@@ -29,4 +29,6 @@ if($sth==false){
     $port = $ts_conn_settings_row[0]['ts_port'];
 }
 
+$logFile = 'logs/log.txt';
+
 ?>

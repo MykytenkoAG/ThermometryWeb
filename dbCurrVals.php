@@ -1,13 +1,9 @@
 <?php
 
-require_once ('configParameters.php');
 require_once('currValsFromTS.php');
 
-$logFile = 'logs/log.txt';
-
 //	Запись строки в журнал
-function writeToLog($loggingString){
-	global $logFile;
+function writeToLog($logFile, $loggingString){
     // Write the contents to the file, 
     // using the FILE_APPEND flag to append the content to the end of the file
     // and the LOCK_EX flag to prevent anyone else writing to the file at the same time
@@ -15,8 +11,7 @@ function writeToLog($loggingString){
     return;
 }
 
-function logClear(){
-	global $logFile;
+function logClear($logFile){
     file_put_contents($logFile, "");
     return;
 }
@@ -85,11 +80,37 @@ function db_update_grainLevels($dbh, $arrayOfLevels){
 	return;
 }
 
+//	Функция получения массива кодов ошибок
+function db_get_error_codes($dbh){
+
+	$query = "SELECT error_id, error_description, error_desc_short, error_desc_for_visu
+				FROM errors
+				ORDER BY error_id;";
+
+	$sth = $dbh->query($query);
+	$error_codes = $sth->fetchAll();
+	//	Создание двумерного ассоциативного массива из БД для удобства и скорости доступа к таблице "errors"
+	$error_codes_arr = array(array());
+	$j=0;
+	for($i=0; $i<$error_codes[count($error_codes)-1]['error_id'];$i++){
+		if($i==$error_codes[$j]['error_id']){
+			array_push($error_codes_arr, $error_codes[$j]);
+			$j++;
+		} else {
+			array_push($error_codes_arr, array());
+		}
+	}
+
+	return $error_codes_arr;
+
+}
+
 //	Функция для записи значений из массивов $arrayOfTemperatures и $arrayOfTempSpeeds в Базу Данных от времени $serverDate
-//db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate);
-function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate){
+//db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate, $logFile);
+function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate, $logFile){
 
 	$loggingString="";
+	$error_codes_arr = db_get_error_codes($dbh);
 
 	$query = "	SELECT  s.sensor_id, s.silo_id, s.podv_id, s.sensor_num, s.is_enabled, s.current_temperature, s.current_speed,
 						s.curr_t_text, s.curr_v_text, s.curr_t_colour, s.curr_v_colour, s.server_date,
@@ -108,25 +129,6 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 	$sth = $dbh->query($query);
 	$rows = $sth->fetchAll();
 
-	$query = "	SELECT  error_id, error_description, error_desc_short, error_desc_for_visu
-					FROM errors
-					ORDER BY error_id;";
-
-	$sth = $dbh->query($query);
-	$error_codes = $sth->fetchAll();
-	//print_r($error_codes);
-	$error_codes_arr = array(array());
-	$j=0;
-	for($i=0; $i<$error_codes[count($error_codes)-1]['error_id'];$i++){
-		if($i==$error_codes[$j]['error_id']){
-			array_push($error_codes_arr, $error_codes[$j]);
-			$j++;
-		} else {
-			array_push($error_codes_arr, array());
-		}
-	}
-	//print_r($error_codes_arr);
-
 	$query = "INSERT INTO zernoib.sensors
 			   (sensor_id, silo_id, podv_id, sensor_num, is_enabled, current_temperature, current_speed,
 				curr_t_text, curr_v_text, curr_t_colour, curr_v_colour, server_date,
@@ -139,62 +141,124 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 		for($j = 0; $j < count($arrayOfTemperatures[$i]); $j++){
 			for($k = 0; $k < count($arrayOfTemperatures[$i][$j]); $k++){
 
-				//	sensor_id
-				$query .= "(".$rows[$sensor_id]['sensor_id'].", ";
-				//	silo_id
-				$query .= "'".$rows[$sensor_id]['silo_id']."', ";
-				//	podv_id
-				$query .= "'".$rows[$sensor_id]['podv_id']."', ";
-				//	sensor_num
-				$query .= "'".$rows[$sensor_id]['sensor_num']."', ";
-				//	is_enabled
-				$query .= "'".$rows[$sensor_id]['is_enabled']."', ";
-				//	current_temperature
-				$query .= "'". ($arrayOfTemperatures[$i][$j][$k] * 0.1) ."', ";
-				//	current_speed
-				$current_temperature_speed = str_replace(",", ".", $arrayOfTempSpeeds[$i][$j][$k]);
-				$query .= "'". $current_temperature_speed ."', ";
-				//	curr_t_text
-				$curr_t_text = "'".$rows[$sensor_id]['curr_t_text']."', ";
 
-				if($rows[$sensor_id]['is_enabled']==0){
-
-					$curr_t_text = "'откл.', ";
-
-				} else if ( is_null($rows[$sensor_id]['error_id']) && $arrayOfTemperatures[$i][$j][$k] < 850 ){
-
-					$curr_t_text = sprintf('\'%01.1f\'', $arrayOfTemperatures[$i][$j][$k] * 0.1).", ";
-
-				} else if ( !is_null($rows[$sensor_id]['error_id']) ) {
-					$curr_t_text = "'".$error_codes_arr[$arrayOfTemperatures[$i][$j][$k] * 0.1]['error_desc_short']."', ";
-
+				//	error NACK
+				if( $rows[$sensor_id]['is_enabled']==1 && is_null($rows[$sensor_id]['error_id']) &&
+					$arrayOfTemperatures[$i][$j][$k]>=850 ){
+						$query_NACK_err = "1, ";
+						$query_TIME_NACK_err = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
+						$query_error_id = "'".($arrayOfTemperatures[$i][$j][$k]*0.1)."'),";
+						$loggingString .= "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". "
+										  .$error_codes_arr[ ($arrayOfTemperatures[$i][$j][$k]*0.1) ]['error_description'].". Срабатывание сигнала АПС;\n";
+				} else {
+						$query_NACK_err = "'".$rows[$sensor_id]['NACK_err']."', ";
+						$query_TIME_NACK_err = is_null($rows[$sensor_id]['TIME_NACK_err']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_NACK_err']."', ";
+						$query_error_id = is_null($rows[$sensor_id]['error_id']) ? "NULL)," : "'".$rows[$sensor_id]['error_id']."'),";
 				}
-				$query .= $curr_t_text;
-				//	curr_v_text
-				$curr_v_text = "'".$rows[$sensor_id]['curr_v_text']."', ";
 
-				if($rows[$sensor_id]['is_enabled']==0){
-
-					$curr_v_text = "'откл.', ";
-
-				} else if ( is_null($rows[$sensor_id]['error_id']) && $arrayOfTemperatures[$i][$j][$k] < 850 ){
-
-					$curr_v_text = sprintf('\'%01.1f\'', $arrayOfTempSpeeds[$i][$j][$k]).", ";
-
-				} else if ( !is_null($rows[$sensor_id]['error_id']) ) {
-					$curr_v_text = "'".$error_codes_arr[$arrayOfTemperatures[$i][$j][$k] * 0.1]['error_desc_short']."', ";
-					
+				//	error reset
+				if( $rows[$sensor_id]['ACK_err']==1 &&
+					($rows[$sensor_id]['is_enabled']==0 || $arrayOfTemperatures[$i][$j][$k]<850) ){
+						$query_NACK_err = "0, ";
+						$query_TIME_NACK_err = "NULL, ";
+						$query_ACK_err = "0, ";
+						$query_TIME_ACK_err = "NULL, ";
+						$query_error_id = "NULL),";
+						$loggingString .= "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". ".$error_codes_arr[ $rows[$sensor_id]['error_id'] ]['error_description'].". Исчезновение сигнала АПС;\n";
+				} else {
+						$query_ACK_err = "'".$rows[$sensor_id]['ACK_err']."', ";
+						$query_TIME_ACK_err = is_null($rows[$sensor_id]['TIME_ACK_err']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_ACK_err']."', ";
+						if($query_NACK_err!="1, "){
+							$query_error_id = is_null($rows[$sensor_id]['error_id']) ? "NULL)," : "'".$rows[$sensor_id]['error_id']."'),";
+						}
 				}
-				$query .= $curr_v_text;
-				//	curr_t_colour
-				$curr_t_colour="'#E5E5E5'";
 
-				if($rows[$sensor_id]['is_enabled']==0){
+				//	Tmax NACK
+				if( is_null($rows[$sensor_id]['error_id']) && $rows[$sensor_id]['is_enabled']==1 &&		//	датчик исправен и включен
+					$rows[$sensor_id]['NACK_Tmax']==0 && $rows[$sensor_id]['ACK_Tmax']==0 &&			//	нет текущего аларма
+					($rows[$sensor_id]['sensor_num'] < $rows[$sensor_id]['grain_level']) &&				//	датчик находится в зерне
+					($arrayOfTemperatures[$i][$j][$k]<850) &&											//	датчик выдает корректные показания
+					($arrayOfTemperatures[$i][$j][$k]*0.1 > $rows[$sensor_id]['t_max']) ){				//	температура выше критической для данного продукта
+						$query_NACK_Tmax = "1, ";
+						$query_TIME_NACK_Tmax = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
+						$loggingString .= "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". Tmax. Срабатывание сигнала АПС;\n";
+				} else {
+						$query_NACK_Tmax = "'".$rows[$sensor_id]['NACK_Tmax']."', ";
+						$query_TIME_NACK_Tmax = is_null($rows[$sensor_id]['TIME_NACK_Tmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_NACK_Tmax']."', ";
+				}
+				
+				//	Tmax reset
+				if( $rows[$sensor_id]['ACK_Tmax']==1 &&													//	АПС была установлена и квитирована
+					( $rows[$sensor_id]['is_enabled']==0 || !is_null($rows[$sensor_id]['error_id']) ||	//	датчик вышел из строя или был отключен
+						$arrayOfTemperatures[$i][$j][$k]>=850 ||											//	датчик стал выдавать некорректные показания
+					($rows[$sensor_id]['sensor_num'] >= $rows[$sensor_id]['grain_level']) ||			//	датчик ниже уровня заполнения
+					($arrayOfTemperatures[$i][$j][$k]*0.1 <= $rows[$sensor_id]['t_max'])  ) ){			//	температура меньше критической
+						$query_NACK_Tmax = "0, ";
+						$query_TIME_NACK_Tmax = "NULL, ";
+						$query_ACK_Tmax = "0, ";
+						$query_TIME_ACK_Tmax = "NULL, ";
+						$loggingString .= "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". Tmax. Исчезновение сигнала АПС;\n";
+				} else {
+						$query_ACK_Tmax = "'".$rows[$sensor_id]['ACK_Tmax']."', ";
+						$query_TIME_ACK_Tmax = is_null($rows[$sensor_id]['TIME_ACK_Tmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_ACK_Tmax']."', ";
+				}
 
-					$curr_t_colour="'#616161'";
 
-				} else if($arrayOfTemperatures[$i][$j][$k] < 850 and $k<$rows[$sensor_id]['grain_level']){
+				//	Vmax NACK
+				if(  is_null($rows[$sensor_id]['error_id']) && $rows[$sensor_id]['is_enabled']==1 &&	//	датчик исправен и включен
+						$rows[$sensor_id]['NACK_Vmax']==0 && $rows[$sensor_id]['ACK_Vmax']==0 &&			//	нет текущего аларма
+					($rows[$sensor_id]['sensor_num'] < $rows[$sensor_id]['grain_level']) &&				//	датчик находится в зерне
+					($arrayOfTemperatures[$i][$j][$k]<850) &&											//	датчик выдает корректные показания
+					($arrayOfTempSpeeds[$i][$j][$k] > $rows[$sensor_id]['v_max']) ){					//	скорость изменения температуры выше критической
+						$query_NACK_Vmax = "1, ";
+						$query_TIME_NACK_Vmax = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
+						$loggingString .= "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". Vmax. Срабатывание сигнала АПС;\n";
+				} else {
+						$query_NACK_Vmax = "'".$rows[$sensor_id]['NACK_Vmax']."', ";
+						$query_TIME_NACK_Vmax = is_null($rows[$sensor_id]['TIME_NACK_Vmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_NACK_Vmax']."', ";
+				}
+				
+				//	Vmax reset
+				if(  $rows[$sensor_id]['ACK_Vmax']==1 &&												//	АПС была установлена и квитирована
+					( $rows[$sensor_id]['is_enabled']==0 || !is_null($rows[$sensor_id]['error_id']) ||	//	датчик вышел из строя или был отключен
+						$arrayOfTemperatures[$i][$j][$k]>=850 ||											//	датчик стал выдавать некорректные показания
+					($rows[$sensor_id]['sensor_num'] >= $rows[$sensor_id]['grain_level']) ||			//	датчик ниже уровня заполнения
+					($arrayOfTempSpeeds[$i][$j][$k] <= $rows[$sensor_id]['v_max'])  ) ){				//	скорость меньше критической
+						$query_NACK_Vmax = "0, ";
+						$query_TIME_NACK_Vmax = "NULL, ";
+						$query_ACK_Vmax = "0, ";
+						$query_TIME_ACK_Vmax = "NULL, ";
+						$loggingString .= "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". Vmax. Исчезновение сигнала АПС;\n";
+				} else {
+						$query_ACK_Vmax = "'".$rows[$sensor_id]['ACK_Vmax']."', ";
+						$query_TIME_ACK_Vmax = is_null($rows[$sensor_id]['TIME_ACK_Vmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_ACK_Vmax']."', ";
+				}
+			
+				//	Отображение параметров в таблице
 
+				//	Текст
+				if($query_error_id!="NULL),"){
+					$query_curr_t_text = "'".$error_codes_arr[($arrayOfTemperatures[$i][$j][$k]*0.1)]['error_desc_short']."', ";
+					$query_curr_v_text = "'".$error_codes_arr[($arrayOfTemperatures[$i][$j][$k]*0.1)]['error_desc_short']."', ";
+				} else if ($rows[$sensor_id]['is_enabled']==0) {
+					$query_curr_t_text = "'откл.', ";
+					$query_curr_v_text = "'откл.', ";
+				} else {
+					$query_curr_t_text = sprintf('\'%01.1f\'', $arrayOfTemperatures[$i][$j][$k] * 0.1).", ";
+					$query_curr_v_text = sprintf('\'%01.1f\'', $arrayOfTempSpeeds[$i][$j][$k]).", ";
+				}
+
+				//	Цвет
+				if($query_error_id!="NULL),"){
+					$query_curr_t_colour="'#FF0000', ";
+					$query_curr_v_colour="'#FF0000', ";
+				} else if ($rows[$sensor_id]['is_enabled']==0) {
+					$query_curr_t_colour="'#616161', ";
+					$query_curr_v_colour="'#616161', ";
+				} else if ($k>=$rows[$sensor_id]['grain_level']) {
+					$query_curr_t_colour="'#E5E5E5', ";
+					$query_curr_v_colour="'#E5E5E5', ";
+				} else {
 					$green = ($rows[$sensor_id]['t_max'] - $arrayOfTemperatures[$i][$j][$k] * 0.1) / ($rows[$sensor_id]['t_max'] - $rows[$sensor_id]['t_min']) * 255;
 					if($green>255){
 						$green=255;
@@ -209,22 +273,8 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 						$red = 0;
 					}
 
-					$curr_t_colour=sprintf('\'#%02X%02X00\'',$red, $green);
+					$query_curr_t_colour=sprintf('\'#%02X%02X00\'',$red, $green).", ";
 
-				} else if( in_array($arrayOfTemperatures[$i][$j][$k],array(850,1270,2510,2520,2530,2540))){
-
-					$curr_t_colour="'#FF0000'";
-
-				}
-				$query .= $curr_t_colour.", ";
-				//	curr_v_colour
-				$curr_v_colour="'#E5E5E5'";
-
-				if($rows[$sensor_id]['is_enabled']==0){
-
-					$curr_v_colour="'#616161'";
-
-				} else if($arrayOfTemperatures[$i][$j][$k] < 850 and $k<$rows[$sensor_id]['grain_level']){
 
 					$green = ($rows[$sensor_id]['v_max'] - str_replace(",", ".", $arrayOfTempSpeeds[$i][$j][$k])) / ($rows[$sensor_id]['v_max'] - $rows[$sensor_id]['v_min']) * 255;
 					if($green>255){
@@ -240,45 +290,33 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 						$red = 0;
 					}
 
-					$curr_v_colour=sprintf('\'#%02X%02X00\'',$red, $green);
-
-				} else if( in_array($arrayOfTemperatures[$i][$j][$k],array(850,1270,2510,2520,2530,2540))){
-					$curr_v_colour="'#FF0000'";
+					$query_curr_v_colour=sprintf('\'#%02X%02X00\'',$red, $green).", ";
 				}
-				$query .= $curr_v_colour.", ";
+
+				//	sensor_id
+				$query .= "(".$rows[$sensor_id]['sensor_id'].", ";
+				//	silo_id
+				$query .= "'".$rows[$sensor_id]['silo_id']."', ";
+				//	podv_id
+				$query .= "'".$rows[$sensor_id]['podv_id']."', ";
+				//	sensor_num
+				$query .= "'".$rows[$sensor_id]['sensor_num']."', ";
+				//	is_enabled
+				$query .= "'".$rows[$sensor_id]['is_enabled']."', ";
+				//	current_temperature
+				$query .= "'". ($arrayOfTemperatures[$i][$j][$k] * 0.1) ."', ";
+				//	current_speed
+				$query .= "'". str_replace(",", ".", $arrayOfTempSpeeds[$i][$j][$k]) ."', ";
+				//	curr_t_text
+				$query .= $query_curr_t_text;
+				//	curr_v_text
+				$query .= $query_curr_v_text;
+				//	curr_t_colour
+				$query .= $query_curr_t_colour;
+				//	curr_v_colour
+				$query .= $query_curr_v_colour;
 				//	server_date
 				$query .= "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
-
-
-				//	В данной секции происходит только установка текущего поля
-				if( is_null($rows[$sensor_id]['error_id']) && $rows[$sensor_id]['is_enabled']==1 &&		//	датчик исправен и включен
-					$rows[$sensor_id]['NACK_Tmax']==0 && $rows[$sensor_id]['ACK_Tmax']==0 &&			//	нет текущего аларма
-					($rows[$sensor_id]['sensor_num'] < $rows[$sensor_id]['grain_level']) &&				//	датчик находится в зерне
-					($arrayOfTemperatures[$i][$j][$k]<850) &&											//	датчик выдает корректные показания
-					($arrayOfTemperatures[$i][$j][$k]*0.1 > $rows[$sensor_id]['t_max']) ){				//	температура выше критической для данного продукта
-						$query_NACK_Tmax = "1, ";
-						$query_TIME_NACK_Tmax = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
-						$loggingString .= "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". Tmax. Срабатывание сигнала АПС;\n";
-				} else {
-						$query_NACK_Tmax = "'".$rows[$sensor_id]['NACK_Tmax']."', ";
-						$query_TIME_NACK_Tmax = is_null($rows[$sensor_id]['TIME_NACK_Tmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_NACK_Tmax']."', ";
-				}
-				
-				//	Установка поля ACK происходит при квитировании АПС. В данной секции происходит сброс
-				if( $rows[$sensor_id]['ACK_Tmax']==1 &&													//	АПС была установлена и квитирована
-				   ( $rows[$sensor_id]['is_enabled']==0 || !is_null($rows[$sensor_id]['error_id']) ||	//	датчик вышел из строя или был отключен
-				     $arrayOfTemperatures[$i][$j][$k]>=850 ||											//	датчик стал выдавать некорректные показания
-				    ($rows[$sensor_id]['sensor_num'] >= $rows[$sensor_id]['grain_level']) ||			//	датчик ниже уровня заполнения
-				    ($arrayOfTemperatures[$i][$j][$k]*0.1 <= $rows[$sensor_id]['t_max'])  ) ){			//	температура меньше критической
-						$query_NACK_Tmax = "0, ";
-						$query_TIME_NACK_Tmax = "NULL, ";
-						$query_ACK_Tmax = "0, ";
-						$query_TIME_ACK_Tmax = "NULL, ";
-						$loggingString .= "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". Tmax. Исчезновение сигнала АПС;\n";
-				} else {
-						$query_ACK_Tmax = "'".$rows[$sensor_id]['ACK_Tmax']."', ";
-						$query_TIME_ACK_Tmax = is_null($rows[$sensor_id]['TIME_ACK_Tmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_ACK_Tmax']."', ";
-				}
 
 				//	NACK_Tmax
 				$query .= $query_NACK_Tmax;
@@ -289,36 +327,6 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 				//	TIME_ACK_Tmax
 				$query .= $query_TIME_ACK_Tmax;
 
-				//	В данной секции происходит только установка текущего поля
-				if(  is_null($rows[$sensor_id]['error_id']) && $rows[$sensor_id]['is_enabled']==1 &&	//	датчик исправен и включен
-					 $rows[$sensor_id]['NACK_Vmax']==0 && $rows[$sensor_id]['ACK_Vmax']==0 &&			//	нет текущего аларма
-					($rows[$sensor_id]['sensor_num'] < $rows[$sensor_id]['grain_level']) &&				//	датчик находится в зерне
-					($arrayOfTemperatures[$i][$j][$k]<850) &&											//	датчик выдает корректные показания
-					($arrayOfTempSpeeds[$i][$j][$k] > $rows[$sensor_id]['v_max']) ){					//	скорость изменения температуры выше критической
-						$query_NACK_Vmax = "1, ";
-						$query_TIME_NACK_Vmax = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
-						$loggingString .= "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". Vmax. Срабатывание сигнала АПС;\n";
-				} else {
-						$query_NACK_Vmax = "'".$rows[$sensor_id]['NACK_Vmax']."', ";
-						$query_TIME_NACK_Vmax = is_null($rows[$sensor_id]['TIME_NACK_Vmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_NACK_Vmax']."', ";
-				}
-				
-				//	Установка поля ACK происходит при квитировании АПС. В данной секции происходит сброс
-				if(  $rows[$sensor_id]['ACK_Vmax']==1 &&												//	АПС была установлена и квитирована
-				   ( $rows[$sensor_id]['is_enabled']==0 || !is_null($rows[$sensor_id]['error_id']) ||	//	датчик вышел из строя или был отключен
-				     $arrayOfTemperatures[$i][$j][$k]>=850 ||											//	датчик стал выдавать некорректные показания
-				    ($rows[$sensor_id]['sensor_num'] >= $rows[$sensor_id]['grain_level']) ||			//	датчик ниже уровня заполнения
-				    ($arrayOfTempSpeeds[$i][$j][$k] <= $rows[$sensor_id]['v_max'])  ) ){				//	скорость меньше критической
-						$query_NACK_Vmax = "0, ";
-						$query_TIME_NACK_Vmax = "NULL, ";
-						$query_ACK_Vmax = "0, ";
-						$query_TIME_ACK_Vmax = "NULL, ";
-						$loggingString .= "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". Vmax. Исчезновение сигнала АПС;\n";
-				} else {
-						$query_ACK_Vmax = "'".$rows[$sensor_id]['ACK_Vmax']."', ";
-						$query_TIME_ACK_Vmax = is_null($rows[$sensor_id]['TIME_ACK_Vmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_ACK_Vmax']."', ";
-				}
-
 				//	NACK_Vmax
 				$query .= $query_NACK_Vmax;
 				//	TIME_NACK_Vmax
@@ -327,35 +335,6 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 				$query .= $query_ACK_Vmax;
 				//	TIME_ACK_Vmax
 				$query .= $query_TIME_ACK_Vmax;
-
-				if( $rows[$sensor_id]['is_enabled']==1 && is_null($rows[$sensor_id]['error_id']) &&
-					$arrayOfTemperatures[$i][$j][$k]>=850 ){
-						$query_NACK_err = "1, ";
-						$query_TIME_NACK_err = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
-						$loggingString .= "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". ".$error_codes_arr[($arrayOfTemperatures[$i][$j][$k]*0.1)]['error_description'].". Срабатывание сигнала АПС;\n";
-				} else {
-						$query_NACK_err = "'".$rows[$sensor_id]['NACK_err']."', ";
-						$query_TIME_NACK_err = is_null($rows[$sensor_id]['TIME_NACK_err']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_NACK_err']."', ";
-						$query_error_id = is_null($rows[$sensor_id]['error_id']) ? "NULL)," : "'".$rows[$sensor_id]['error_id']."'),";
-				}
-
-				if( $rows[$sensor_id]['ACK_err']==1 &&
-				   ($rows[$sensor_id]['is_enabled']==0 || $arrayOfTemperatures[$i][$j][$k]<850) ){
-						$query_NACK_err = "0, ";
-						$query_TIME_NACK_err = "NULL, ";
-						$query_ACK_err = "0, ";
-						$query_TIME_ACK_err = "NULL, ";
-						$query_error_id = "NULL),";
-						$loggingString .= "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". ".$error_codes_arr[($arrayOfTemperatures[$i][$j][$k]*0.1)]['error_description'].". Исчезновение сигнала АПС;\n";
-				} else {
-						$query_ACK_err = "'".$rows[$sensor_id]['ACK_err']."', ";
-						$query_TIME_ACK_err = is_null($rows[$sensor_id]['TIME_ACK_err']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_ACK_err']."', ";
-						$query_error_id = is_null($rows[$sensor_id]['error_id']) ? "NULL)," : "'".$rows[$sensor_id]['error_id']."'),";
-				}
-
-				if($arrayOfTemperatures[$i][$j][$k]>=850){
-					$query_error_id = "'".($arrayOfTemperatures[$i][$j][$k]*0.1)."'),";
-				}
 
 				//	NACK_err
 				$query .= $query_NACK_err;
@@ -402,14 +381,15 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 	$stmt = $dbh->prepare($query);
 	$stmt->execute();
 
-	writeToLog($loggingString);
+	writeToLog($logFile, $loggingString);
 
 	return;
 }
 
-function alarms_ack($dbh, $serverDate){
+function alarms_ack($dbh, $serverDate, $logFile){
 
 	$loggingString = "";
+	$error_codes_arr = db_get_error_codes($dbh);
 	
 	$query = "	SELECT  sensor_id, silo_id, podv_id, sensor_num, is_enabled, current_temperature, current_speed,
 					curr_t_text, curr_v_text, curr_t_colour, curr_v_colour, server_date,
@@ -461,6 +441,10 @@ function alarms_ack($dbh, $serverDate){
 			$query_TIME_NACK_Tmax = "'".$rows[$i]['TIME_NACK_Tmax']."', ";
 			$query_ACK_Tmax = "1, ";
 			$query_TIME_ACK_Tmax = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
+
+			$loggingString .= "$serverDate: Силос ".$rows[$i]['silo_name'].". НП"
+							 .($rows[$i]['podv_id']+1).". НД".($rows[$i]['sensor_num']+1).". Tmax. Подтверждение сигнала АПС;\n";
+		
 		} else {
 			$query_NACK_Tmax = "'".$rows[$i]['NACK_Tmax']."', ";
 			$query_TIME_NACK_Tmax = is_null($rows[$i]['TIME_NACK_Tmax']) ? "NULL, " : "'".$rows[$i]['TIME_NACK_Tmax']."', ";
@@ -482,6 +466,10 @@ function alarms_ack($dbh, $serverDate){
 			$query_TIME_NACK_Vmax = "'".$rows[$i]['TIME_NACK_Vmax']."', ";
 			$query_ACK_Vmax = "1, ";
 			$query_TIME_ACK_Vmax = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
+			
+			$loggingString .= "$serverDate: Силос ".$rows[$i]['silo_name'].". НП".($rows[$i]['podv_id']+1).". НД".($rows[$i]['sensor_num']+1)
+							 .". Vmax. Подтверждение сигнала АПС;\n";
+
 		} else {
 			$query_NACK_Vmax = "'".$rows[$i]['NACK_Vmax']."', ";
 			$query_TIME_NACK_Vmax = is_null($rows[$i]['TIME_NACK_Vmax']) ? "NULL, " : "'".$rows[$i]['TIME_NACK_Vmax']."', ";
@@ -503,6 +491,10 @@ function alarms_ack($dbh, $serverDate){
 			$query_TIME_NACK_err = "'".$rows[$i]['TIME_NACK_err']."', ";
 			$query_ACK_err = "1, ";
 			$query_TIME_ACK_err = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
+			
+			$loggingString .= "$serverDate: Силос ".$rows[$i]['silo_name'].". НП".($rows[$i]['podv_id']+1).". НД".($rows[$i]['sensor_num']+1).". "
+							  .$error_codes_arr[$rows[$i]['error_id']]['error_description'].". Подтверждение сигнала АПС;\n";
+
 		} else {
 			$query_NACK_err = "'".$rows[$i]['NACK_err']."', ";
 			$query_TIME_NACK_err = is_null($rows[$i]['TIME_NACK_err']) ? "NULL, " : "'".$rows[$i]['TIME_NACK_err']."', ";
@@ -552,7 +544,7 @@ function alarms_ack($dbh, $serverDate){
 	$stmt = $dbh->prepare($query);
 	$stmt->execute();
 
-	writeToLog($loggingString);
+	writeToLog($logFile, $loggingString);
 
 	return $query;
 }

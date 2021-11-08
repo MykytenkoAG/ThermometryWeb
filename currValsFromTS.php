@@ -106,7 +106,7 @@ if(!checkReadValsToDBSensors($dbh, $arrayOfTemperatures)){
 //	Данные в порядке. Теперь необходимо занести новые показания в БД и выполнить проверку на алармы
 if($configOK){
 	db_update_grainLevels($dbh, $arrayOfLevels);
-	db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate);
+	db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate, $logFile);
 }
 
 exit_from_script:
@@ -455,7 +455,7 @@ if( isset($_POST['POST_currValsFromTS_get_number_of_new_alarms']) ) {
 }
 
 if( isset($_POST['POST_currValsFromTS_acknowledge_alarms']) ) {
-	echo alarms_ack($dbh,$serverDate);
+	echo alarms_ack($dbh,$serverDate, $logFile);
     //echo "Произведено подтверждение сигналов АПС" ;
 }
 
