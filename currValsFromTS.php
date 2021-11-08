@@ -4,7 +4,6 @@ require_once ('configParameters.php');		//	Параметры подключен
 require_once ('dbDebugTables.php');			//	Создание, удаление и изменение отладочных таблиц в БД
 require_once ('dbDDL.php');					//	Создание и инициализация всех таблиц в БД
 require_once ('dbCurrVals.php');			//	Запись текущих измеренных значений в БД
-require_once ('dbAlarms.php');				//	Работа с сигналами АПС
 
 $configOK=true;
 $errors=array();
@@ -108,9 +107,6 @@ if(!checkReadValsToDBSensors($dbh, $arrayOfTemperatures)){
 if($configOK){
 	db_update_grainLevels($dbh, $arrayOfLevels);
 	db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate);
-
-	alarms_set  ($dbh, $serverDate);
-	alarms_reset($dbh, $serverDate);
 }
 
 exit_from_script:
@@ -459,8 +455,8 @@ if( isset($_POST['POST_currValsFromTS_get_number_of_new_alarms']) ) {
 }
 
 if( isset($_POST['POST_currValsFromTS_acknowledge_alarms']) ) {
-	alarms_ack($dbh,$serverDate);
-    echo "Произведено подтверждение сигналов АПС" ;
+	echo alarms_ack($dbh,$serverDate);
+    //echo "Произведено подтверждение сигналов АПС" ;
 }
 
 //	Получение текущих значений

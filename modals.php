@@ -150,32 +150,24 @@
                         </table>
                     </div>
 
-                    <br>
+                    <br><br>
                     <h6 class="modal-title" id="">В случае, если была обновлена конфигурация проекта, загрузите новые файлы TermoServer.ini и TermoClient.ini.</h5>
                     <br>
 
-                    <div class="row" style="margin-left: auto; margin-right: auto; width: 100%;">
+                    <div class="col" style="margin-left: auto; margin-right: auto; width: 100%;">
 
-                        <div class="col g-1" style="display: block; margin: auto;">
-                            <label  class="btn btn-light w-100">
-                                <i class="">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16">
-                                        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                                        <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
-                                    </svg>
-                                </i>TermoServer.ini<input type="file" style="display: none;"  name="POST_termoServerIniFile">
-                            </label>
+                        <div class="row g-1" style="display: block; margin: auto;">
+                            <div class="mb-3">
+                                <label for="modal-ts-connection-settings-termo-server-ini" class="form-label">TermoServer.ini</label>
+                                <input class="form-control" type="file" id="modal-ts-connection-settings-termo-server-ini" name="POST_termoServerIniFile">
+                            </div>
                         </div>
 
-                        <div class="col g-1" style="display: block; margin: auto;">
-                            <label  class="btn btn-light w-100">
-                                <i class="">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16">
-                                        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                                        <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
-                                    </svg>
-                                </i>TermoClient.ini<input type="file" style="display: none;"  name="POST_termoClientIniFile">
-                            </label>
+                        <div class="row g-1" style="display: block; margin: auto;">
+                            <div class="mb-3">
+                                <label for="modal-ts-connection-settings-termo-client-ini" class="form-label">TermoClient.ini</label>
+                                <input class="form-control" type="file" id="modal-ts-connection-settings-termo-client-ini" name="POST_termoClientIniFile">
+                            </div>
                         </div>
 
                     </div>
@@ -204,7 +196,7 @@
 
             <div class="modal-body col" style="margin-left: auto; margin-right: auto; text-align:center;">
                 
-                <div class="row p-1 mb-3">
+                <div class="row p-1 mb-4">
                     <button type="submit" id="sconf-db-create-backup" class="btn btn-light">
                         Резервное копирование БД
                     </button>
@@ -212,18 +204,13 @@
 
                 <form action="visu_silo_config.php" method="post" enctype="multipart/form-data">
                     Восстановление БД из резервной копии:
-                    <div class="row mb-3">
-                        <div class="col-6 g-1">
-                            <label  class="btn btn-light w-100">
-                                <i class="">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16">
-                                        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                                        <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
-                                    </svg>
-                                </i>Файл<input type="file" style="display: none;"  name="databaseBackupFile">
-                            </label>
+                    <div class="row mb-4">
+                        <div class="col-12 g-1">
+                            <div class="mb-1">
+                                <input class="form-control" type="file" id="sconf-db-backup-file" name="databaseBackupFile">
+                            </div>
                         </div>
-                        <div class="col-6 g-1">
+                        <div class="col-12 g-1">
                             <button class="btn btn-light w-100" type="submit" id="sconf-db-restore-from-backup" name="POST_sconf_db_restore_from_backup">
                                 Восстановить
                             </button>

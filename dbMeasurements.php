@@ -4,9 +4,7 @@
 
 require_once('currValsFromTS.php');
 
-if( ! $simulation_mode ){
-	echo add_new_measurement($dbh, $arrayOfTemperatures, $serverDate);
-}
+add_new_measurement($dbh, $arrayOfTemperatures, $serverDate);
 
 //	measurements
 //	Выбор id последней даты

@@ -6,7 +6,6 @@ require_once ('configParameters.php');
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-//session_start();    //  сессия необходима для сохранения текущего пользователя
 
 $accessLevel=0;
 
