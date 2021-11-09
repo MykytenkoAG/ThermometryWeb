@@ -83,26 +83,25 @@ function vRep_drawMeasCheckboxes($measurementArray){
 
         if(count($measurementArray[$date])>1){
             $outStr.= "
-                                <div class=\"form-check mt-0 mb-1 collapse multi-collapse prfchbmc_$date\" style=\"margin-left: 3px; text-align: left\">
-                                    <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchball_$date\" onchange=\"vRep_prfChbCurrDate('prfchball_$date');vRep_rprtprf_checkDatesAndBlockDownloadButtons();\">
-                                    <label class=\"form-check-label\">
-                                        Все
-                                    </label>
-                                </div>
-                            
-                            ";
+                        <div class=\"form-check mt-0 mb-1 collapse multi-collapse prfchbmc_$date\" style=\"margin-left: 3px; text-align: left\">
+                            <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchball_$date\" onchange=\"vRep_prfChbCurrDate('prfchball_$date');vRep_rprtprf_checkDatesAndBlockDownloadButtons();\">
+                            <label class=\"form-check-label\">
+                                Все
+                            </label>
+                        </div>
+                    ";
         }
 
         //  Построение чекбоксов для конкретного дня
         foreach($time as $measTime){
             $outStr.= "
-                                <div class=\"form-check mt-0 mb-1 collapse multi-collapse prfchbmc_$date\" style=\"margin-left: 3px; text-align: left\">
-                                    <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchb_".$date."_".$measTime."\"  onchange=\"vRep_rprtprf_checkDatesAndBlockDownloadButtons();\">
-                                    <label class=\"form-check-label\">
-                                        $measTime
-                                    </label>
-                                </div>
-                            ";
+                        <div class=\"form-check mt-0 mb-1 collapse multi-collapse prfchbmc_$date\" style=\"margin-left: 3px; text-align: left\">
+                            <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchb_".$date."_".$measTime."\"  onchange=\"vRep_rprtprf_checkDatesAndBlockDownloadButtons();\">
+                            <label class=\"form-check-label\">
+                                $measTime
+                            </label>
+                        </div>
+                    ";
         }
 
         $outStr.= "</div></td></tr>";

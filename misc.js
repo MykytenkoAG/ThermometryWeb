@@ -30,49 +30,70 @@ function deleteCookie(name) {
 };
 
 function modalWindows() {
-    //  Если произошло обновление проекта
+    //  Главная страница. Произошло обновление проекта
     const project_was_updated = getCookie("popupProjectWasUpdated");
     if (project_was_updated === "OK") {
         document.getElementById("modal-info-body-message").innerText = "Проект успешно обновлен. Приятного пользования!";
         $("#modal-info").modal('show');
         document.cookie = 'popupProjectWasUpdated=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     }
-    //  Файл TermoClient.ini не был загружен из страницы настроек
-    const popupTermoClientIniWasNotUploaded = getCookie("popupTermoClientIniWasNotUploaded");
-    if (popupTermoClientIniWasNotUploaded === "OK") {
+    //  Страница настроек. Файл TermoClient.ini не был загружен
+    const popup_pjtUpdate_TermoClientIniWasNotUploaded = getCookie("popup_pjtUpdate_TermoClientIniWasNotUploaded");
+    if (popup_pjtUpdate_TermoClientIniWasNotUploaded === "OK") {
         document.getElementById("modal-info-body-message").innerText = "Файл TermoClient.ini не был загружен.";
         $("#modal-info").modal('show');
-        document.cookie = 'popupTermoClientIniWasNotUploaded=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        document.cookie = 'popup_pjtUpdate_TermoClientIniWasNotUploaded=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     }
-    //  Файл TermoServer.ini не был загружен из страницы настроек
-    const popupTermoServerIniWasNotUploaded = getCookie("popupTermoServerIniWasNotUploaded");
-    if (popupTermoServerIniWasNotUploaded === "OK") {
+    //  Страница настроек. Файл TermoServer.ini не был загружен
+    const popup_pjtUpdate_TermoServerIniWasNotUploaded = getCookie("popup_pjtUpdate_TermoServerIniWasNotUploaded");
+    if (popup_pjtUpdate_TermoServerIniWasNotUploaded === "OK") {
         document.getElementById("modal-info-body-message").innerText = "Файл TermoServer.ini не был загружен.";
         $("#modal-info").modal('show');
-        document.cookie = 'popupTermoServerIniWasNotUploaded=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        document.cookie = 'popup_pjtUpdate_TermoServerIniWasNotUploaded=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     }
-    //  Файлы TermoClient.ini и TermoServer.ini не совместимы друг с другом
-    const popupIniFilesAreNotConsistent = getCookie("popupIniFilesAreNotConsistent");
-    if (popupIniFilesAreNotConsistent === "OK") {
+    //  Файл TermoServer.ini поврежден
+    const popup_pjtUpdate_TermoServerIni_Damaged = getCookie("popup_pjtUpdate_TermoServerIni_Damaged");
+    if (popup_pjtUpdate_TermoServerIni_Damaged === "OK") {
+        document.getElementById("modal-info-body-message").innerText = "Файл TermoServer.ini поврежден. Загрузите корректный файл или обратитесь к поставщику.";
+        $("#modal-info").modal('show');
+        document.cookie = 'popup_pjtUpdate_TermoServerIni_Damaged=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+    //  Файл TermoClient.ini поврежден
+    const popup_pjtUpdate_TermoClientIni_Damaged = getCookie("popup_pjtUpdate_TermoClientIni_Damaged");
+    if (popup_pjtUpdate_TermoClientIni_Damaged === "OK") {
+        document.getElementById("modal-info-body-message").innerText = "Файл TermoClient.ini поврежден. Загрузите корректный файл или обратитесь к поставщику.";
+        $("#modal-info").modal('show');
+        document.cookie = 'popup_pjtUpdate_TermoClientIni_Damaged=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+    //  Страница настроек. Файлы TermoClient.ini и TermoServer.ini не совместимы друг с другом
+    const popup_pjtUpdate_IniFilesAreNotConsistent = getCookie("popup_pjtUpdate_IniFilesAreNotConsistent");
+    if (popup_pjtUpdate_IniFilesAreNotConsistent === "OK") {
         document.getElementById("modal-info-body-message").innerText = "Файлы TermoServer.ini и TermoClient.ini не совместимы друг с другом.";
         $("#modal-info").modal('show');
-        document.cookie = 'popupIniFilesAreNotConsistent=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        document.cookie = 'popup_pjtUpdate_IniFilesAreNotConsistent=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     }
-    //  Настройки подключения к ПО Термосервер успшено применены
+    //  Страница настроек. Настройки подключения к ПО Термосервер успшено применены
     const popupTSConnSettingsChanged = getCookie("popupTSConnSettingsChanged");
     if (popupTSConnSettingsChanged === "OK") {
         document.getElementById("modal-info-body-message").innerText = "Настройки подключения к ПО Термосервер успешно применены.";
         $("#modal-info").modal('show');
         document.cookie = 'popupTSConnSettingsChanged=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     }
-    //  База данных успешно восстановлена из страницы настроек
+    //  Страница настроек. Выбранный Вами файл не соответствует конфигурации базы данных текущего проекта
+    const db_databaseBackupFile_is_Bad = getCookie("db_databaseBackupFile_is_Bad");
+    if (db_databaseBackupFile_is_Bad === "OK") {
+        document.getElementById("modal-info-body-message").innerText = "Выбранный Вами файл не соответствует конфигурации базы данных текущего проекта";
+        $("#modal-info").modal('show');
+        document.cookie = 'db_databaseBackupFile_is_Bad=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
+    //  Страница настроек. База данных успешно восстановлена
     const db_successfully_restored = getCookie("dbRestoredSuccessfully");
     if (db_successfully_restored === "OK") {
         document.getElementById("modal-info-body-message").innerText = "База данных успешно восстановлена";
         $("#modal-info").modal('show');
         document.cookie = 'dbRestoredSuccessfully=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     }
-    //  Ошибка при загрузке файла на сервер
+    //  Страница настроек. Ошибка при загрузке файла на сервер
     const errorUploadingFile = getCookie("errorUploadingFile");
     if (errorUploadingFile === "OK") {
         document.getElementById("modal-info-body-message").innerText = "Ошибка при загрузке файла на сервер";

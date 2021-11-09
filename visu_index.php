@@ -507,8 +507,13 @@ function vInd_drawCurrValuesTable($accessLevel, $rowsNumber, $colsNumber, $shift
             $lvlSlider_rowspan = $rowsNumber + 1;
             $lvlSlider_max   = $rowsNumber;
             $lvlSlider_value = $dbRowsArr[0]['grain_level'];
-            $lvlSlider_style ="width: 15px; --tdHeight: calc(27px * $rowsNumber); height: var( --tdHeight );
-                            padding-right: 0px; margin-right: 0px;
+            $lvlSlider_style ="position: absolute;
+                            display: block;
+                            top: 30px;
+                            width: 40px;
+                            --tdHeight: calc(27px * $rowsNumber); height: var( --tdHeight );
+                            margin-left: auto; margin-right: auto;
+                            vertical-align: top;
                             -webkit-appearance: slider-vertical;";
 
             $outStr .= "<td rowspan=\"$lvlSlider_rowspan\">

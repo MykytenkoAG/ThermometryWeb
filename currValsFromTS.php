@@ -64,9 +64,8 @@ if($configOK){
 	projectUpdate($dbh, $termoClientINI, $termoServerINI);
 }
 
-tableSensorsOK:
+tableSensorsOK:		//	Таблицы существуют и заполнены данными
 
-//	Таблицы существуют и заполнены данными
 //	Заполнение массивов $arrayOfTemperatures; $arrayOfTempSpeed; $arrayOfLevels и переменной $serverDate
 //	РАБОЧИЙ РЕЖИМ:	значения шлет Термосервер
 //	РЕЖИМ ОТЛАДКИ:	значения вычитываются из БД (запись значений производится из отладочной страницы визуализации)
@@ -134,32 +133,42 @@ function replaceForbiddenChars($str){
 }
 //	Проверка файла TermoServer.ini на наличие всех необходимых ключей
 function isIniFileTermoServerOK($termoServerINI){
+	$siloKeyCount=0;
 	foreach ($termoServerINI as $key => $value) {
 		if(preg_match('/Silos[0-9]+/',$key)){
-			if( !isset($termoServerINI[$key]['SilosName'])		||
-				!isset($termoServerINI[$key]['PodvCount'])		||
-				!isset($termoServerINI[$key]['SensorsStr'])		||
-				!isset($termoServerINI[$key]['DeviceAddress'])	||
-				!isset($termoServerINI[$key]['FirstPodvShift'])	||
-				!isset($termoServerINI[$key]['off_']) ){
+			if( !isset($termoServerINI[$key]['SilosName'])		||			//	имя силоса
+				!isset($termoServerINI[$key]['PodvCount'])		||			//	количество подвесок
+				!isset($termoServerINI[$key]['SensorsStr'])		||			//	строка с количеством датчиков по подвескам
+				!isset($termoServerINI[$key]['DeviceAddress'])	||			//	адрес Блока Сбора информации
+				!isset($termoServerINI[$key]['FirstPodvShift'])	||			//	смещение первой подвески в ПЗУ Блока Сбора
+				!isset($termoServerINI[$key]['off_']) ){					//	силос отключен на сервере
 				return false;
-			}			
+			}
+			$siloKeyCount++;
 		}
+	}
+	if($siloKeyCount==0){		//	Если ключей Silos[0-9]+ нет вообще
+		return false;
 	}
 	return true;
 }
 //	Проверка файла TermoClient.ini на наличие всех необходимых ключей
 function isIniFileTermoClientOK($termoClientINI){
+	$siloKeyCount=0;
 	foreach ($termoClientINI as $key => $value) {
 		if(preg_match('/Silos[0-9]+/',$key)){
-			if( !isset($termoClientINI[$key]['Left'])	||
-				!isset($termoClientINI[$key]['Top'])	||
-				!isset($termoClientINI[$key]['Size'])	||
-				!isset($termoClientINI[$key]['sType'])	||
-				!isset($termoClientINI[$key]['Group'])	){
+			if( !isset($termoClientINI[$key]['Left'])	||					//	столбец
+				!isset($termoClientINI[$key]['Top'])	||					//	строка
+				!isset($termoClientINI[$key]['Size'])	||					//	размер
+				!isset($termoClientINI[$key]['sType'])	||					//	тип (квадратный, круглый)
+				!isset($termoClientINI[$key]['Group'])	){					//	номер группы силосов
 				return false;
-			}			
+			}
+			$siloKeyCount++;
 		}
+	}
+	if($siloKeyCount==0){		//	Если ключей Silos[0-9]+ нет вообще
+		return false;
 	}
 	return true;
 }
