@@ -15,7 +15,7 @@
       ?>
       <main>
         <div class="row row-cols-1 row-cols-sm-1 row-cols-xxl-3 g-0">
-          <div class="col-12 col-xxl-5 g-1">
+          <div class="col-12  col-xl-6 col-xxl-5 g-1">
             <div class="card border-light h-100">
               <div class="card-body">
                 <div class="d-flex justify-content-center">
@@ -51,7 +51,7 @@
             </div>
           </div>
 
-          <div class="col-12 col-sm-12 col-md-12 col-xxl-5 g-1">
+          <div class="col-12 col-sm-12 col-md-12 col-xl-6 col-xxl-5 g-1">
             <div class="card border-light h-100">
               <div class="card-body">
                 <div class="d-flex justify-content-center">

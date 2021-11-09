@@ -79,6 +79,13 @@ function modalWindows() {
         $("#modal-info").modal('show');
         document.cookie = 'popupTSConnSettingsChanged=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
     }
+    //  Страница настроек. Вы выбрали файл неподдерживаемого формата
+    const db_databaseBackupFile_unknownFormat = getCookie("db_databaseBackupFile_unknownFormat");
+    if (db_databaseBackupFile_unknownFormat === "OK") {
+        document.getElementById("modal-info-body-message").innerText = "Вы выбрали файл неподдерживаемого формата";
+        $("#modal-info").modal('show');
+        document.cookie = 'db_databaseBackupFile_unknownFormat=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    }
     //  Страница настроек. Выбранный Вами файл не соответствует конфигурации базы данных текущего проекта
     const db_databaseBackupFile_is_Bad = getCookie("db_databaseBackupFile_is_Bad");
     if (db_databaseBackupFile_is_Bad === "OK") {
@@ -109,6 +116,8 @@ document.addEventListener("DOMContentLoaded", () => {
     authGetCurrentUser(); //  Запрашиваем текущего пользователя из сессии
     getNewAlarmsNumber(); //  Проверяем наличие новых алармов, чтобы в случае необходимости включить звук
     getConf_ProjectConfArr(); //  Последовательно запрашиваем конфигурационные массивы из PHP
+    
+    console.log(current_page);
     //getConf_ArrayOfSiloNames();
 });
 

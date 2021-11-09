@@ -459,22 +459,33 @@ if(isset($_POST["POST_sconf_db_restore_from_backup"])) {
         $detected_type = finfo_file( $fileInfo, $target_file );
         finfo_close( $fileInfo );
         if($detected_type!=="text/plain"){
-            echo "Вы выбрали файл неподдерживаемого формата!";
+
+            setcookie("db_databaseBackupFile_unknownFormat", "OK", time()+3600);            //  Если пользователь загрузил файл не того формата
+            header('Location: silo_config.php');
+
         } else {
             
             if (vSConf_db_checkDBFileToCurrentDB($dbh, file_get_contents($target_file)) ){  //  Если загруженный файл соответствует конфигурации БД текущего проекта
                 vSConf_db_restore_from_backup($dbh, file_get_contents($target_file));   //  Выполняем восстановление БД
+                // Удаляем все файлы в папке uploads
+                $files = glob('uploads/*'); // get all file names
+                foreach($files as $file){ // iterate files
+                if(is_file($file))
+                    unlink($file); // delete file
+                }
                 setcookie("dbRestoredSuccessfully", "OK", time()+3600);
                 header('Location: silo_config.php');
             } else {
-                setcookie("db_databaseBackupFile_is_Bad", "OK", time()+3600);
+                setcookie("db_databaseBackupFile_is_Bad", "OK", time()+3600);               //  Загруженный файл не соответствует конфигурации текущей БД
                 header('Location: silo_config.php');
             }
 
         }
     } else {
+
         setcookie("errorUploadingFile", "OK", time()+3600);
         header('Location: silo_config.php');
+
     }
 }
 

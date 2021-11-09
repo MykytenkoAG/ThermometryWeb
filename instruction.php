@@ -19,9 +19,9 @@
     </script>
 
     <main>
-      <div class="row row-cols-1 row-cols-sm-12 row-cols-md-12 row-cols-lg-12 row-cols-xl-12 row-cols-xxl-12 g-0">
-          <div class="g-1" style="width:3%">
-            <div class="col">
+      <div class="row row-cols-sm-12 row-cols-md-12 row-cols-lg-12 row-cols-xl-12 row-cols-xxl-12 g-0">
+          
+            <div class="col-12 g-1">
 
               <ul class="nav me-auto mt-2" style="margin-left: 5px;">
                 <li>
@@ -59,15 +59,15 @@
 
 
             </div>
-          </div>
-    <script type="text/javascript" src="visu_instruction.js"></script>
+          
+          <script type="text/javascript" src="visu_instruction.js"></script>
 
-          <div class="g-1" style="width:97%">
-              <video id="instr-mp4-video" style="margin: 10px; height: calc(100vh - 110px); width: calc(100vw - 85px);" controls>
+          <div class="col-12 g-1" style="width:97%">
+              <video id="instr-mp4-video" style="margin: 10px; height: calc(100vh - 170px); width: calc(100vw - 25px);" controls>
                 <source src="video/instruction.mp4" type="video/mp4">
                 Your browser does not support HTML video.
               </video>
-              <iframe id="instr-pdf-document" src="docs/ТСС-02 - инструкция по эксплуатации ПО.pdf" style="margin: 10px; height: calc(100vh - 110px); width: calc(100vw - 85px);">
+              <iframe id="instr-pdf-document" src="docs/ТСС-02 - инструкция по эксплуатации ПО.pdf" style="margin: 10px; height: calc(100vh - 170px); width: calc(100vw - 25px);">
           </div>
 
       </div>

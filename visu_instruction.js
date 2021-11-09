@@ -12,15 +12,17 @@ function init_instruction(){
 
 $("a").hover(
     function() {
-        if(  ( $(this).attr('id')  === 'instr-href-text' && curr_instr_format==="text" ) ||
-             ( $(this).attr('id')  === 'instr-href-video' && curr_instr_format==="video") ){
+        if(   ( $(this).attr('id').split("-").pop() === current_page) || 
+              ( $(this).attr('id')  === 'instr-href-text' && curr_instr_format==="text") ||
+              ( $(this).attr('id')  === 'instr-href-video' && curr_instr_format==="video") ){
             return;
         }
         $(this).removeClass("text-black");
         $(this).addClass("text-primary");
     },
     function() {
-        if(  ( $(this).attr('id')  === 'instr-href-text' && curr_instr_format==="text" ) ||
+        if(  ( $(this).attr('id').split("-").pop() === current_page) ||
+             ( $(this).attr('id')  === 'instr-href-text' && curr_instr_format==="text" ) ||
              ( $(this).attr('id')  === 'instr-href-video' && curr_instr_format==="video") ){
             return;
         }
