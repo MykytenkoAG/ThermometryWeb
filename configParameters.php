@@ -6,7 +6,13 @@ mb_internal_encoding("UTF-8");
 //	Необходимые параметры для подключения к БД
 const servername = "localhost"; const username = "root"; const password = ""; const dbname = "zernoib";
 //	Создание объекта PDO для работы с Базой Данных
-$dbh = new PDO("mysql:host=".servername.";dbname=".dbname.";charset=utf8;", username, password/*, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]*/);
+$pdo_options = [
+    PDO::ATTR_TIMEOUT => 5//,
+    //PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    //PDO::ATTR_CASE => PDO::CASE_NATURAL,
+    //PDO::ATTR_ORACLE_NULLS => PDO::NULL_EMPTY_STRING
+];
+$dbh = new PDO("mysql:host=".servername.";dbname=".dbname.";charset=utf8;", username, password, $pdo_options);
 
 //	Подключение к TermoServer
 $IPAddr; $port;

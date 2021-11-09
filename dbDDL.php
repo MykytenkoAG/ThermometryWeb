@@ -35,6 +35,18 @@ function ddl_truncate_Measurements($dbh){
 	return;
 }
 
+function ddl_delete_old_measurements($dbh, $interval){
+
+	$query = 
+	   "DELETE FROM measurements WHERE date_id < (SELECT MIN(date_id) FROM dates WHERE DATE_SUB(CURDATE(),INTERVAL $interval) <= date);";
+
+	$stmt = $dbh->prepare($query);
+
+	$stmt->execute();
+
+	return;
+}
+
 //	Создание таблиц
 function ddl_create_Users($dbh){
 	

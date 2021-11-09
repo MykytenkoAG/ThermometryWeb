@@ -66,6 +66,7 @@ function vRep_drawMeasCheckboxes($measurementArray){
 
     foreach($measurementArray as $date => $time){
 
+        //  Отрисовка кнопки
         $outStr.= " <tr>
                         <td colspan=\"2\" style=\"margin: 0px;\">
                             <p style=\"margin-bottom: 0px; padding: 0px;\">
@@ -78,34 +79,34 @@ function vRep_drawMeasCheckboxes($measurementArray){
                     </tr>
                     ";
 
+        $outStr.= "<tr><td><div class=\"collapse multi-collapse prfchbmc_$date\">";
+
         if(count($measurementArray[$date])>1){
-            $outStr.= "<tr>
-                            <td>
+            $outStr.= "
                                 <div class=\"form-check mt-0 mb-1 collapse multi-collapse prfchbmc_$date\" style=\"margin-left: 3px; text-align: left\">
                                     <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchball_$date\" onchange=\"vRep_prfChbCurrDate('prfchball_$date');vRep_rprtprf_checkDatesAndBlockDownloadButtons();\">
                                     <label class=\"form-check-label\">
                                         Все
                                     </label>
                                 </div>
-                            </td>
-                        </tr>
+                            
                             ";
         }
 
+        //  Построение чекбоксов для конкретного дня
         foreach($time as $measTime){
             $outStr.= "
-                        <tr>
-                            <td>
                                 <div class=\"form-check mt-0 mb-1 collapse multi-collapse prfchbmc_$date\" style=\"margin-left: 3px; text-align: left\">
                                     <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchb_".$date."_".$measTime."\"  onchange=\"vRep_rprtprf_checkDatesAndBlockDownloadButtons();\">
                                     <label class=\"form-check-label\">
                                         $measTime
                                     </label>
                                 </div>
-                            </td>
-                        </tr>";
+                            ";
         }
 
+        $outStr.= "</div></td></tr>";
+        
     }
 
     $outStr .= "</table>";

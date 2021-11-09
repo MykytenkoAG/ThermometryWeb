@@ -547,6 +547,51 @@ function vSConf_db_truncate_measurements(){
     });
 }
 
+$("#sconf-db-delete-old-measurements").click(function() {
+    document.getElementById("modal-are-you-sure-text").innerText = "Удалить записи старше одного месяца?";
+    document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
+    document.getElementById("modal-are-you-sure-btn-cancel").innerText = "Отмена";
+    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "vSConf_db_delete_old_measurements()");
+    $("#modal-are-you-sure").modal('show');
+});
+
+function vSConf_db_delete_old_measurements(){
+    $.ajax({
+        url: 'visu_silo_config.php',
+        type: 'POST',
+        cache: false,
+        data: { 'POST_vSConf_db_delete_old_measurements': 1 },
+        dataType: 'html',
+        success: function(fromPHP) {
+            document.getElementById("modal-info-body-message").innerText = fromPHP;
+            $("#modal-info").modal('show');
+        }
+    });
+}
+
+//  Очистить журнал
+$('#sconf-silo-config-btn-clear-log').click(function() {
+    document.getElementById("modal-are-you-sure-text").innerText = "Очистить журнал АПС?";
+    document.getElementById("modal-are-you-sure-btn-ok").innerText = "Да";
+    document.getElementById("modal-are-you-sure-btn-cancel").innerText = "Отмена";
+    document.getElementById("modal-are-you-sure-btn-ok").setAttribute("onclick", "vSConf_clear_log()");
+    $("#modal-are-you-sure").modal('show');
+});
+
+function vSConf_clear_log(){
+    $.ajax({
+        url: 'visu_silo_config.php',
+        type: 'POST',
+        cache: false,
+        data: { 'POST_vSConf_clear_log': 1 },
+        dataType: 'html',
+        success: function(fromPHP) {
+            document.getElementById("modal-info-body-message").innerText = fromPHP;
+            $("#modal-info").modal('show');
+        }
+    });
+}
+
 //  Изменить пароль
 $("#sconf-silo-config-btn-change-password").click(function() {
     document.getElementById("modal-sign-in-btn-close").setAttribute("onclick", "modalPasswordInputClear('modal-pass-change-pwd1');modalPasswordInputClear('modal-pass-change-pwd2')");

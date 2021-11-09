@@ -396,6 +396,8 @@ if( isset($_POST['POST_vSConf_db_create_backup']) ) {
 //  ! Необходимо добавить try catch, так как возможны ошибки при выполнении sql команд
 //  ! Также следует почитать об ограничениях на загрузку файлов через браузер
 function vSConf_db_restore_from_backup($dbh, $dbBackupFile){
+    //$cmd = "mysql -h {localhost} -u {root} -p{} {zernoib} < $dbBackupFile";
+    //exec($cmd);
     $stmt = $dbh->prepare( $dbBackupFile );
     $stmt->execute();
     return;
@@ -411,6 +413,7 @@ if(isset($_POST["POST_sconf_db_restore_from_backup"])) {
         if($detected_type!=="text/plain"){
             echo "Вы выбрали файл неподдерживаемого формата!";
         } else {
+            //echo file_get_contents($target_file);
             vSConf_db_restore_from_backup($dbh, file_get_contents($target_file));   //  Файл прошел проверку на тип. Пробуем восстановить состояние БД
             setcookie("dbRestoredSuccessfully", "OK", time()+3600);
             header('Location: silo_config.php');                                    //  Перенаправление на ту же страницу, но чтобы произошло событие "DOMContentLoaded"
@@ -426,6 +429,19 @@ if(isset($_POST["POST_sconf_db_restore_from_backup"])) {
 if( isset($_POST['POST_vSConf_db_truncate_measurements']) ) {
     ddl_truncate_Measurements($dbh);
     echo "База данных успешно очищена";
+}
+
+//  Удаление записей, которые старше одного месяца
+if( isset($_POST['POST_vSConf_db_delete_old_measurements']) ) {
+    ddl_delete_old_measurements($dbh, "1 MONTH");
+    echo "Записи успешно удалены";
+}
+
+
+//  Очистка журнала АПС
+if( isset($_POST['POST_vSConf_clear_log']) ) {
+    logClear($logFile);
+    echo "Журнал АПС успешно очищен";
 }
 
 ?>

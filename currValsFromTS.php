@@ -364,13 +364,6 @@ function checkReadValsToDBSensors($dbh, $arrayOfTemperatures){
 //  Вызываются при переходе на новую страницу
 
 //	Выход: трехмерный массив [массив имен силосов][массив подвесок][массив датчиков]
-//$projectConfArr = getConfForVisu_ProjectConfig($dbh) ;
-//$projectConfArr = json_encode ($projectConfArr);
-//print_r(json_last_error_msg());
-//print_r($projectConfArr);
-//print_r(getConfForVisu_ProjectConfig($dbh));
-
-//print_r(getConfForVisu_ProjectConfig($dbh));
 function getConfForVisu_ProjectConfig($dbh){
 
     $projectConfArr = array();

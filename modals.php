@@ -205,12 +205,10 @@
                 <form action="visu_silo_config.php" method="post" enctype="multipart/form-data">
                     Восстановление БД из резервной копии:
                     <div class="row mb-4">
-                        <div class="col-12 g-1">
-                            <div class="mb-1">
-                                <input class="form-control" type="file" id="sconf-db-backup-file" name="databaseBackupFile">
-                            </div>
+                        <div class="col-8 g-1">
+                            <input class="form-control" type="file" id="sconf-db-backup-file" name="databaseBackupFile">
                         </div>
-                        <div class="col-12 g-1">
+                        <div class="col-4 g-1">
                             <button class="btn btn-light w-100" type="submit" id="sconf-db-restore-from-backup" name="POST_sconf_db_restore_from_backup">
                                 Восстановить
                             </button>
@@ -218,11 +216,19 @@
                     </div>
                 </form>
 
-                <div class="row p-1">
-                    <button type="submit" id="sconf-db-truncate-measurements" class="btn btn-light" data-bs-dismiss="modal" >
-                        Очистить БД
-                    </button>
+                <div class="row">
+                    <div class="col-4 g-1">
+                        <button type="submit" id="sconf-db-truncate-measurements" class="btn btn-light w-100" data-bs-dismiss="modal" >
+                            Очистить БД
+                        </button>
+                    </div>
+                    <div class="col-8 g-1">
+                        <button type="submit" id="sconf-db-delete-old-measurements" class="btn btn-light w-100" data-bs-dismiss="modal" >
+                            Удалить записи старше 1 месяца
+                        </button>
+                    </div>
                 </div>
+
 
             </div>
 
