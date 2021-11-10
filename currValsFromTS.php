@@ -431,10 +431,10 @@ function getConfForVisu_SiloNames($dbh){
 //	Выход: название силоса с максимальным количеством подвесок. Необходимо для страницы "Отчет" (печатные формы)
 function getConfForVisu_SiloNameWithMaxPodvNumber($dbh){
 
-    $sql = "SELECT s.silo_id, pbs.silo_name, count(distinct (s.podv_id))
+    $sql = "SELECT s.silo_id, pbs.silo_name, count(distinct (s.podv_id)), count(distinct(s.sensor_num))
 			FROM sensors AS s INNER JOIN prodtypesbysilo AS pbs ON s.silo_id = pbs.silo_id 
 			GROUP BY s.silo_id
-			ORDER BY count(distinct (s.podv_id)) DESC, pbs.silo_name";
+			ORDER BY count(distinct (s.podv_id)) DESC, count(distinct(s.sensor_num)) DESC, pbs.silo_name";
 
     $sth = $dbh->query($sql);
 

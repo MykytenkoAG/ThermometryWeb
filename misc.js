@@ -117,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
     getNewAlarmsNumber(); //  Проверяем наличие новых алармов, чтобы в случае необходимости включить звук
     getConf_ProjectConfArr(); //  Последовательно запрашиваем конфигурационные массивы из PHP
     
-    console.log(current_page);
+    //console.log(current_page);
     //getConf_ArrayOfSiloNames();
 });
 
@@ -131,7 +131,7 @@ function getConf_ProjectConfArr() {
         data: { 'POST_currValsFromTS_get_project_conf_array': 1 },
         dataType: 'html',
         success: function(fromPHP) {
-            console.log(fromPHP);
+            //console.log(fromPHP);
             project_conf_array = (JSON.parse(fromPHP));
             //console.log("project conf arr");
             //console.log(project_conf_array);
@@ -289,7 +289,7 @@ function alarmsAck() {
         data: { 'POST_currValsFromTS_acknowledge_alarms': 1 },
         dataType: 'html',
         success: function(fromPHP) {
-            console.log(fromPHP);
+            //console.log(fromPHP);
             controlAudio(0); //  Выключаем звук
             getNewAlarmsNumber(); //  Проверяем появление новых алармов
         }

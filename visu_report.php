@@ -5,12 +5,18 @@ require_once ('currValsFromTS.php');
 //  Печатные формы -------------------------------------------------------------------------------------------------------------------------------------------------------
 //  Получить все даты измерений
 //  out = [дата => массив времен измерений]
+//vRep_getAllMeasDates($dbh);
 function vRep_getAllMeasDates($dbh){
 
-    $sql = "SELECT DISTINCT (d.date)
+    /*$sql = "SELECT DISTINCT (d.date)
                 FROM measurements m
                 INNER JOIN dates d ON m.date_id = d.date_id
-                ORDER BY d.date";
+                ORDER BY d.date;";*/
+
+    $sql = "SELECT DISTINCT (DATE_FORMAT(d.date,'%d.%m.%Y %H:%i:%s'))
+                FROM measurements m
+                INNER JOIN dates d ON m.date_id = d.date_id
+                ORDER BY d.date;";
 
     $sth = $dbh->query($sql);
 
@@ -25,8 +31,8 @@ function vRep_getAllMeasDates($dbh){
     $daysIndArr = array();
 
     for($i=0; $i<count($rows); $i++){
-        $day    = preg_split('/ /', $rows[$i]['date'], -1, PREG_SPLIT_NO_EMPTY)[0];
-        $time   = preg_split('/ /', $rows[$i]['date'], -1, PREG_SPLIT_NO_EMPTY)[1];
+        $day    = preg_split('/ /', $rows[$i]["(DATE_FORMAT(d.date,'%d.%m.%Y %H:%i:%s'))"], -1, PREG_SPLIT_NO_EMPTY)[0];         //  Разбиваем строку по пробелу
+        $time   = preg_split('/ /', $rows[$i]["(DATE_FORMAT(d.date,'%d.%m.%Y %H:%i:%s'))"], -1, PREG_SPLIT_NO_EMPTY)[1];
         if($currDay!=$day){
             $currDay=$day;
             array_push($daysIndArr,$i);
@@ -40,12 +46,13 @@ function vRep_getAllMeasDates($dbh){
             $outArr[$daysArr[$i]] = array_slice($timesArr, $daysIndArr[$i]);
             break;
         }
-        $outArr[$daysArr[$i]] = array_slice( $timesArr, $daysIndArr[$i], ($daysIndArr[$i+1]-$daysIndArr[$i] ) );
+        $outArr[$daysArr[$i]] = array_slice( $timesArr, $daysIndArr[$i], ( $daysIndArr[$i+1]-$daysIndArr[$i] ) );
     }
 
     return $outArr;
 }
 //  Отрисовка кнопок с датами и чекбоксов с конкретным временем измерения
+//vRep_drawMeasCheckboxes(vRep_getAllMeasDates($dbh));
 function vRep_drawMeasCheckboxes($measurementArray){
 
     $outStr = "<table>";
@@ -67,11 +74,12 @@ function vRep_drawMeasCheckboxes($measurementArray){
     foreach($measurementArray as $date => $time){
 
         //  Отрисовка кнопки
+        $dateValidSelector = str_replace(".","-",$date);
         $outStr.= " <tr>
                         <td colspan=\"2\" style=\"margin: 0px;\">
                             <p style=\"margin-bottom: 0px; padding: 0px;\">
                                 <button class=\"btn btn-secondary mt-0 mb-1\" type=\"button\" data-bs-toggle=\"collapse\"
-                                        data-bs-target=\".prfchbmc_$date\" aria-expanded=\"false\">
+                                        data-bs-target=\".prfchbmc_$dateValidSelector\" aria-expanded=\"false\">
                                     $date
                                 </button>
                             </p>
@@ -79,11 +87,11 @@ function vRep_drawMeasCheckboxes($measurementArray){
                     </tr>
                     ";
 
-        $outStr.= "<tr><td><div class=\"collapse multi-collapse prfchbmc_$date\">";
+        $outStr.= "<tr><td><div class=\"collapse multi-collapse prfchbmc_$dateValidSelector\">";
 
         if(count($measurementArray[$date])>1){
             $outStr.= "
-                        <div class=\"form-check mt-0 mb-1 collapse multi-collapse prfchbmc_$date\" style=\"margin-left: 3px; text-align: left\">
+                        <div class=\"form-check mt-0 mb-1 collapse multi-collapse prfchbmc_$dateValidSelector\" style=\"margin-left: 3px; text-align: left\">
                             <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchball_$date\" onchange=\"vRep_prfChbCurrDate('prfchball_$date');vRep_rprtprf_checkDatesAndBlockDownloadButtons();\">
                             <label class=\"form-check-label\">
                                 Все
@@ -95,7 +103,7 @@ function vRep_drawMeasCheckboxes($measurementArray){
         //  Построение чекбоксов для конкретного дня
         foreach($time as $measTime){
             $outStr.= "
-                        <div class=\"form-check mt-0 mb-1 collapse multi-collapse prfchbmc_$date\" style=\"margin-left: 3px; text-align: left\">
+                        <div class=\"form-check mt-0 mb-1 collapse multi-collapse prfchbmc_$dateValidSelector\" style=\"margin-left: 3px; text-align: left\">
                             <input class=\"form-check-input\" type=\"checkbox\" id=\"prfchb_".$date."_".$measTime."\"  onchange=\"vRep_rprtprf_checkDatesAndBlockDownloadButtons();\">
                             <label class=\"form-check-label\">
                                 $measTime
@@ -110,11 +118,14 @@ function vRep_drawMeasCheckboxes($measurementArray){
 
     $outStr .= "</table>";
 
+    //echo $outStr;
+
     return $outStr;
 }
 
 //  Получение параметров для печатных форм -------------------------------------------------------------------------------------------------------------------------------
 //  Средние температуры в слоях
+//vRep_getAvgTemperByLayer($dbh, array(6), array(1), array('10.11.2021 07:26:26') );
 function vRep_getAvgTemperByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $arrayOfDates){
 
     $outObj=[];
@@ -127,18 +138,18 @@ function vRep_getAvgTemperByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $arrayOfD
     foreach($arrayOfSilos as $currSiloName){
         foreach($arrayOfDates as $currDate){
 
-            $strDate = "STR_TO_DATE('$currDate', '%Y-%m-%d %H:%i:%s')";
-    
-            $sql = "SELECT d.date, pbs.silo_name, s.sensor_num, ROUND(AVG(temperature),2)
-                        FROM measurements m
-                        INNER JOIN dates d ON m.date_id = d.date_id
-                        INNER JOIN sensors s ON m.sensor_id = s.sensor_id 
-                        INNER JOIN prodtypesbysilo pbs ON s.silo_id = pbs.silo_id 
-                        GROUP BY sensor_num, s.silo_id, date
-                        HAVING  d.date = $strDate AND
-                            pbs.silo_name = $currSiloName AND
-                            s.sensor_num IN $strArrayOfLayers
-                    ORDER BY d.date, pbs.silo_name, s.sensor_num;";
+            $strDate = "STR_TO_DATE('$currDate', '%d.%m.%Y %H:%i:%s')";
+
+            $sql = "SELECT (DATE_FORMAT(d.date,'%d.%m.%Y %H:%i:%s')) AS date_f, pbs.silo_name, s.sensor_num, ROUND(AVG(temperature),2)
+                FROM measurements m
+                INNER JOIN dates d ON m.date_id = d.date_id
+                INNER JOIN sensors s ON m.sensor_id = s.sensor_id 
+                INNER JOIN prodtypesbysilo pbs ON s.silo_id = pbs.silo_id 
+                GROUP BY sensor_num, s.silo_id, date
+                HAVING  date = $strDate AND
+                    pbs.silo_name = $currSiloName AND
+                    s.sensor_num IN $strArrayOfLayers
+            ORDER BY date_f, pbs.silo_name, s.sensor_num;";
 
             $sth = $dbh->query($sql);
 
@@ -156,7 +167,7 @@ function vRep_getAvgTemperByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $arrayOfD
             foreach($layersArr as $layer){
                 $layersObj[]=array($layer['sensor_num']+1=>$layer['ROUND(AVG(temperature),2)']);
             }
-            $outObj[]=array('date'=>$layersArr[0]['date'], 'silo'=>$layersArr[0]['silo_name'], 'layerTemperatures'=>$layersObj);
+            $outObj[]=array('date'=>$layersArr[0]["date_f"], 'silo'=>$layersArr[0]['silo_name'], 'layerTemperatures'=>$layersObj);
         }
     }
     return $outObj;
@@ -178,16 +189,16 @@ function vRep_getSensorTemperByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $array
     foreach($arrayOfDates as $currDate){
         foreach($arrayOfSilos as $currSiloName){
             foreach($arrayOfLayers as $currLayer){
-        
-                $strDate = "STR_TO_DATE('$currDate', '%Y-%m-%d %H:%i:%s')";
 
-                $sql = "SELECT d.date, pbs.silo_name, s.sensor_num, s.podv_id, temperature
+                $strDate = "STR_TO_DATE('$currDate', '%d.%m.%Y %H:%i:%s')";
+
+                $sql = "SELECT (DATE_FORMAT(d.date,'%d.%m.%Y %H:%i:%s')) AS date_f, pbs.silo_name, s.sensor_num, s.podv_id, temperature
                                 FROM measurements m
                                 INNER JOIN dates d ON m.date_id = d.date_id
                                 INNER JOIN sensors s ON m.sensor_id = s.sensor_id 
                                 INNER JOIN prodtypesbysilo pbs ON s.silo_id = pbs.silo_id 
                                 WHERE d.date = $strDate AND pbs.silo_name = $currSiloName AND s.sensor_num = $currLayer
-                                ORDER BY d.date, pbs.silo_name, s.sensor_num, podv_id;";
+                                ORDER BY date_f, pbs.silo_name, s.sensor_num, podv_id;";
 
                 $sth = $dbh->query($sql);
 
@@ -201,7 +212,7 @@ function vRep_getSensorTemperByLayer($dbh, $arrayOfSilos, $arrayOfLayers, $array
                 foreach($podvArr as $podv){
                     $podvObj[]=array($podv['podv_id']+1=>$podv['temperature']);
                 }
-                $outObj[]=array('date'=>$podvArr[0]['date'], 'silo'=>$podvArr[0]['silo_name'], 'layer'=>$podvArr[0]['sensor_num']+1, 'sensorTemperatures'=>$podvObj);
+                $outObj[]=array('date'=>$podvArr[0]['date_f'], 'silo'=>$podvArr[0]['silo_name'], 'layer'=>$podvArr[0]['sensor_num']+1, 'sensorTemperatures'=>$podvObj);
 
             }
         }
@@ -233,9 +244,9 @@ function vRep_getSensorTemperByPodv($dbh, $arrayOfSilos, $arrayOfPodv, $arrayOfS
         foreach($arrayOfSilos as $currSiloName){
             foreach($arrayOfPodv as $currPodv){
         
-                $strDate = "STR_TO_DATE('$currDate', '%Y-%m-%d %H:%i:%s')";
+                $strDate = "STR_TO_DATE('$currDate', '%d.%m.%Y %H:%i:%s')";
 
-                $sql = "SELECT d.date, pbs.silo_name, s.podv_id, s.sensor_num, temperature
+                $sql = "SELECT (DATE_FORMAT(d.date,'%d.%m.%Y %H:%i:%s')) AS date_f, pbs.silo_name, s.podv_id, s.sensor_num, temperature
                             FROM measurements m
                             INNER JOIN dates d ON m.date_id = d.date_id
                             INNER JOIN sensors s ON m.sensor_id = s.sensor_id 
@@ -244,7 +255,7 @@ function vRep_getSensorTemperByPodv($dbh, $arrayOfSilos, $arrayOfPodv, $arrayOfS
                                     pbs.silo_name = $currSiloName AND
                                     s.podv_id = $currPodv AND
                                     s.sensor_num IN $strArrayOfSensors
-                            ORDER BY d.date, pbs.silo_name, podv_id, s.sensor_num;";
+                            ORDER BY date_f, pbs.silo_name, podv_id, s.sensor_num;";
                         
                 $sth = $dbh->query($sql);
                 
@@ -258,7 +269,7 @@ function vRep_getSensorTemperByPodv($dbh, $arrayOfSilos, $arrayOfPodv, $arrayOfS
                 foreach($sensorArr as $sensor){
                     $sensorsObj[]=array($sensor['sensor_num']+1=>$sensor['temperature']);
                 }
-                $outObj[]=array('date'=>$sensorArr[0]['date'], 'silo'=>$sensorArr[0]['silo_name'], 'podv'=>$sensorArr[0]['podv_id']+1, 'sensorTemperatures'=>$sensorsObj);
+                $outObj[]=array('date'=>$sensorArr[0]['date_f'], 'silo'=>$sensorArr[0]['silo_name'], 'podv'=>$sensorArr[0]['podv_id']+1, 'sensorTemperatures'=>$sensorsObj);
 
             }
         }

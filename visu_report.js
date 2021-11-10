@@ -296,7 +296,7 @@ function vRep_rprtprf_getArrayOfDates() {
     let arrayOfDates = [];
 
     let dateCheckboxes = document.getElementsByTagName("input");
-    const re = /\w+_(\d{4}-\d{2}-\d{2}_\d{2}:\d{2}:\d{2})/;
+    const re = /\w+_(\d{2}\.\d{2}\.\d{4}_\d{2}:\d{2}:\d{2})/;           //  prfchb_день.месяц.год_часы:минуты:секунды
 
     for (let i = 0; i < dateCheckboxes.length; i++) {
         if (dateCheckboxes[i].id.match(re)) {
