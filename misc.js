@@ -275,6 +275,9 @@ function alarmsAck() {
         data: { 'POST_currValsFromTS_acknowledge_alarms': 1 },
         dataType: 'html',
         success: function(fromPHP) {
+            if(sessionStorage.getItem('configurationError')==='NACK'){
+                sessionStorage.setItem('configurationError', 'ACK');
+            }
             controlAudio(0);        //  Выключаем звук
             getNewAlarmsNumber();   //  Проверяем появление новых алармов
         }
@@ -292,10 +295,20 @@ function getNewAlarmsNumber() {
         dataType: 'html',
         success: function(fromPHP) {
 
-            console.log(fromPHP);
-            console.log("isJSON: "+isJson(fromPHP));
+            //console.log(fromPHP);
+            //console.log("isJSON: "+isJson(fromPHP));
+
+            //console.log(sessionStorage.getItem('configurationError'));
+            if(sessionStorage.getItem('configurationError')==='NACK'){
+                controlAudio(1);
+            }
             
             if (!isJson(fromPHP)) {     //  Если из PHP получен не JSON, значит произошла ошибка
+
+                sessionStorage.setItem('configurationError', 'OK');
+                if(current_page==="error_page.php"){
+                    document.location.href = "index.php";
+                }
 
                 if (fromPHP > alarmsNACKNumber) {   //  Если появились неквитированные алармы
                     controlAudio(1);                //  Включаем звук
@@ -308,8 +321,19 @@ function getNewAlarmsNumber() {
                     vIndOnClickOnSilo(lastSiloID);  //  Перерисовываем таблицу с текущими показаниями
                 }
 
-            } else if (current_page !== "error_page.php" && current_page !== "silo_config.php") {       //  Если мы не на странице настроек или ошибок
-                document.location.href = "error_page.php";                                              //  Переходим на страницу ошибок
+            } else {
+
+                if(sessionStorage.getItem('configurationError')!=='ACK'){
+                    sessionStorage.setItem('configurationError', 'NACK');
+                    controlAudio(1);
+                }
+                
+                if ( current_page !== "error_page.php" &&
+                    current_page !== "silo_config.php" &&
+                    current_page !== "instruction.php" ) {       //  Если мы не на странице настроек или ошибок
+                    document.location.href = "error_page.php";           //  Переходим на страницу ошибок
+                }
+
             }
 
         }

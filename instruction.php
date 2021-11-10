@@ -19,6 +19,12 @@
     </script>
 
     <main>
+      <?php
+        foreach($errors as $error){
+          echo $POSSIBLE_ERRORS[$error]['message'];
+        }
+      ?>
+
       <div class="row row-cols-sm-12 row-cols-md-12 row-cols-lg-12 row-cols-xl-12 row-cols-xxl-12 g-0">
           
             <div class="col-12 g-1">
@@ -63,11 +69,11 @@
           <script type="text/javascript" src="visu_instruction.js"></script>
 
           <div class="col-12 g-1" style="width:97%">
-              <video id="instr-mp4-video" style="margin: 10px; height: calc(100vh - 170px); width: calc(100vw - 25px);" controls>
+              <video id="instr-mp4-video" style="margin: 10px; height: calc(100vh - 170px); width: calc(100vw - 30px);" controls>
                 <source src="video/instruction.mp4" type="video/mp4">
                 Your browser does not support HTML video.
               </video>
-              <iframe id="instr-pdf-document" src="docs/ТСС-02 - инструкция по эксплуатации ПО.pdf" style="margin: 10px; height: calc(100vh - 170px); width: calc(100vw - 25px);">
+              <iframe id="instr-pdf-document" src="docs/ТСС-02 - инструкция по эксплуатации ПО.pdf" style="margin: 10px; height: calc(100vh - 170px); width: calc(100vw - 30px);">
           </div>
 
       </div>

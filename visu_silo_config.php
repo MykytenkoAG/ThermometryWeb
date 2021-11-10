@@ -453,16 +453,8 @@ function vSConf_db_restore_from_backup($dbh, $dbBackupFile){
     $users_rows = $sth->fetchAll();
 
     //  Создаем запросы для того, чтобы восстановить таблицу users и восстанавливаем Базу Данных из файла
-    $query_users="DROP TABLE users;
-                CREATE TABLE IF NOT EXISTS zernoib.users
-                (user_id INT NOT NULL AUTO_INCREMENT,
-                user_name VARCHAR(20) NOT NULL,
-                password VARCHAR(32) NOT NULL,
-                access_level INT NOT NULL DEFAULT 0,
-                PRIMARY KEY (user_id))
-                ENGINE = InnoDB
-                CHARSET=utf8 COLLATE utf8_general_ci;
-                INSERT INTO users (user_id, user_name, password, access_level) VALUES ";
+    $query_users = SQL_STATEMENT_DROP_USERS.SQL_STATEMENT_CREATE_USERS."INSERT INTO users (user_id, user_name, password, access_level) VALUES ";
+
     foreach($users_rows as $users_row){
         $query_users .= "(".$users_row['user_id'].", '".$users_row['user_name']."', '".$users_row['password']."', '".$users_row['access_level']."'),";
     }
@@ -477,7 +469,7 @@ function vSConf_db_restore_from_backup($dbh, $dbBackupFile){
     $ts_conn_settings_rows = $sth->fetchAll();
 
     //  Создаем запросы для того, чтобы восстановить таблицу users и восстанавливаем Базу Данных из файла
-    $query_ts_conn_settings="DROP TABLE zernoib.ts_conn_settings;
+    $query_ts_conn_settings="DROP TABLE IF EXISTS zernoib.ts_conn_settings;
                             CREATE TABLE IF NOT EXISTS zernoib.ts_conn_settings
                                 (id INT NOT NULL AUTO_INCREMENT,
                                 ts_ip VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '127.0.0.1',

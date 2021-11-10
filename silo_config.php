@@ -14,6 +14,11 @@
         require_once "modals.php";
       ?>
       <main>
+        <?php
+          foreach($errors as $error){
+            echo $POSSIBLE_ERRORS[$error]['message'];
+          }
+        ?>
         <div class="row row-cols-1 row-cols-sm-1 row-cols-xxl-3 g-0">
           <div class="col-12  col-xl-6 col-xxl-5 g-1">
             <div class="card border-light h-100">

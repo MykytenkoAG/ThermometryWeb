@@ -26,8 +26,10 @@ function add_new_measurement($dbh, $arrayOfTemperatures,$serverDate){
 	for($i = 0; $i < count($arrayOfTemperatures); $i++){
 		for($j = 0; $j < count($arrayOfTemperatures[$i]); $j++){
 			for($k = 0; $k < count($arrayOfTemperatures[$i][$j]); $k++){
-						$query.="(".$last_date_id.","."'".$sensor_id."'".",".$arrayOfTemperatures[$i][$j][$k] * 0.1 ."),";
-						$sensor_id++;
+				//$currentTemperature = $arrayOfTemperatures[$i][$j][$k]<850 ? $arrayOfTemperatures[$i][$j][$k] * 0.1: "NULL" ;
+				$currentTemperature = $arrayOfTemperatures[$i][$j][$k] * 0.1;
+				$query.="(".$last_date_id.","."'".$sensor_id."'".",".$currentTemperature."),";
+				$sensor_id++;
 			}
 		}
 	}
