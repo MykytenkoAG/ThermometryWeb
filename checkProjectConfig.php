@@ -144,7 +144,7 @@ function projectUpdate($dbh, $termoClientINI, $termoServerINI){
 	
 }
 
-//	Перечень функций для выдачи конфигурационных массивов в JavaScript для повышения интерактивности.------------------------------------------------------------
+//	Перечень функций для выдачи конфигурационных массивов в JavaScript для повышения интерактивности
 //  Вызываются при переходе на новую страницу
 //	Выход: трехмерный массив [массив имен силосов][массив подвесок][массив датчиков]
 function getConfForVisu_ProjectConfig($dbh){
@@ -219,6 +219,31 @@ function getConfForVisu_SiloNameWithMaxPodvNumber($dbh){
     $rows = $sth->fetchAll();
     
     return $rows[0]['silo_name'];
+}
+
+//	Функции для отображения ошибок
+//	Функция для отрисовки сообщений с ошибками
+function draw_errors($POSSIBLE_ERRORS, $errors){
+	$outStr = "";
+	foreach($errors as $error){
+		$outStr .= $POSSIBLE_ERRORS[$error]['message'];
+	}
+	return $outStr;
+}
+function draw_error_images($POSSIBLE_ERRORS, $errors){
+	$outStr = "";
+	if(	array_search("NoTermoServer.ini", $errors)!=false		||
+		array_search("NoTermoClient.ini", $errors)!=false		||
+		array_search("DamagedTermoServer.ini", $errors)!=false	||
+		array_search("DamagedTermoClient.ini", $errors)!=false	||
+		array_search("IniFilesInconsistent", $errors)!=false	||
+		array_search("ProjectIsOutOfDate", $errors)!=false ){
+			$outStr .= $POSSIBLE_ERRORS["SolutionINIFilesAreDamaged"]['image'];
+	}
+	if(array_search("TermoServerIsOff", $errors)){
+			$outStr .= $POSSIBLE_ERRORS["SolutionTermoServerIsOff"]['image'];
+	}
+	return $outStr;
 }
 
 ?>

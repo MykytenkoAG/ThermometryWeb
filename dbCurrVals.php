@@ -1,7 +1,5 @@
 <?php
 
-require_once('currValsFromTS.php');
-
 //	Запись строки в журнал
 function writeToLog($logFile, $loggingString){
     // Write the contents to the file, 
@@ -10,12 +8,11 @@ function writeToLog($logFile, $loggingString){
     file_put_contents($logFile, $loggingString, FILE_APPEND | LOCK_EX);
     return;
 }
-
+//	Очистка журнала
 function logClear($logFile){
     file_put_contents($logFile, "");
     return;
 }
-
 //	Функция для записи значений из массива $arrayOfLevels в Базу Данных
 function db_update_grainLevels($dbh, $arrayOfLevels){
 
@@ -79,7 +76,6 @@ function db_update_grainLevels($dbh, $arrayOfLevels){
 	
 	return;
 }
-
 //	Функция получения массива кодов ошибок
 function db_get_error_codes($dbh){
 
@@ -90,7 +86,7 @@ function db_get_error_codes($dbh){
 	$sth = $dbh->query($query);
 	$error_codes = $sth->fetchAll();
 	//	Создание двумерного ассоциативного массива из БД для удобства и скорости доступа к таблице "errors"
-	$error_codes_arr = array(array());
+	$error_codes_arr = array();
 	$j=0;
 	for($i=0; $i<$error_codes[count($error_codes)-1]['error_id'];$i++){
 		if($i==$error_codes[$j]['error_id']){
@@ -104,9 +100,7 @@ function db_get_error_codes($dbh){
 	return $error_codes_arr;
 
 }
-
 //	Функция для записи значений из массивов $arrayOfTemperatures и $arrayOfTempSpeeds в Базу Данных от времени $serverDate
-//db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate, $logFile);
 function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate, $logFile){
 
 	$loggingString="";
@@ -206,7 +200,7 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 
 				//	Vmax NACK
 				if(  is_null($rows[$sensor_id]['error_id']) && $rows[$sensor_id]['is_enabled']==1 &&	//	датчик исправен и включен
-						$rows[$sensor_id]['NACK_Vmax']==0 && $rows[$sensor_id]['ACK_Vmax']==0 &&			//	нет текущего аларма
+					 $rows[$sensor_id]['NACK_Vmax']==0 && $rows[$sensor_id]['ACK_Vmax']==0 &&			//	нет текущего аларма
 					($rows[$sensor_id]['sensor_num'] < $rows[$sensor_id]['grain_level']) &&				//	датчик находится в зерне
 					($arrayOfTemperatures[$i][$j][$k]<850) &&											//	датчик выдает корректные показания
 					($arrayOfTempSpeeds[$i][$j][$k] > $rows[$sensor_id]['v_max']) ){					//	скорость изменения температуры выше критической
@@ -221,7 +215,7 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 				//	Vmax reset
 				if(  $rows[$sensor_id]['ACK_Vmax']==1 &&												//	АПС была установлена и квитирована
 					( $rows[$sensor_id]['is_enabled']==0 || !is_null($rows[$sensor_id]['error_id']) ||	//	датчик вышел из строя или был отключен
-						$arrayOfTemperatures[$i][$j][$k]>=850 ||											//	датчик стал выдавать некорректные показания
+					  $arrayOfTemperatures[$i][$j][$k]>=850 ||											//	датчик стал выдавать некорректные показания
 					($rows[$sensor_id]['sensor_num'] >= $rows[$sensor_id]['grain_level']) ||			//	датчик ниже уровня заполнения
 					($arrayOfTempSpeeds[$i][$j][$k] <= $rows[$sensor_id]['v_max'])  ) ){				//	скорость меньше критической
 						$query_NACK_Vmax = "0, ";
@@ -233,7 +227,7 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 						$query_ACK_Vmax = "'".$rows[$sensor_id]['ACK_Vmax']."', ";
 						$query_TIME_ACK_Vmax = is_null($rows[$sensor_id]['TIME_ACK_Vmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_ACK_Vmax']."', ";
 				}
-			
+
 				//	Отображение параметров в таблице
 
 				//	Текст
@@ -274,7 +268,6 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 					}
 
 					$query_curr_t_colour=sprintf('\'#%02X%02X00\'',$red, $green).", ";
-
 
 					$green = ($rows[$sensor_id]['v_max'] - str_replace(",", ".", $arrayOfTempSpeeds[$i][$j][$k])) / ($rows[$sensor_id]['v_max'] - $rows[$sensor_id]['v_min']) * 255;
 					if($green>255){
@@ -385,7 +378,7 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 
 	return;
 }
-
+//	Квитирование алармов
 function alarms_ack($dbh, $serverDate, $logFile){
 
 	$loggingString = "";
@@ -548,7 +541,6 @@ function alarms_ack($dbh, $serverDate, $logFile){
 
 	return $query;
 }
-
 //	Функция определения того, есть ли неквитированные алармы
 function alarms_get_nack_number($dbh){
 	$sql = "SELECT count(sensor_id) FROM zernoib.sensors WHERE (NACK_err=1 OR NACK_Tmax=1 OR NACK_Vmax=1)";

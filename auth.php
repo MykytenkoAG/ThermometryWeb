@@ -2,7 +2,6 @@
 
 require_once ('configParameters.php');
 
-//  Данный файл включается во все страницы проекта
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -68,7 +67,6 @@ function auth_getCurrentUser(){
     $current_user = "anonymous";
 
     if ( isset($_SESSION["SESSION_curr_access_level"]) ){
-
         switch($_SESSION["SESSION_curr_access_level"]){
         case 1:
             $current_user =  "oper";

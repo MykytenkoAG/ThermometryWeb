@@ -1,14 +1,9 @@
 <?php
-/*  Данный скрипт вызывается 1 раз в 30 минут в фоне для записи показаний температуры в базу данных
-*/
-
+//  Данный скрипт вызывается 1 раз в 30 минут в фоне для записи показаний температуры в базу данных
 require_once('currValsFromTS.php');
 
 add_new_measurement($dbh, $arrayOfTemperatures, $serverDate);
 
-//	measurements
-//	Выбор id последней даты
-//	Запись температур из массива $arrayOfTemperatures
 function add_new_measurement($dbh, $arrayOfTemperatures,$serverDate){
 
 	$query="INSERT INTO dates (date) VALUES (STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'));";
@@ -26,8 +21,7 @@ function add_new_measurement($dbh, $arrayOfTemperatures,$serverDate){
 	for($i = 0; $i < count($arrayOfTemperatures); $i++){
 		for($j = 0; $j < count($arrayOfTemperatures[$i]); $j++){
 			for($k = 0; $k < count($arrayOfTemperatures[$i][$j]); $k++){
-				//$currentTemperature = $arrayOfTemperatures[$i][$j][$k]<850 ? $arrayOfTemperatures[$i][$j][$k] * 0.1: "NULL" ;
-				$currentTemperature = $arrayOfTemperatures[$i][$j][$k] * 0.1;
+				$currentTemperature = $arrayOfTemperatures[$i][$j][$k]<850 ? $arrayOfTemperatures[$i][$j][$k] * 0.1: "NULL" ;
 				$query.="(".$last_date_id.","."'".$sensor_id."'".",".$currentTemperature."),";
 				$sensor_id++;
 			}

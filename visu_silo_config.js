@@ -76,6 +76,9 @@ function vSConf_redrawTableProdtypes() {
             tbl_prodtypes_changed = 0;
             vSConf_buttonDisable("sconf-table-prodtypes-btn-save-changes");
             vSConf_buttonDisable("sconf-table-prodtypes-btn-discard-changes");
+            if((current_page==="silo_config.php") && curr_user==="tehn"){                       //  Включение кнопки "Добавить", в случае, если пользователь - технолог
+                vSConf_buttonEnable("sconf-table-prodtypes-btn-add");
+            }
         }
     });
     return;
@@ -94,6 +97,9 @@ function vSConf_redrawTableProdtypesbysilo() {
             tbl_prodtypesbysilo_changed = 0;
             vSConf_buttonDisable("sconf-table-prodtypesbysilo-btn-save-changes");
             vSConf_buttonDisable("sconf-table-prodtypesbysilo-btn-discard-changes");
+            if((current_page==="silo_config.php") && curr_user==="tehn"){                       //  Включение кнопки "Добавить", в случае, если пользователь - технолог
+                vSConf_buttonEnable("sconf-table-prodtypes-btn-add");
+            }
         }
     });
     return;

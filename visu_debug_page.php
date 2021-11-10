@@ -171,7 +171,6 @@ if( isset( $_POST['POST_vDbgPage_dbg_8_set_all_params_to_0']) ) {
 //  Сохранение текущих значений параметров в Базу Данных
 if( isset( $_POST['POST_vDbgPage_write_measurements_to_db'] ) ) {
     require_once ('dbMeasurements.php');
-    //add_new_measurement($dbh, $arrayOfTemperatures, $serverDate);
     echo "Текущие параметры занесены в БД";
 }
 

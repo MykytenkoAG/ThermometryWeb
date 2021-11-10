@@ -9,18 +9,14 @@
    </head>
    <body>
 
-
       <div class="container-fluid">
          <?php
             require_once ('header.php');
             require_once ('modals.php');
             require_once ('currValsFromTS.php');
+            echo draw_errors($POSSIBLE_ERRORS, $errors);
+            echo draw_error_images($POSSIBLE_ERRORS, $errors);
          ?>
-            <?php
-               foreach($errors as $error){
-                  echo $POSSIBLE_ERRORS[$error]['message'];
-               }
-            ?>
 
          <div class="d-flex mt-3 mb-3 justify-content-center">
 

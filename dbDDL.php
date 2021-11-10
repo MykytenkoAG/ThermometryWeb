@@ -1,27 +1,16 @@
 <?php
-
-//require_once ('currValsFromTS.php');
-require_once ('configParameters.php');
-
 //	Выполнение ddl-запросов
 function ddl_execute_statement($dbh,$sql_statement){
 	$stmt = $dbh->prepare($sql_statement);
 	$stmt->execute();
 	return;
 }
-
 function ddl_truncate_Measurements($dbh){
-
-	$query = 
-	   "TRUNCATE zernoib.measurements;";
-
+	$query = "TRUNCATE zernoib.measurements;";
 	$stmt = $dbh->prepare($query);
-
 	$stmt->execute();
-
 	return;
 }
-
 function ddl_delete_old_measurements($dbh, $interval){
 
 	$query = 
@@ -33,7 +22,6 @@ function ddl_delete_old_measurements($dbh, $interval){
 
 	return;
 }
-
 //	Инициализация таблиц
 function ddl_init_Users($dbh){
 	
@@ -46,7 +34,6 @@ function ddl_init_Users($dbh){
 
 	return;
 }
-
 function ddl_init_Errors($dbh){
 
 	$query="REPLACE INTO errors (error_id, error_description, error_desc_short, error_desc_for_visu) VALUES 
@@ -66,7 +53,6 @@ function ddl_init_Errors($dbh){
 	
 	return;
 }
-
 function ddl_init_Dates($dbh, $serverDate){
 
 	$query="INSERT INTO dates (date) VALUES (STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'));";
@@ -76,7 +62,6 @@ function ddl_init_Dates($dbh, $serverDate){
 
 	return;
 }
-
 function ddl_init_Prodtypes($dbh){
 
 	$query="INSERT INTO prodtypes (product_name, t_min, t_max, v_min, v_max) VALUES 
@@ -93,7 +78,6 @@ function ddl_init_Prodtypes($dbh){
 
 	return;
 }
-
 function ddl_init_SilosesGroups($dbh, $termoClientINI){
 
 	$query  = "INSERT INTO zernoib.silosesgroups (silo_group, silo_group_name, silo_group_col, silo_group_row, silo_group_size) VALUES ";
@@ -113,7 +97,6 @@ function ddl_init_SilosesGroups($dbh, $termoClientINI){
 
 	return;
 }
-
 //	Функция сортировки ini-файлов по именам силосов. Полезна в больших проектах, где имена в ini-файле идут в разнобой
 function getTermoServerIniSortedBySiloName($termoClientINI,$termoServerINI){
 
@@ -171,12 +154,11 @@ function getTermoServerIniSortedBySiloName($termoClientINI,$termoServerINI){
 	return $outArr;
 
 }
-
 function ddl_init_Prodtypesbysilo($dbh, $termoClientINI, $termoServerINI){
 
     $query = "SELECT product_id FROM zernoib.prodtypes ORDER BY product_id ASC LIMIT 1";
     $sth = $dbh->query($query);
-    // fetch all rows into array, by default PDO::FETCH_BOTH is used
+	
 	$product_id=($sth->fetchAll())[0]['product_id'];					//	Выбираем продукт с id=1 для заполенения им всех силосов (только при инициализации)
 
 	$query="INSERT INTO prodtypesbysilo (silo_id, silo_name, bs_addr, product_id, grain_level_fromTS, grain_level, is_square, size, position_col, position_row, silo_group) VALUES ";
@@ -205,7 +187,6 @@ function ddl_init_Prodtypesbysilo($dbh, $termoClientINI, $termoServerINI){
 
 	return;
 }
-
 function ddl_init_Sensors($dbh, $termoClientINI, $termoServerINI, $serverDate){
 
 	$query="INSERT INTO sensors (sensor_id, silo_id, podv_id, sensor_num, current_temperature, current_speed, server_date) VALUES ";

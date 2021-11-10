@@ -116,8 +116,6 @@ document.addEventListener("DOMContentLoaded", () => {
     getNewAlarmsNumber();       //  Проверяем наличие новых алармов, чтобы в случае необходимости включить звук
     modalWindows();             //  Проверяем Cookie и в случае необходимости отображаем модальные окна
     getConf_ProjectConfArr();   //  Последовательно запрашиваем конфигурационные массивы из PHP
-
-    console.log("current page: " + current_page);
 });
 
 //  Получение массивов с конфигурациями для повышения интерактивности ---------------------------------------------------------------------------------------
@@ -295,10 +293,6 @@ function getNewAlarmsNumber() {
         dataType: 'html',
         success: function(fromPHP) {
 
-            //console.log(fromPHP);
-            //console.log("isJSON: "+isJson(fromPHP));
-
-            //console.log(sessionStorage.getItem('configurationError'));
             if(sessionStorage.getItem('configurationError')==='NACK'){
                 controlAudio(1);
             }

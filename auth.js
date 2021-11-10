@@ -1,6 +1,4 @@
-/*  Функция определения текущего пользователя
-    Вызывается каждый раз при заходе на новую страницу
-*/
+//  Функция определения текущего пользователя. Вызывается каждый раз при заходе на новую страницу
 function authGetCurrentUser(){
     $.ajax({
         url: '/Thermometry/auth.php',
@@ -19,16 +17,12 @@ function authGetCurrentUser(){
         }
     });
 }
-/*  Функция для очистки неудачно введенного пароля
-    Вызывается при нажатии на кнопку "Отмена" или "Закрыть" модального окна ввода пароля
-*/
+//  Функция для очистки неудачно введенного пароля
 function modalPasswordInputClear(inputPasswordID){
     document.getElementById(inputPasswordID).value = "";
     return;
 }
-/*  Аутентификация
-    В случае правильно введенного пароля, текущий пользователь сохраняется в сессии, которая автоматически очищается при выходе из браузера
-*/
+//  Аутентификация. В случае правильно введенного пароля, текущий пользователь сохраняется в сессии, которая автоматически очищается при выходе из браузера
 function authSignIn(user, inputPassID){
     password = document.getElementById(inputPassID).value;
 
@@ -55,8 +49,7 @@ function authSignIn(user, inputPassID){
 
     return;
 }
-/*  Функция выхода из текущей учетной записи
-*/
+//  Функция выхода из текущей учетной записи
 function authSignOut(){
     $.ajax({
         url: '/Thermometry/auth.php',
@@ -74,9 +67,7 @@ function authSignOut(){
     });
     return;
 }
-/*  Функция для смены пароля
-    Пароль сохраняется в БД в виде хеша
-*/
+//  Функция для смены пароля
 function authPasswordChange(user, inputPassID1, inputPassID2){
 
     pwd1 = document.getElementById(inputPassID1).value;

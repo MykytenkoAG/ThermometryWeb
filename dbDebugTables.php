@@ -1,7 +1,5 @@
 <?php
 
-require_once ('configParameters.php');
-
 function ddl_debug_drop_all($dbh){
 
 	$query = 
@@ -14,10 +12,7 @@ function ddl_debug_drop_all($dbh){
 
     return;
 }
-/*
-    Поля:
-    silo_id, grain_level
-*/
+//  silo_id, grain_level
 function ddl_debug_create_Silo($dbh){
 	
 	$sql = "CREATE TABLE IF NOT EXISTS zernoib.debug_silo
@@ -45,12 +40,6 @@ function ddl_debug_create_Silo($dbh){
         $sql .= "(" . $prodtypesbysiloRow['silo_id'] . "," . "0" . "),";
     }
 
-    /*foreach ($termoServerINI as $key => $value) {
-		if( preg_match('/Silos([0-9]+)/',$key,$matches) ){
-            $sql .= "(" . ($matches[1]-1) . "," . "0" . "),";
-		}
-	}*/
-
 	$sql = substr($sql,0,-1).";";
 
 	$stmt = $dbh->prepare($sql);
@@ -58,10 +47,7 @@ function ddl_debug_create_Silo($dbh){
 
     return;
 }
-/*
-    Поля:
-    sensor_id, silo_id, podv_id, sensor_num, current_temperature, current_temperature_speed
-*/
+//  sensor_id, silo_id, podv_id, sensor_num, current_temperature, current_temperature_speed
 function ddl_debug_create_Sensors($dbh){
 
 	$sql = "CREATE TABLE IF NOT EXISTS zernoib.debug_sensors
@@ -95,24 +81,6 @@ function ddl_debug_create_Sensors($dbh){
     foreach($sensorsRows as $sensorsRow){
         $sql .= "(".$sensorsRow['sensor_id'].",".$sensorsRow['silo_id'].",".$sensorsRow['podv_id'].",".$sensorsRow['sensor_num'].","."0".","."0"."),";
     }
-
-    /*$sensor_id = 0;
-    foreach ($termoServerINI as $key => $value) {
-		if(preg_match('/Silos([0-9]+)/',$key,$matches)){
-            $silo_id=$matches[1]-1;
-			$sensorsArr = preg_split('/,/',$termoServerINI[$key]['SensorsStr'],-1,PREG_SPLIT_NO_EMPTY);
-            $podv_id=0;
-			foreach($sensorsArr as $podvSensorsNumber){
-                $sensor_num=0;
-                for($i=0;$i<$podvSensorsNumber;$i++){
-                    $sql .= "(".$sensor_id.",".$silo_id.",".$podv_id.",".$sensor_num.","."0".","."0"."),";
-                    $sensor_num++;
-                    $sensor_id++;
-                }
-                $podv_id++;
-            }
-		}
-	}*/
 
 	$sql = substr($sql,0,-1).";";
 

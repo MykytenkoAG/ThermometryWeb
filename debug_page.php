@@ -310,10 +310,10 @@
               </div>
             </div>
           </div>
-          <div class="col-md-6 g-1">
+          <div class="col-4 g-1">
             <div class="card rounded-3 shadow-sm">
               <div class="card-header py-3" style="height: 60px;">
-                <h4 class="my-0 fw-normal align-center" id="CurrentSiloName" style="position: absolute; top: auto; left: 40%;">Параметры</h4>
+                <h4 class="my-0 fw-normal align-center" style="position: absolute; top: auto; left: 40%;">Параметры</h4>
               </div>  
               <div class="card-body d-flex justify-content-center" style="height:750px; overflow: auto;" id="debug_parameters_table">
                 <?php
@@ -322,6 +322,38 @@
               </div>
             </div>
           </div>
+          
+          <div class="col-xl-2 g-1">
+
+            <div class="card rounded-3 shadow-sm">
+              <div class="card-header py-3" style="height: 60px;">
+                <h4 class="my-0 fw-normal align-center" style="position: absolute; top: auto; left: 25%;">Коды ошибок</h4>
+              </div>  
+              <div class="card-body d-flex justify-content-left" style="height:750px; overflow: auto; text-align:left;">
+                85 Обрыв плюсового провода
+                <br>
+                127 Неисправность датчика температуры
+                <br>
+                128 Температура не измерялась'
+                <br>
+                251 Обрыв линии связи термпоподвески ТП
+                <br>
+                252 Короткое замыкание линии связи ТП
+                <br>
+                253 Неисправность встроенного ПЗУ БС
+                <br>
+                254 Отсутствие связи с блоком сбора БС
+                <br>
+                255 Датчик отключен оператором
+                <br>
+                256 Силос отключен на сервере
+                <br>
+
+              </div>
+              
+            </div>
+          </div>
+
         </div>
       </main>
     </div>
