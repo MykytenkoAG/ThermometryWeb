@@ -452,7 +452,6 @@ function vSConf_db_restore_from_backup($dbh, $dbBackupFile){
     }
     $users_rows = $sth->fetchAll();
 
-    //  Создаем запросы для того, чтобы восстановить таблицу users и восстанавливаем Базу Данных из файла
     $query_users = SQL_STATEMENT_DROP_USERS.SQL_STATEMENT_CREATE_USERS."INSERT INTO users (user_id, user_name, password, access_level) VALUES ";
 
     foreach($users_rows as $users_row){
@@ -468,14 +467,8 @@ function vSConf_db_restore_from_backup($dbh, $dbBackupFile){
     }
     $ts_conn_settings_rows = $sth->fetchAll();
 
-    //  Создаем запросы для того, чтобы восстановить таблицу users и восстанавливаем Базу Данных из файла
-    $query_ts_conn_settings="DROP TABLE IF EXISTS zernoib.ts_conn_settings;
-                            CREATE TABLE IF NOT EXISTS zernoib.ts_conn_settings
-                                (id INT NOT NULL AUTO_INCREMENT,
-                                ts_ip VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '127.0.0.1',
-                                ts_port SMALLINT NOT NULL DEFAULT '200', PRIMARY KEY (id))
-                                ENGINE = InnoDB;
-                            INSERT INTO zernoib.ts_conn_settings (id, ts_ip, ts_port) VALUES ";
+    $query_ts_conn_settings=SQL_STATEMENT_DROP_TS_CONN_SETTINGS.SQL_STATEMENT_CREATE_TS_CONN_SETTINGS
+                            ."INSERT INTO zernoib.ts_conn_settings (id, ts_ip, ts_port) VALUES ";
     foreach($ts_conn_settings_rows as $ts_conn_settings_row){
         $query_ts_conn_settings .= "(".$ts_conn_settings_row['id'].", '".$ts_conn_settings_row['ts_ip']."', '".$ts_conn_settings_row['ts_port']."'),";
     }

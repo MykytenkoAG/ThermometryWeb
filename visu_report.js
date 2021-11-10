@@ -239,7 +239,7 @@ let data = {
     datasets: []
 };
 //  config
-const config = {
+let config = {
     type: 'line',
     data: data,
     options: {

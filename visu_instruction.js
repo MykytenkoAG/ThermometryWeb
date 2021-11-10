@@ -1,10 +1,8 @@
 let curr_instr_format="text";
 
 function init_instruction(){
-
     document.getElementById("hdr-href-instruction.php").setAttribute("class", "nav-link text-primary");
-
-    $('#instr-href-text').removeClass("text-black");
+    $('#instr-href-text').removeClass("text-black");        //  При заходе на страницу открываем текстовую версию инструкции
     $('#instr-href-text').addClass("text-primary");
     $('#instr-pdf-document').show();
     $('#instr-mp4-video').hide();

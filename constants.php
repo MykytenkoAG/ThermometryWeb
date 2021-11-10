@@ -175,6 +175,8 @@ const SQL_STATEMENT_CREATE_MEASUREMENTS =
         ENGINE = InnoDB
         CHARSET=utf8 COLLATE utf8_general_ci;";
 
+const SQL_STATEMENT_DROP_TS_CONN_SETTINGS = "DROP TABLE IF EXISTS zernoib.ts_conn_settings;";
+
 const SQL_STATEMENT_CREATE_TS_CONN_SETTINGS =
        "CREATE TABLE IF NOT EXISTS zernoib.ts_conn_settings
         ( id INT NOT NULL AUTO_INCREMENT,

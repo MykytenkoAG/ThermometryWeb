@@ -1,10 +1,9 @@
 //  TODO
 /*
     При наличии активных АПС обе таблицы должны блокироваться
-
 */
 
-let arrayOfLevels = [];
+let arrayOfLevels = [];             //  массив уровней для автоматического заполнения уровня в таблице "Загрузка силосов"
 let tbl_prodtypes_changed;
 let tbl_prodtypesbysilo_changed;
 
@@ -18,7 +17,6 @@ function init_silo_config() {
     tbl_prodtypesbysilo_changed = 0;
     SConf_prodtypes_changes_queue.length = 0;
     SConf_prodtypesbysilo_update_list.length = 0;
-
 }
 
 //  Получение массива с текущими уровнями для установки уровня в автоматическом режиме для таблицы "Загрузка силосов"
@@ -76,7 +74,7 @@ function vSConf_redrawTableProdtypes() {
             tbl_prodtypes_changed = 0;
             vSConf_buttonDisable("sconf-table-prodtypes-btn-save-changes");
             vSConf_buttonDisable("sconf-table-prodtypes-btn-discard-changes");
-            if((current_page==="silo_config.php") && curr_user==="tehn"){                       //  Включение кнопки "Добавить", в случае, если пользователь - технолог
+            if(curr_user==="tehn"){                                             //  Включение кнопки "Добавить", в случае, если пользователь - технолог
                 vSConf_buttonEnable("sconf-table-prodtypes-btn-add");
             }
         }
@@ -97,7 +95,7 @@ function vSConf_redrawTableProdtypesbysilo() {
             tbl_prodtypesbysilo_changed = 0;
             vSConf_buttonDisable("sconf-table-prodtypesbysilo-btn-save-changes");
             vSConf_buttonDisable("sconf-table-prodtypesbysilo-btn-discard-changes");
-            if((current_page==="silo_config.php") && curr_user==="tehn"){                       //  Включение кнопки "Добавить", в случае, если пользователь - технолог
+            if(curr_user==="tehn"){
                 vSConf_buttonEnable("sconf-table-prodtypes-btn-add");
             }
         }
@@ -143,13 +141,8 @@ function vSConf_siloConfigSaveChanges() {
 }
 //  Возвращение значений к текущему состоянию
 function vSConf_siloConfigDiscardChanges() {
-
     vSConf_redrawTableProdtypes();
     vSConf_redrawTableProdtypesbysilo();
-    if (curr_user == "tehn") {
-        vSConf_buttonEnable("sconf-table-prodtypes-btn-add");
-    }
-
 }
 //  Таблица "Типы продукта". Кнопка "Добавить"
 $("#sconf-table-prodtypes-btn-add").click(function() {
@@ -482,30 +475,6 @@ function vSConf_checkIP() {
     document.getElementById("modal-ts-connection-settings-btn-ok").disabled = true;
     return;
 
-}
-
-//  Сохранение настроек подключения к ПО Термосервер
-function vSConf_ts_connection_settings_Save(){
-
-    const ts_ip = document.getElementById("modal-ts-connection-settings-ip").value;
-    const ts_port = document.getElementById("modal-ts-connection-settings-port").value;
-    
-    $.ajax({
-        url: 'visu_silo_config.php',
-        type: 'POST',
-        cache: false,
-        data: { 'POST_vSConf_ts_connection_settings_save_ip': ts_ip,
-                'POST_vSConf_ts_connection_settings_save_port': ts_port},
-        dataType: 'html',
-        success: function(fromPHP) {
-
-            document.getElementById("modal-info-body-message").innerText = fromPHP;
-            $("#modal-info").modal('show');
-
-        }
-    });
-
-    return;
 }
 
 //  Операции с БД -------------------------------------------------------------------------------------------------------
