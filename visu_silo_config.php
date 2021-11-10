@@ -404,8 +404,7 @@ if( isset($_POST['POST_vSConf_db_create_backup']) ) {
     echo $sql_backup_file;
 }
 
-//  Восстановить БД из резервной копии
-
+//  Восстановить БД из резервной копии ------------------------------------------------
 //  Проверка файла резервной копии на соответствие текущей Базе Данных
 function vSConf_db_checkDBFileToCurrentDB($dbh, $dbBackupFile){
 
@@ -442,12 +441,57 @@ function vSConf_db_checkDBFileToCurrentDB($dbh, $dbBackupFile){
 }
 
 //  ! Необходимо добавить try catch, так как возможны ошибки при выполнении sql команд
-//  ! Также следует почитать об ограничениях на загрузку файлов через браузер
 function vSConf_db_restore_from_backup($dbh, $dbBackupFile){
-    //$cmd = "mysql -h {localhost} -u {root} -p{} {zernoib} < $dbBackupFile";
-    //exec($cmd);
-    $stmt = $dbh->prepare( $dbBackupFile );
+    //  Необходимо предварительно сохранить таблицу с пользователями и таблицу с настройками подключения к Термосерверу
+
+    //  Сохраняем текущее состояние таблицы users
+    $sql = "SELECT user_id, user_name, password, access_level FROM users;";
+    $sth = $dbh->query($sql);
+    if($sth==false){
+        return false;
+    }
+    $users_rows = $sth->fetchAll();
+
+    //  Создаем запросы для того, чтобы восстановить таблицу users и восстанавливаем Базу Данных из файла
+    $query_users="DROP TABLE users;
+                CREATE TABLE IF NOT EXISTS zernoib.users
+                (user_id INT NOT NULL AUTO_INCREMENT,
+                user_name VARCHAR(20) NOT NULL,
+                password VARCHAR(32) NOT NULL,
+                access_level INT NOT NULL DEFAULT 0,
+                PRIMARY KEY (user_id))
+                ENGINE = InnoDB
+                CHARSET=utf8 COLLATE utf8_general_ci;
+                INSERT INTO users (user_id, user_name, password, access_level) VALUES ";
+    foreach($users_rows as $users_row){
+        $query_users .= "(".$users_row['user_id'].", '".$users_row['user_name']."', '".$users_row['password']."', '".$users_row['access_level']."'),";
+    }
+    $query_users = substr( $query_users, 0, -1 ).";";
+
+    //  Сохраняем текущее состояние таблицы ts_conn_settings
+    $sql = "SELECT id, ts_ip, ts_port FROM ts_conn_settings;";
+    $sth = $dbh->query($sql);
+    if($sth==false){
+        return false;
+    }
+    $ts_conn_settings_rows = $sth->fetchAll();
+
+    //  Создаем запросы для того, чтобы восстановить таблицу users и восстанавливаем Базу Данных из файла
+    $query_ts_conn_settings="DROP TABLE zernoib.ts_conn_settings;
+                            CREATE TABLE IF NOT EXISTS zernoib.ts_conn_settings
+                                (id INT NOT NULL AUTO_INCREMENT,
+                                ts_ip VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '127.0.0.1',
+                                ts_port SMALLINT NOT NULL DEFAULT '200', PRIMARY KEY (id))
+                                ENGINE = InnoDB;
+                            INSERT INTO zernoib.ts_conn_settings (id, ts_ip, ts_port) VALUES ";
+    foreach($ts_conn_settings_rows as $ts_conn_settings_row){
+        $query_ts_conn_settings .= "(".$ts_conn_settings_row['id'].", '".$ts_conn_settings_row['ts_ip']."', '".$ts_conn_settings_row['ts_port']."'),";
+    }
+    $query_ts_conn_settings = substr( $query_ts_conn_settings, 0, -1 ).";";
+
+    $stmt = $dbh->prepare( $dbBackupFile . $query_users . $query_ts_conn_settings );
     $stmt->execute();
+
     return;
 }
 
@@ -502,7 +546,7 @@ if( isset($_POST['POST_vSConf_db_delete_old_measurements']) ) {
     echo "Записи успешно удалены";
 }
 
-//  Очистка журнала АПС
+//  Очистка журнала АПС ---------------------------------------------------------------------------------------------------------------------------------------------
 if( isset($_POST['POST_vSConf_clear_log']) ) {
     logClear($logFile);
     echo "Журнал АПС успешно очищен";

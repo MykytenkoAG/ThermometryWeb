@@ -5,8 +5,9 @@
             <ul class="nav me-auto">
 
                 <?php
-                if($simulation_mode){
-                    echo "
+                if( isset($simulation_mode) ){
+                    if($simulation_mode){
+                        echo "
                 <li>
                     <a href=\"#\" id=\"hdr-href-debug_page.php\"    class=\"nav-link text-black\" data-bs-toggle=\"tooltip\" data-bs-placement=\"right\"
 title=\"Режим симуляции данных\">
@@ -18,6 +19,7 @@ title=\"Режим симуляции данных\">
                     </a>
                 </li>
                     ";
+                    }
                 }
                 ?>
 

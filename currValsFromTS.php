@@ -1,5 +1,6 @@
 <?php
 
+require_once ('constants.php');
 require_once ('configParameters.php');		//	Параметры подключения к БД и связи с Термосервером
 require_once ('dbDebugTables.php');			//	Создание, удаление и изменение отладочных таблиц в БД
 require_once ('dbDDL.php');					//	Создание и инициализация всех таблиц в БД
@@ -16,6 +17,7 @@ if( isTableExistAndNotEmpty($dbh,"zernoib.sensors") ){
 	goto tableSensorsOK;
 }
 
+//	Обязательно необходимо преобразовать файлы из кодировки WINDOWS-1251 в UTF-8
 $termoServerINI  =	@parse_ini_string(replaceForbiddenChars(mb_convert_encoding(file_get_contents('settings/TermoServer.ini'), "UTF-8", "WINDOWS-1251")), true);
 $termoClientINI  =	@parse_ini_string(replaceForbiddenChars(mb_convert_encoding(file_get_contents('settings/TermoClient.ini'), "UTF-8", "WINDOWS-1251")), true);
 
@@ -72,6 +74,10 @@ tableSensorsOK:		//	Таблицы существуют и заполнены д
 if( ! $simulation_mode) {
 
 	$inputValsArr		 = getFromTS_inputArray ( getFromTS_inputString($IPAddr, $port) );	//	[температуры][скорости][уровни][дата]
+	if($inputValsArr==false){
+		array_push($errors, "TermoServerIsOff");
+		goto exit_from_script;
+	}
 	$arrayOfTemperatures = getFromTS_arrayOfValues3d($inputValsArr[0]);
 	$arrayOfTempSpeeds   = getFromTS_arrayOfValues3d($inputValsArr[1]);
 	$arrayOfLevels       = getFromTS_grainLevels($inputValsArr[2]);
@@ -194,16 +200,16 @@ function areIniFilesConsistent($termoServerINI,$termoClientINI){
 //	Обновление проекта. Инициализация всех таблиц в Базе Данных
 function projectUpdate($dbh, $termoClientINI, $termoServerINI){
 
-	ddl_drop_all($dbh);
+	ddl_execute_statement($dbh, sql_statement_drop_all_tables);
 
-	ddl_create_Users($dbh);				
-	ddl_create_Errors($dbh);			
-	ddl_create_Dates($dbh);				
-	ddl_create_Prodtypes($dbh);
-	ddl_create_SilosesGroups($dbh);
-	ddl_create_Prodtypesbysilo($dbh);	
-	ddl_create_Sensors($dbh);			
-	ddl_create_Measurements($dbh);
+	ddl_execute_statement($dbh, sql_statement_create_users);
+	ddl_execute_statement($dbh, sql_staement_create_errors);
+	ddl_execute_statement($dbh, sql_statement_create_dates);
+	ddl_execute_statement($dbh, sql_statement_create_prodtypes);
+	ddl_execute_statement($dbh, sql_statement_create_silosesgroups);
+	ddl_execute_statement($dbh, sql_statement_create_prodtypesbysilo);
+	ddl_execute_statement($dbh, sql_statement_create_sensors);
+	ddl_execute_statement($dbh, sql_statement_create_measurements);
 
 	date_default_timezone_set('Europe/Kiev'); $date = date('d.m.Y H:i:s', time()); $serverDate = $date;
 
@@ -266,11 +272,13 @@ function areIniFilesConsistentToDB($dbh, $tableSensors, $sortedIniArr){
 //	Функция для получения строки с текущими значениями
 //	В случае, если термосервер не запущен, происходит запись в глобальную переменную $errors
 function getFromTS_inputString($IPAddr, $port){
-	global $errors;
-	array_push($errors, "TermoServerIsOff");
 	//http://docs.php.net/fsockopen
-	$fp = @fsockopen($IPAddr, $port, $errno, $errstr, 30)
-		or die(require_once('error_page.php'));	//	Перенаправление на страницу с описанием ошибки
+	$fp = @fsockopen($IPAddr, $port, $errno, $errstr, 30);
+
+	if($fp == false){
+		return false;
+	}
+
 	if (!$fp) {
 		echo "$errstr ($errno)<br />\n";    
 	} else {
@@ -289,7 +297,6 @@ function getFromTS_inputString($IPAddr, $port){
 		}
 		fclose($fp);
 	}
-	array_pop($errors);
 	return $inputStr;
 }
 //	Функция для преобразования строки с текущими значениями в массив

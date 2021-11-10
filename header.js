@@ -2,9 +2,9 @@ let intent_page; //  вспомогательная переменная на т
 //  страницу, не сохранив изменения на странице настроек
 $("a").hover(
     function() {
-        if (($(this).attr('id').split("-").pop() === current_page) || //  изменять подсветку текущей страницы нельзя
-            ($(this).attr('id').split("-").pop() === curr_user) || //  текущего пользователя тоже
-            (($(this).attr('id').split("-").pop() === "ack") && alarmsNACKNumber > 0)) { //  и кнопку квитирования при наличии неквитированных сигналов АПС
+        if (($(this).attr('id').split("-").pop() === current_page) ||                       //  изменять подсветку текущей страницы нельзя
+            ($(this).attr('id').split("-").pop() === curr_user) ||                          //  текущего пользователя тоже
+            (($(this).attr('id').split("-").pop() === "ack") && alarmsNACKNumber > 0)) {    //  и кнопку квитирования при наличии неквитированных сигналов АПС
             return;
         }
         $(this).removeClass("text-black");

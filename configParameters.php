@@ -1,6 +1,7 @@
 <?php
 
 $simulation_mode = true;
+//$simulation_mode = false;
 $debugPageDisableElements = $simulation_mode ? "" : "disabled";
 mb_internal_encoding("UTF-8");
 //	Необходимые параметры для подключения к БД

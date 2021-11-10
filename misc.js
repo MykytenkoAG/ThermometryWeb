@@ -112,13 +112,12 @@ function modalWindows() {
 
 //  Действия при загрузке каждой страницы -------------------------------------------------------------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", () => {
-    modalWindows();
-    authGetCurrentUser(); //  Запрашиваем текущего пользователя из сессии
-    getNewAlarmsNumber(); //  Проверяем наличие новых алармов, чтобы в случае необходимости включить звук
-    getConf_ProjectConfArr(); //  Последовательно запрашиваем конфигурационные массивы из PHP
-    
-    //console.log(current_page);
-    //getConf_ArrayOfSiloNames();
+    authGetCurrentUser();       //  Запрашиваем текущего пользователя из сессии
+    getNewAlarmsNumber();       //  Проверяем наличие новых алармов, чтобы в случае необходимости включить звук
+    modalWindows();             //  Проверяем Cookie и в случае необходимости отображаем модальные окна
+    getConf_ProjectConfArr();   //  Последовательно запрашиваем конфигурационные массивы из PHP
+
+    console.log("current page: " + current_page);
 });
 
 //  Получение массивов с конфигурациями для повышения интерактивности ---------------------------------------------------------------------------------------
@@ -131,12 +130,7 @@ function getConf_ProjectConfArr() {
         data: { 'POST_currValsFromTS_get_project_conf_array': 1 },
         dataType: 'html',
         success: function(fromPHP) {
-            //console.log(fromPHP);
             project_conf_array = (JSON.parse(fromPHP));
-            //console.log("project conf arr");
-            //console.log(project_conf_array);
-            //console.log("\n");
-            //console.log("keys"+Object.keys(project_conf_array));
             getConf_ArrayOfSiloNames();
         }
     });
@@ -151,13 +145,8 @@ function getConf_ArrayOfSiloNames() {
         data: { 'POST_currValsFromTS_get_silo_names_array': 1 },
         dataType: 'html',
         success: function(fromPHP) {
-
-            //console.log("Silo Names Array: "+fromPHP);
-            //  массив с названиями силосов, в котором индекс - это silo_id, а значение - название силоса
             silo_names_array = JSON.parse(fromPHP);
-
             getConf_SiloNameWithMaxPodvNumber();
-
         }
     });
     return;
@@ -173,7 +162,6 @@ function getConf_SiloNameWithMaxPodvNumber() {
         dataType: 'html',
         success: function(fromPHP) {
             silo_name_with_max_podv_number = fromPHP;
-
             //  После того, как все необходимые данные получены, переходим к секции инициализации в зависимости от того,
             //  на какой странице находимся
             if (current_page === "index.php") {
@@ -187,7 +175,6 @@ function getConf_SiloNameWithMaxPodvNumber() {
             } else if (current_page === "instruction.php") {
                 init_instruction();
             }
-
         }
     });
     return;
@@ -281,7 +268,6 @@ function controlAudio(OnOff) {
 }
 
 function alarmsAck() {
-
     $.ajax({
         url: '/Thermometry/currValsFromTS.php',
         type: 'POST',
@@ -289,9 +275,8 @@ function alarmsAck() {
         data: { 'POST_currValsFromTS_acknowledge_alarms': 1 },
         dataType: 'html',
         success: function(fromPHP) {
-            //console.log(fromPHP);
-            controlAudio(0); //  Выключаем звук
-            getNewAlarmsNumber(); //  Проверяем появление новых алармов
+            controlAudio(0);        //  Выключаем звук
+            getNewAlarmsNumber();   //  Проверяем появление новых алармов
         }
     });
     return;
@@ -307,28 +292,33 @@ function getNewAlarmsNumber() {
         dataType: 'html',
         success: function(fromPHP) {
 
-            if (!isJson(fromPHP)) {
+            console.log(fromPHP);
+            console.log("isJSON: "+isJson(fromPHP));
+            
+            if (!isJson(fromPHP)) {     //  Если из PHP получен не JSON, значит произошла ошибка
 
-                if (fromPHP > alarmsNACKNumber) { //  Если появились неквитированные алармы
-                    controlAudio(1); //  Включаем звук
+                if (fromPHP > alarmsNACKNumber) {   //  Если появились неквитированные алармы
+                    controlAudio(1);                //  Включаем звук
                 } else if (fromPHP==0){
                     controlAudio(0);
                 }
                 alarmsNACKNumber = fromPHP;
 
-                if (current_page === "index.php") {
-                    vIndOnClickOnSilo(lastSiloID); //  Перерисовываем таблицу с текущими показаниями
+                if (current_page === "index.php") { //  Если мы на главной странице
+                    vIndOnClickOnSilo(lastSiloID);  //  Перерисовываем таблицу с текущими показаниями
                 }
 
-            } else if (current_page !== "error_page.php" && current_page !== "silo_config.php") {
-                document.location.href = "error_page.php";
+            } else if (current_page !== "error_page.php" && current_page !== "silo_config.php") {       //  Если мы не на странице настроек или ошибок
+                document.location.href = "error_page.php";                                              //  Переходим на страницу ошибок
             }
 
         }
     });
+
     return;
 }
 
+//  Функция проверки того, является ли строка JSON'ом
 function isJson(item) {
     item = typeof item !== "string" ?
         JSON.stringify(item) :
