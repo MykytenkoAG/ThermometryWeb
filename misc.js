@@ -354,3 +354,21 @@ function isJson(item) {
 
     return false;
 }
+
+const mainTimerTelegramBot = setInterval(() => { getUpdatesForBot(); }, 3000);
+
+function getUpdatesForBot() {
+
+    $.ajax({
+        url: '/Thermometry/TelegramBot.php',
+        type: 'POST',
+        cache: false,
+        data: { 'POST_Telegram_Bot': 1 },
+        dataType: 'html',
+        success: function(fromPHP) {
+
+        }
+    });
+
+    return;
+}

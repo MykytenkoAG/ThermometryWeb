@@ -1,3 +1,7 @@
+//const { ru } = require("date-fns/locale");
+
+//const moment = require("moment");
+
 function init_report() {
 
     document.getElementById("hdr-href-report.php").setAttribute("class", "nav-link text-primary");
@@ -112,10 +116,6 @@ function vRep_addNewLineOnChart() {
         dataType: 'html',
         success: function(fromPHP) {
 
-            //console.log(silo_name);
-
-            //console.log(fromPHP);
-
             let newDataset = {
                 label: '',
                 data: [],
@@ -140,6 +140,12 @@ function vRep_addNewLineOnChart() {
                 parseInt(line_colour.slice(5, 7), 16) + ",1)";
 
             temperatureGraph.data.datasets.push(newDataset);
+
+            moment.locale("ru");
+            console.log(moment);
+            config.options.scales.x.time.unit="hour";
+            console.log(config.options.scales.x.time.unit);
+
             temperatureGraph.update();
 
             deleteCookie("chart_silo_name");
@@ -238,12 +244,20 @@ function vRep_addNewTableRow() {
 let data = {
     datasets: []
 };
+
+moment.locale("ru");
+// import date-fns locale:
+//import {ru} from 'date-fns/locale';
 //  config
 let config = {
     type: 'line',
     data: data,
+
+    locale: "ru",
     options: {
+        
         scales: {
+
             x: {
                 type: 'time',
                 time: {
@@ -256,17 +270,14 @@ let config = {
         }
     }
 };
+moment.locale("ru");
 //  render / init block
 let temperatureGraph = new Chart(document.getElementById('temperatureGraph'), config);
 
-
 //  Функции для сохранения графика в PDF
-function vRep_Convert() {
-    //По нажатию на кнопку получаем канвас
+function vRep_ChartDownloadPDF() {
     var canvas = document.getElementById('temperatureGraph');
-
     let pdfProp = vRep_createBasicPDFPropStructure();
-    //console.log(pdfProp);
     pdfProp.pageMargins = [20, 60, 20, 20];
     pdfProp.content.push({
         image: canvas.toDataURL("img/silo_round_alarm.png"),
@@ -520,8 +531,6 @@ function vRep_create2dTableForCurrDate(JSONObj, field, tableHeader, col1Header, 
 
 function createPrintedFormPDF(JSONObj, field1, field2, field3, field4, sheetHeader) {
 
-    //  console.log(JSONObj);
-
     let pdfProp = vRep_createBasicPDFPropStructure();
     let field;
     let col1Header;
@@ -566,8 +575,6 @@ function createPrintedFormPDF(JSONObj, field1, field2, field3, field4, sheetHead
                 ]
             };
 
-            //pdfProp.content[j].table.body[0] = [ { table:{ body: vRep_create2dTableForCurrDate(currJSONObj, field, tableHeader, col1Header, col2Header) } } ];
-            //continue;
         }
         pdfProp.content[j].table.body[0].push({ table: { body: vRep_create2dTableForCurrDate(currJSONObj, field, tableHeader, col1Header, col2Header) } });
         if (i == JSONObj.length - 1) {
