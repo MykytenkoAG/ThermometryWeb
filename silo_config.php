@@ -40,7 +40,7 @@
                       Добавить
                     </button>
                     <button type="submit" class="btn btn-success" id="sconf-table-prodtypes-btn-save-changes" disabled>
-                      <img  src="img/button-save-changes.png" width="16" height="16"/>
+                      <img  src="assets/img/button-save-changes.png" width="16" height="16"/>
                       <span>Сохранить изменения</span>
                     </button>
                     <button type="submit" class="btn btn-danger"  id="sconf-table-prodtypes-btn-discard-changes" disabled>
@@ -71,7 +71,7 @@
 
                     <button type="submit" class="btn btn-success"
                       id="sconf-table-prodtypesbysilo-btn-save-changes" disabled>
-                      <img  src="img/button-save-changes.png" width="16" height="16"/>
+                      <img  src="assets/img/button-save-changes.png" width="16" height="16"/>
                       <span>Сохранить изменения</span></button>
                     <button type="submit" class="btn btn-danger" id="sconf-table-prodtypesbysilo-btn-discard-changes" disabled>
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16">
@@ -166,6 +166,6 @@
           </div>
         </div>
       </main>
-     <script src="visu_silo_config.js"></script>
+     <script src="js/visu_silo_config.js"></script>
     </body>
 </html>

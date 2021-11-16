@@ -5,15 +5,16 @@ $simulation_mode = true;
                    //false;
 $debugPageDisableElements = $simulation_mode ? "" : "disabled";     //  Отключение элементов на странице отладки
 //	Подключение к Базе Данных ----------------------------------------------------------------------------------------------------------
-const servername = "localhost"; const username = "root"; const password = ""; const dbname = "zernoib"; mb_internal_encoding("UTF-8");
+const servername = "localhost"; const username = "root"; const password = ""; const dbname = "zernoib";
 $pdo_options = [
-    PDO::ATTR_TIMEOUT => 5//,
+    PDO::ATTR_TIMEOUT => 5,
+    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"//,
     //PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION//,
     //PDO::ATTR_CASE => PDO::CASE_NATURAL//,
     //PDO::ATTR_ORACLE_NULLS => PDO::NULL_EMPTY_STRING
 ];
-$dbh = new PDO("mysql:host=".servername, username, password, $pdo_options);
-$dbh->query("CREATE DATABASE IF NOT EXISTS ".dbname); $dbh->query("use ".dbname);
+$dbh = new PDO("mysql:host=".servername."; charset=utf8;", username, password, $pdo_options);
+$dbh->query("CREATE DATABASE IF NOT EXISTS ".dbname." CHARACTER SET utf8 COLLATE utf8_general_ci;"); $dbh->query("use ".dbname);
 //	Подключение к ПО TermoServer -------------------------------------------------------------------------------------------------------
 $IPAddr; $port;
 $sql = SQL_STATEMENT_SELECT_TS_CONN_SETTINGS;

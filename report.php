@@ -5,7 +5,7 @@
     <?php
       $webSiteTitle="Отчет";
       require_once "head.php";
-      require_once('visu_report.php');
+      require_once "visu_report.php";
     ?>
 
 
@@ -181,7 +181,7 @@
 
 
 
-                <script type="text/javascript" src="visu_report.js"></script>
+                <script type="text/javascript" src="js/visu_report.js"></script>
 
               </div>
             </div>

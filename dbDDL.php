@@ -1,4 +1,7 @@
 <?php
+
+mb_internal_encoding("UTF-8");
+
 //	Выполнение ddl-запросов
 function ddl_execute_statement($dbh,$sql_statement){
 	$stmt = $dbh->prepare($sql_statement);

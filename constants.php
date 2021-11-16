@@ -1,5 +1,7 @@
 <?php
 
+mb_internal_encoding("UTF-8");
+
 $logFile = 'logs/log.txt';
 
 $CURRENT_WORKING_DIRECTORY = getcwd();

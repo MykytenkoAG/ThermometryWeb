@@ -220,7 +220,7 @@ function vInd_drawSiloPlan($dbh){
 
                     if($siloConfigRow['is_square']){
                         //  Если силос круглый
-                        $outStr .= "<img src=\"/Thermometry/img/silo_square_OK.png\"
+                        $outStr .= "<img src=\"/Thermometry/assets/img/silo_square_OK.png\"
                         id=\"silo-".$siloConfigRow['silo_id']."\" onclick=\"vIndOnClickOnSilo(event.target.id)\"
 
                         data-bs-toggle=\"tooltip\" data-bs-placement=\"right\" title=\"$siloTooltip\"
@@ -228,7 +228,7 @@ function vInd_drawSiloPlan($dbh){
                         style=\"display: block; margin-left: auto; margin-right: auto; width: ".($siloConfigRow['size']*100)."%;\"/>";
                     } else{
                         //  Если силос квадратный
-                        $outStr .= "<img src=\"/Thermometry/img/silo_round_OK.png\"
+                        $outStr .= "<img src=\"/Thermometry/assets/img/silo_round_OK.png\"
                         id=\"silo-".$siloConfigRow['silo_id']."\" onclick=\"vIndOnClickOnSilo(event.target.id)\"
 
                         data-bs-toggle=\"tooltip\" data-bs-placement=\"right\" title=\"$siloTooltip\"

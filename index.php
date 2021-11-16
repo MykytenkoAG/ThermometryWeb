@@ -271,5 +271,5 @@
       </main>
           
   </body>
-  <script type="text/javascript" src="visu_index.js"></script>
+  <script type="text/javascript" src="js/visu_index.js"></script>
 </html>

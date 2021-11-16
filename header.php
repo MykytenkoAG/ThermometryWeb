@@ -137,7 +137,7 @@ title="Квитировать сигналы АПС">
         </div>
     </nav>
     
-    <script type="text/javascript" src="header.js"></script>
-    <audio id="alarm-sound" src="sound/alarm_sound.mp3"></audio>
+    <script type="text/javascript" src="js/header.js"></script>
+    <audio id="alarm-sound" src="assets/sound/alarm_sound.mp3"></audio>
 
 </header>

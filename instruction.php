@@ -70,10 +70,10 @@
 
           <div class="col-12 g-1" style="width:97%">
               <video id="instr-mp4-video" style="margin: 10px; height: calc(100vh - 170px); width: calc(100vw - 30px);" controls>
-                <source src="video/instruction.mp4" type="video/mp4">
+                <source src="assets/video/instruction.mp4" type="video/mp4">
                 Your browser does not support HTML video.
               </video>
-              <iframe id="instr-pdf-document" src="docs/ТСС-02 - инструкция по эксплуатации ПО.pdf" style="margin: 10px; height: calc(100vh - 170px); width: calc(100vw - 30px);">
+              <iframe id="instr-pdf-document" src="assets/docs/ТСС-02 - инструкция по эксплуатации ПО.pdf" style="margin: 10px; height: calc(100vh - 170px); width: calc(100vw - 30px);">
           </div>
 
       </div>

@@ -357,6 +357,6 @@
         </div>
       </main>
     </div>
-    <script type="text/javascript" src="visu_debug_page.js"></script>
+    <script type="text/javascript" src="js/visu_debug_page.js"></script>
   </body>
 </html>

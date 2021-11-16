@@ -90,7 +90,7 @@ function vSConf_draw_Prodtypes($dbh, $accessLevel){
             }
 
             $outStr .= ">
-                    <img  src=\"img/icon-remove.png\" width=\"20\" height=\"20\"/>
+                    <img  src=\"assets/img/icon-remove.png\" width=\"20\" height=\"20\"/>
                 </button>
             </td>
         </tr>";

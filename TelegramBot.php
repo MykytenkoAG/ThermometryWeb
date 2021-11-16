@@ -1,10 +1,10 @@
 <?php
 /*  Перечень команд:
-conf - получение конфигурации системы. Формат ответа: [силос]:НП[номер подвески]/[количество датчиков]
-temp1 - получение текущей температуры. Формат команды: /temp [силос].[подвеска].[датчик]
-speed1 - получение текущей скорости изменения температуры. Формат команды: /speed [силос].[подвеска].[датчик]
-lvl1 - получение уровня заполнения силоса. Формат команды: /lvl [силос]
-alarms - получение текущих неисправностей
+    conf - получение конфигурации системы. Формат ответа: [силос]:НП[номер подвески]/[количество датчиков]
+    temp1 - получение текущей температуры. Формат команды: /temp [силос].[подвеска].[датчик]
+    speed1 - получение текущей скорости изменения температуры. Формат команды: /speed [силос].[подвеска].[датчик]
+    lvl1 - получение уровня заполнения силоса. Формат команды: /lvl [силос]
+    alarms - получение текущих неисправностей
 */
 require_once('currValsFromTS.php');
 //  Работа ведется по методу getUpdates. Каждые 3с JS код вызывает данную секцию (т.е. до получения SSL бот будет работать только при подкл. кого-либо из клиентов)
@@ -105,7 +105,7 @@ function recognizeCmd($dbh, $update){
         dbWriteUpdates($dbh, $update);
 
     //} else if (preg_match('/[Уу]ровень\s+(\d{0,5})?/',$update["text"],$matches)){
-    } else if (preg_match('/\/lvl\s+(\d{0,5})?/',$update["text"],$matches)){
+    } else if (preg_match('/\/lvl\s*(\d{0,5})?/',$update["text"],$matches)){
 
         $arrayToSend = cmdGetGrainLevels($dbh, $matches[1]);
         foreach($arrayToSend as $currMess){
@@ -120,6 +120,10 @@ function recognizeCmd($dbh, $update){
         foreach($arrayToSend as $currMess){
             file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$update["sender_id"]."&text=".$currMess);
         }
+        dbWriteUpdates($dbh, $update);
+
+    } else if (preg_match('/\/start/',$update["text"],$matches)) {
+        
         dbWriteUpdates($dbh, $update);
 
     } else {
@@ -335,7 +339,7 @@ function cmdGetGrainLevels($dbh, $silo_name){
     $i=0;
     foreach($rows as $row){
         $outStr .= "Силос ".$row["silo_name"].". ";
-        $outStr .= "Уровень заполнения: ".($row["grain_level"]/$row["count(s.sensor_num)"])." %";
+        $outStr .= "Уровень заполнения: ".(($row["grain_level"]/$row["count(s.sensor_num)"])*100)." %";
         $outStr .= ";%0A";
 
         if( ($i>0 && $i%10==0) || $i==(count($rows)-1) ){
@@ -350,7 +354,7 @@ function cmdGetGrainLevels($dbh, $silo_name){
 
 function cmdGetAlarms($dbh){
     
-    $sql = "SELECT s.sensor_id, s.silo_id, s.podv_id, s.sensor_num, pbs.silo_name, e.error_desc_for_visu 
+    $sql = "SELECT s.sensor_id, s.silo_id, s.podv_id, s.sensor_num, pbs.silo_name, s.NACK_Tmax, s.ACK_Tmax, s.NACK_Vmax, s.ACK_Vmax, s.NACK_err, s.ACK_Vmax, e.error_id, e.error_desc_for_visu 
             FROM sensors AS s
             INNER JOIN prodtypesbysilo AS pbs ON s.silo_id = pbs.silo_id
             LEFT JOIN errors AS e ON s.error_id = e.error_id
@@ -373,8 +377,14 @@ function cmdGetAlarms($dbh){
     foreach($rows as $row){
 
         $outStr .= "Силос ".$row["silo_name"].". НП".($row["podv_id"]+1).". НД".($row["sensor_num"]+1).". ";
-        $outStr .= $row["error_desc_vor_visu"];
-
+        if(!is_null($row["error_desc_for_visu"])){
+            $outStr .= $row["error_desc_for_visu"];
+        } else if ($row["NACK_Tmax"]||$row["ACK_Tmax"]){
+            $outStr .= "Tmax";
+        } else if ($row["NACK_Vmax"]||$row["ACK_Vmax"]){
+            $outStr .= "Vmax";
+        }
+        
         $outStr .= ";%0A";
         
         if( ($i>0 && $i%10==0) || $i==(count($rows)-1) ){
