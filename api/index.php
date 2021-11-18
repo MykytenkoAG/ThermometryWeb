@@ -10,7 +10,7 @@ $param_name = isset($params[0]) ? $params[0] : "";
 $param0 = isset($params[1]) ? $params[1] : ""; $param1 = isset($params[2]) ? $params[2] : ""; $param2 = isset($params[3]) ? $params[3] : "";
 
 //print_r($params);
-echo "param_name: $param_name; param0: $param0; param1: $param1; param2: $param2;";
+//echo "param_name: $param_name; param0: $param0; param1: $param1; param2: $param2;";
 
 //  Функции
 function apiGetSiloConfiguration($dbh, $silo_id=""){

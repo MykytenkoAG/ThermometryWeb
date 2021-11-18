@@ -112,10 +112,10 @@ function modalWindows() {
 
 //  Действия при загрузке каждой страницы -------------------------------------------------------------------------------------------------------------------
 document.addEventListener("DOMContentLoaded", () => {
-    authGetCurrentUser();       //  Запрашиваем текущего пользователя из сессии
-    getNewAlarmsNumber();       //  Проверяем наличие новых алармов, чтобы в случае необходимости включить звук
-    modalWindows();             //  Проверяем Cookie и в случае необходимости отображаем модальные окна
-    getConf_ProjectConfArr();   //  Последовательно запрашиваем конфигурационные массивы из PHP
+    authGetCurrentUser(); //  Запрашиваем текущего пользователя из сессии
+    getNewAlarmsNumber(); //  Проверяем наличие новых алармов, чтобы в случае необходимости включить звук
+    modalWindows(); //  Проверяем Cookie и в случае необходимости отображаем модальные окна
+    getConf_ProjectConfArr(); //  Последовательно запрашиваем конфигурационные массивы из PHP
 });
 
 //  Получение массивов с конфигурациями для повышения интерактивности ---------------------------------------------------------------------------------------
@@ -273,11 +273,11 @@ function alarmsAck() {
         data: { 'POST_currValsFromTS_acknowledge_alarms': 1 },
         dataType: 'html',
         success: function(fromPHP) {
-            if(sessionStorage.getItem('configurationError')==='NACK'){
+            if (sessionStorage.getItem('configurationError') === 'NACK') {
                 sessionStorage.setItem('configurationError', 'ACK');
             }
-            controlAudio(0);        //  Выключаем звук
-            getNewAlarmsNumber();   //  Проверяем появление новых алармов
+            controlAudio(0); //  Выключаем звук
+            getNewAlarmsNumber(); //  Проверяем появление новых алармов
         }
     });
     return;
@@ -293,39 +293,39 @@ function getNewAlarmsNumber() {
         dataType: 'html',
         success: function(fromPHP) {
 
-            if(sessionStorage.getItem('configurationError')==='NACK'){
+            if (sessionStorage.getItem('configurationError') === 'NACK') {
                 controlAudio(1);
             }
-            
-            if (!isJson(fromPHP)) {     //  Если из PHP получен не JSON, значит произошла ошибка
+
+            if (!isJson(fromPHP)) { //  Если из PHP получен не JSON, значит произошла ошибка
 
                 sessionStorage.setItem('configurationError', 'OK');
-                if(current_page==="error_page.php"){
+                if (current_page === "error_page.php") {
                     document.location.href = "index.php";
                 }
 
-                if (fromPHP > alarmsNACKNumber) {   //  Если появились неквитированные алармы
-                    controlAudio(1);                //  Включаем звук
-                } else if (fromPHP==0){
+                if (fromPHP > alarmsNACKNumber) { //  Если появились неквитированные алармы
+                    controlAudio(1); //  Включаем звук
+                } else if (fromPHP == 0) {
                     controlAudio(0);
                 }
                 alarmsNACKNumber = fromPHP;
 
                 if (current_page === "index.php") { //  Если мы на главной странице
-                    vIndOnClickOnSilo(lastSiloID);  //  Перерисовываем таблицу с текущими показаниями
+                    vIndOnClickOnSilo(lastSiloID); //  Перерисовываем таблицу с текущими показаниями
                 }
 
             } else {
 
-                if(sessionStorage.getItem('configurationError')!=='ACK'){
+                if (sessionStorage.getItem('configurationError') !== 'ACK') {
                     sessionStorage.setItem('configurationError', 'NACK');
                     controlAudio(1);
                 }
-                
-                if ( current_page !== "error_page.php" &&
+
+                if (current_page !== "error_page.php" &&
                     current_page !== "silo_config.php" &&
-                    current_page !== "instruction.php" ) {       //  Если мы не на странице настроек или ошибок
-                    document.location.href = "error_page.php";           //  Переходим на страницу ошибок
+                    current_page !== "instruction.php") { //  Если мы не на странице настроек или ошибок
+                    document.location.href = "error_page.php"; //  Переходим на страницу ошибок
                 }
 
             }
@@ -360,7 +360,7 @@ const mainTimerTelegramBot = setInterval(() => { getUpdatesForBot(); }, 3000);
 function getUpdatesForBot() {
 
     $.ajax({
-        url: '/Thermometry/TelegramBot.php',
+        url: '/Thermometry/telegram/bot.php',
         type: 'POST',
         cache: false,
         data: { 'POST_Telegram_Bot': 1 },

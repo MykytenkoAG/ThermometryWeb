@@ -1,13 +1,14 @@
 <?php
 /*  Перечень команд:
+    siloinfo - краткая информация по текущему состоянию. Формат ответа: Силос, Продукт, Уровень, Ткр, Tmax, Tmin, Vкр, Vmax
     conf - получение конфигурации системы. Формат ответа: [силос]:НП[номер подвески]/[количество датчиков]
     temp1 - получение текущей температуры. Формат команды: /temp [силос].[подвеска].[датчик]
     speed1 - получение текущей скорости изменения температуры. Формат команды: /speed [силос].[подвеска].[датчик]
     lvl1 - получение уровня заполнения силоса. Формат команды: /lvl [силос]
     alarms - получение текущих неисправностей
 */
-require_once('currValsFromTS.php');
-//  Работа ведется по методу getUpdates. Каждые 3с JS код вызывает данную секцию (т.е. до получения SSL бот будет работать только при подкл. кого-либо из клиентов)
+require_once('../currValsFromTS.php');
+//  Работа ведется по методу getUpdates. Каждые 3с JS код вызывает данную секцию
 const TOKEN = "2123872619:AAENLR1KZVjWBmeOP8vcqHM39KPZOPX9OW4";     //  Токен, уникальный для каждого бота
 const BASE_URL = "https://api.telegram.org/bot";
 
@@ -78,7 +79,16 @@ function getNewUpdates($dbh, $updates){
 function recognizeCmd($dbh, $update){
 
     //if( preg_match('/[Кк]онфигурация/',$update["text"],$matches) ){
-    if( preg_match('/\/conf/',$update["text"],$matches) ){
+    if( preg_match('/\/siloinfo\s*/',$update["text"],$matches) ){
+
+        $arrayToSend = cmdGetSiloInfo($dbh);
+        foreach($arrayToSend as $currMess){
+            file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$update["sender_id"]."&text=".$currMess);
+        }
+        dbWriteUpdates($dbh, $update);
+
+    //if( preg_match('/[Кк]онфигурация/',$update["text"],$matches) ){
+    } else if( preg_match('/\/conf\s*/',$update["text"],$matches) ){
 
         $arrayToSend = cmdGetConfiguration($dbh);
         foreach($arrayToSend as $currMess){
@@ -87,7 +97,7 @@ function recognizeCmd($dbh, $update){
         dbWriteUpdates($dbh, $update);
 
     //} else if (preg_match('/[Тт]емпература\s*(\d{0,5})\.?(\d{0,2})?\.?(\d{0,2})?/',$update["text"],$matches)) {
-    } else if (preg_match('/\/temp\s*(\d{0,5})\.?(\d{0,2})?\.?(\d{0,2})?/',$update["text"],$matches)) {
+    } else if (preg_match('/\/temp\s*(\d{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/',$update["text"],$matches)) {
 
         $arrayToSend = cmdGetTemperatures($dbh, $matches[1], $matches[2], $matches[3]);
         foreach($arrayToSend as $currMess){
@@ -96,7 +106,7 @@ function recognizeCmd($dbh, $update){
         dbWriteUpdates($dbh, $update);
         
     //} else if (preg_match('/[Сс]корость\s*(\d{0,5})\.?(\d{0,2})?\.?(\d{0,2})?/',$update["text"],$matches)) {
-    } else if (preg_match('/\/speed\s*(\d{0,5})\.?(\d{0,2})?\.?(\d{0,2})?/',$update["text"],$matches)) {
+    } else if (preg_match('/\/speed\s*(\d{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/',$update["text"],$matches)) {
 
         $arrayToSend = cmdGetTemperatureSpeeds($dbh, $matches[1], $matches[2], $matches[3]);
         foreach($arrayToSend as $currMess){
@@ -105,7 +115,7 @@ function recognizeCmd($dbh, $update){
         dbWriteUpdates($dbh, $update);
 
     //} else if (preg_match('/[Уу]ровень\s+(\d{0,5})?/',$update["text"],$matches)){
-    } else if (preg_match('/\/lvl\s*(\d{0,5})?/',$update["text"],$matches)){
+    } else if (preg_match('/\/lvl\s*(\d{0,5})?\s*/',$update["text"],$matches)){
 
         $arrayToSend = cmdGetGrainLevels($dbh, $matches[1]);
         foreach($arrayToSend as $currMess){
@@ -114,7 +124,7 @@ function recognizeCmd($dbh, $update){
         dbWriteUpdates($dbh, $update);
         
     //} else if (preg_match('/[Аа]лармы/',$update["text"],$matches)){
-    } else if (preg_match('/\/alarms/',$update["text"],$matches)){
+    } else if (preg_match('/\/alarms\s*/',$update["text"],$matches)){
 
         $arrayToSend = cmdGetAlarms($dbh);
         foreach($arrayToSend as $currMess){
@@ -151,6 +161,50 @@ function dbWriteUpdates($dbh, $update){
 function dbTruncateOldUpdates(){
 
     return;
+}
+
+function cmdGetSiloInfo($dbh){
+
+    $sql = "SELECT s.sensor_id, s.silo_id, s.podv_id, s.sensor_num,
+            pbs.silo_name,
+            p.product_name, p.t_max, p.t_min, p.v_max,
+            max(s.current_temperature),
+            min(s.current_temperature),
+            max(s.current_speed),
+            pbs.grain_level,
+            max(s.sensor_num)
+            FROM sensors AS s
+            INNER JOIN prodtypesbysilo AS pbs ON s.silo_id=pbs.silo_id
+            INNER JOIN prodtypes AS p ON pbs.product_id=p.product_id
+            GROUP BY silo_id
+            ORDER BY silo_id";
+    
+    $sth = $dbh->query($sql);
+
+    if($sth==false){
+        return false;
+    }
+    $rows = $sth->fetchAll();
+
+    $outArr = array(); $outStr = ""; $currentSilo="";
+    
+    for($i=0; $i<count($rows); $i++){
+
+        $outStr .= "Силос "         .$rows[$i]["silo_name"]
+                .",%0AПродукт: "    .$rows[$i]["product_name"]
+                .",%0AУровень: "    .round((($rows[$i]["grain_level"]/($rows[$i]["max(s.sensor_num)"]+1))*100),1)." %"
+                .",%0ATкр: "        .round($rows[$i]["t_max"],1)." %C2%B0C"
+                .", Tmax: "         .round($rows[$i]["max(s.current_temperature)"],1)." %C2%B0C"
+                .", Tmin: "         .round($rows[$i]["min(s.current_temperature)"],1)." %C2%B0C"
+                .",%0AVкр: "        .round($rows[$i]["v_max"],1)." %C2%B0C/сут."
+                .", Vmax: "         .round($rows[$i]["max(s.current_speed)"],1)." %C2%B0C/сут."
+                .";";
+        array_push($outArr, $outStr);
+        $outStr = "";
+        
+    }
+
+    return $outArr;
 }
 
 function cmdGetConfiguration($dbh){
@@ -396,6 +450,8 @@ function cmdGetAlarms($dbh){
 
     return $outArr;
 }
+
+
 
 exit_from_script:
 
