@@ -7,158 +7,70 @@
     lvl1 - получение уровня заполнения силоса. Формат команды: /lvl [силос]
     alarms - получение текущих неисправностей
 */
+//  set webhook:
+//  https://api.telegram.org/bot2123872619:AAENLR1KZVjWBmeOP8vcqHM39KPZOPX9OW4/setWebhook?url=https://nethermometrytest.ddns.net:8443/Thermometry/telegram/
 require_once('../currValsFromTS.php');
-//  Работа ведется по методу getUpdates. Каждые 3с JS код вызывает данную секцию
 const TOKEN = "2123872619:AAENLR1KZVjWBmeOP8vcqHM39KPZOPX9OW4";     //  Токен, уникальный для каждого бота
 const BASE_URL = "https://api.telegram.org/bot";
+ini_set("allow_url_fopen", true);
 
-//print_r( json_decode(file_get_contents(BASE_URL.TOKEN."/getUpdates"))->result );
+$newMessage = json_decode(file_get_contents('php://input'));
+//file_put_contents(__DIR__.'/debug.txt', print_r($newMessage,1), FILE_APPEND);
+recognizeCmd($dbh, $newMessage);
 
-$updatesArray = getUpdates(BASE_URL.TOKEN."/getUpdates");
-$newUpdatesArray = getNewUpdates($dbh, getUpdates(BASE_URL.TOKEN."/getUpdates"));
-foreach($updatesArray as $update){
+function recognizeCmd($dbh, $newMessage){
 
-    if(in_array($update["update_id"],$newUpdatesArray)){
-        print_r($update);
-        print_r("<br>");
-        recognizeCmd($dbh, $update);
-    }
+    $command = $newMessage->message->text;
+    $sender_id = $newMessage->message->from->id;
 
-}
-
-//  Функция отправляет запрос и получает JSON-объект с текущими обновлениями
-function getUpdates($url){
-    $jsobObject = json_decode(file_get_contents($url));
-    if($jsobObject->ok==false){
-        return false;
-    }
-    $outArr=array();
-    foreach($jsobObject->result as $currMessage){
-        $outArr[] = array(  "update_id" => $currMessage->update_id,
-                            "sender_id" => $currMessage->message->from->id,
-                            "date"      => $currMessage->message->date,
-                            "text"      => $currMessage->message->text);
-    }
-    return $outArr;
-}
-
-//  Функция принимает JSON-объект и делает запрос в БД, чтобы проверить, какие сообщения еще не обрабатывались на данный момент
-//  Возвращает объекты с новыми сообщениями
-function getNewUpdates($dbh, $updates){
-
-    $sql_statement_create_table_telegram_bot =
-        "CREATE TABLE IF NOT EXISTS `zernoib`.`telegram_bot`
-            ( `update_id` INT(32) NOT NULL, `sender_id` INT(32) NOT NULL,
-              `date` INT(32) NOT NULL, `text` VARCHAR(100) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-              PRIMARY KEY (`update_id`))
-              ENGINE = InnoDB
-              CHARSET = utf8 COLLATE utf8_general_ci;";
-
-    $stmt = $dbh->prepare($sql_statement_create_table_telegram_bot);
-	$stmt->execute();
-
-    $updatesArr=array();
-    foreach($updates as $update){
-        array_push($updatesArr,$update["update_id"]);
-    }
-
-    $sql_statement_select_new_updates = "SELECT update_id FROM zernoib.telegram_bot;";
-	$sth = $dbh->query($sql_statement_select_new_updates);
-    $rows = $sth->fetchAll();
-
-    $updatesFromDBArr=array();
-    foreach($rows as $row){
-        array_push($updatesFromDBArr, $row["update_id"]);
-    }
-
-    $newUpdatesArr = array_diff($updatesArr, $updatesFromDBArr);
-
-    return $newUpdatesArr;
-}
-
-function recognizeCmd($dbh, $update){
-
-    //if( preg_match('/[Кк]онфигурация/',$update["text"],$matches) ){
-    if( preg_match('/\/siloinfo\s*/',$update["text"],$matches) ){
+    if( preg_match('/\/siloinfo\s*/',$command,$matches) ){
 
         $arrayToSend = cmdGetSiloInfo($dbh);
         foreach($arrayToSend as $currMess){
-            file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$update["sender_id"]."&text=".$currMess);
-        }
-        dbWriteUpdates($dbh, $update);
 
-    //if( preg_match('/[Кк]онфигурация/',$update["text"],$matches) ){
-    } else if( preg_match('/\/conf\s*/',$update["text"],$matches) ){
+            file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$sender_id."&text=".$currMess);
+        }
+
+    } else if( preg_match('/\/conf\s*/',$command,$matches) ){
 
         $arrayToSend = cmdGetConfiguration($dbh);
         foreach($arrayToSend as $currMess){
-            file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$update["sender_id"]."&text=".$currMess);
+            file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$sender_id."&text=".$currMess);
         }
-        dbWriteUpdates($dbh, $update);
 
-    //} else if (preg_match('/[Тт]емпература\s*(\d{0,5})\.?(\d{0,2})?\.?(\d{0,2})?/',$update["text"],$matches)) {
-    } else if (preg_match('/\/temp\s*(\d{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/',$update["text"],$matches)) {
+    } else if (preg_match('/\/temp\s*(\d{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/',$command,$matches)) {
 
         $arrayToSend = cmdGetTemperatures($dbh, $matches[1], $matches[2], $matches[3]);
         foreach($arrayToSend as $currMess){
-            file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$update["sender_id"]."&text=".$currMess);
+            file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$sender_id."&text=".$currMess);
         }
-        dbWriteUpdates($dbh, $update);
-        
-    //} else if (preg_match('/[Сс]корость\s*(\d{0,5})\.?(\d{0,2})?\.?(\d{0,2})?/',$update["text"],$matches)) {
-    } else if (preg_match('/\/speed\s*(\d{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/',$update["text"],$matches)) {
+
+    } else if (preg_match('/\/speed\s*(\d{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/',$command,$matches)) {
 
         $arrayToSend = cmdGetTemperatureSpeeds($dbh, $matches[1], $matches[2], $matches[3]);
         foreach($arrayToSend as $currMess){
-            file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$update["sender_id"]."&text=".$currMess);
+            file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$sender_id."&text=".$currMess);
         }
-        dbWriteUpdates($dbh, $update);
 
-    //} else if (preg_match('/[Уу]ровень\s+(\d{0,5})?/',$update["text"],$matches)){
-    } else if (preg_match('/\/lvl\s*(\d{0,5})?\s*/',$update["text"],$matches)){
+    } else if (preg_match('/\/lvl\s*(\d{0,5})?\s*/',$command,$matches)){
 
         $arrayToSend = cmdGetGrainLevels($dbh, $matches[1]);
         foreach($arrayToSend as $currMess){
-            file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$update["sender_id"]."&text=".$currMess);
+            file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$sender_id."&text=".$currMess);
         }
-        dbWriteUpdates($dbh, $update);
-        
-    //} else if (preg_match('/[Аа]лармы/',$update["text"],$matches)){
-    } else if (preg_match('/\/alarms\s*/',$update["text"],$matches)){
+
+    } else if (preg_match('/\/alarms\s*/',$command,$matches)){
 
         $arrayToSend = cmdGetAlarms($dbh);
         foreach($arrayToSend as $currMess){
-            file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$update["sender_id"]."&text=".$currMess);
+            file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$sender_id."&text=".$currMess);
         }
-        dbWriteUpdates($dbh, $update);
 
-    } else if (preg_match('/\/start/',$update["text"],$matches)) {
-        
-        dbWriteUpdates($dbh, $update);
+    } else if (preg_match('/\/start/',$command,$matches)) {
 
     } else {
-
-        file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$update["sender_id"]."&text=Неопознанная команда");        
-        dbWriteUpdates($dbh, $update);
-
+        file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$sender_id."&text=Неопознанная команда");        
     }
-
-    echo "<br><br>";
-
-    return;
-}
-//  Запись выполненных команд в БД
-function dbWriteUpdates($dbh, $update){
-    $query = "INSERT INTO zernoib.telegram_bot
-			   		(update_id, sender_id, date, text)
-			  VALUES ("
-              ."'".$update["update_id"]."','".$update["sender_id"]."','".$update["date"]."','".$update["text"]."');";
-    $stmt = $dbh->prepare($query);
-    $stmt->execute();
-    return;
-}
-//  Удаление из БД старых команд
-function dbTruncateOldUpdates(){
 
     return;
 }
@@ -450,9 +362,5 @@ function cmdGetAlarms($dbh){
 
     return $outArr;
 }
-
-
-
-exit_from_script:
 
 ?>
