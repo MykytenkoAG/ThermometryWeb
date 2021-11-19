@@ -13,6 +13,7 @@
       require_once "header.php";
       require_once "modals.php";
       require_once ('configParameters.php');
+      //phpinfo();
     ?>
     <div class="container-fluid h-100">
       <main>
