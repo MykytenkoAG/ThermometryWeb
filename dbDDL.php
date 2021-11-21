@@ -9,7 +9,7 @@ function ddl_execute_statement($dbh,$sql_statement){
 	return;
 }
 function ddl_truncate_Measurements($dbh){
-	$query = "TRUNCATE zernoib.measurements;";
+	$query = "TRUNCATE ".DBNAME.".measurements;";
 	$stmt = $dbh->prepare($query);
 	$stmt->execute();
 	return;
@@ -83,7 +83,7 @@ function ddl_init_Prodtypes($dbh){
 }
 function ddl_init_SilosesGroups($dbh, $termoClientINI){
 
-	$query  = "INSERT INTO zernoib.silosesgroups (silo_group, silo_group_name, silo_group_col, silo_group_row, silo_group_size) VALUES ";
+	$query  = "INSERT INTO ".DBNAME.".silosesgroups (silo_group, silo_group_name, silo_group_col, silo_group_row, silo_group_size) VALUES ";
 	$query .= "(0, 'default_group', 0, 0, 1),";
 
 	if(isset($termoClientINI['SilosesGroups'])){
@@ -159,7 +159,7 @@ function getTermoServerIniSortedBySiloName($termoClientINI,$termoServerINI){
 }
 function ddl_init_Prodtypesbysilo($dbh, $termoClientINI, $termoServerINI){
 
-    $query = "SELECT product_id FROM zernoib.prodtypes ORDER BY product_id ASC LIMIT 1";
+    $query = "SELECT product_id FROM ".DBNAME.".prodtypes ORDER BY product_id ASC LIMIT 1";
     $sth = $dbh->query($query);
 	
 	$product_id=($sth->fetchAll())[0]['product_id'];					//	Выбираем продукт с id=1 для заполенения им всех силосов (только при инициализации)

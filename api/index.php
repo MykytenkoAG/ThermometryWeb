@@ -2,6 +2,7 @@
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/Thermometry/currValsFromTS.php');
 
+header('Access-Control-Allow-Origin: *');
 header('Content-type: json/application');
 
 $method = $_SERVER['REQUEST_METHOD'];

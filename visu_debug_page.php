@@ -5,7 +5,7 @@ require_once ('currValsFromTS.php');
 function vDbg_draw_debugParamsTable($dbh){
 
     $sql = "SELECT s.sensor_id, pbs.silo_name, s.podv_id, s.sensor_num, s.current_temperature, s.current_speed, pbs.grain_level 
-            FROM zernoib.sensors s INNER JOIN prodtypesbysilo pbs ON s.silo_id = pbs.silo_id";
+            FROM ".DBNAME.".sensors s INNER JOIN prodtypesbysilo pbs ON s.silo_id = pbs.silo_id";
 
     $sth = $dbh->query($sql);
 

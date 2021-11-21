@@ -19,12 +19,12 @@ function db_update_grainLevels($dbh, $arrayOfLevels){
 	$query = "	SELECT	silo_id, silo_name, bs_addr, product_id,
 						grain_level_fromTS, grain_level,
 						is_square, size, position_col, position_row, silo_group
-					FROM zernoib.prodtypesbysilo;";
+					FROM ".DBNAME.".prodtypesbysilo;";
 
 	$sth = $dbh->query($query);
 	$rows = $sth->fetchAll();
 
-	$query = "INSERT INTO zernoib.prodtypesbysilo
+	$query = "INSERT INTO ".DBNAME.".prodtypesbysilo
 			   		(silo_id, silo_name, bs_addr, product_id,
 					 grain_level_fromTS, grain_level,
 					 is_square, size, position_col, position_row, silo_group)
@@ -103,7 +103,9 @@ function db_get_error_codes($dbh){
 //	Функция для записи значений из массивов $arrayOfTemperatures и $arrayOfTempSpeeds в Базу Данных от времени $serverDate
 function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate, $logFile){
 
-	$loggingString="";
+	$alarmMessage = "";
+	$loggingString = "";
+	$telegramMessage = "";
 	$error_codes_arr = db_get_error_codes($dbh);
 
 	$query = "	SELECT  s.sensor_id, s.silo_id, s.podv_id, s.sensor_num, s.is_enabled, s.current_temperature, s.current_speed,
@@ -123,7 +125,7 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 	$sth = $dbh->query($query);
 	$rows = $sth->fetchAll();
 
-	$query = "INSERT INTO zernoib.sensors
+	$query = "INSERT INTO ".DBNAME.".sensors
 			   (sensor_id, silo_id, podv_id, sensor_num, is_enabled, current_temperature, current_speed,
 				curr_t_text, curr_v_text, curr_t_colour, curr_v_colour, server_date,
 				NACK_Tmax, TIME_NACK_Tmax, ACK_Tmax, TIME_ACK_Tmax, NACK_Vmax, TIME_NACK_Vmax, ACK_Vmax, TIME_ACK_Vmax,
@@ -142,8 +144,13 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 						$query_NACK_err = "1, ";
 						$query_TIME_NACK_err = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
 						$query_error_id = "'".($arrayOfTemperatures[$i][$j][$k]*0.1)."'),";
-						$loggingString .= "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". "
-										  .$error_codes_arr[ ($arrayOfTemperatures[$i][$j][$k]*0.1) ]['error_description'].". Срабатывание сигнала АПС;\n";
+
+						$alarmMessage = "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". "
+										.$error_codes_arr[ ($arrayOfTemperatures[$i][$j][$k]*0.1) ]['error_description'].". Срабатывание сигнала АПС;\n";
+
+						$loggingString .= $alarmMessage;
+						$telegramMessage .= $alarmMessage;
+
 				} else {
 						$query_NACK_err = "'".$rows[$sensor_id]['NACK_err']."', ";
 						$query_TIME_NACK_err = is_null($rows[$sensor_id]['TIME_NACK_err']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_NACK_err']."', ";
@@ -175,7 +182,12 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 					($arrayOfTemperatures[$i][$j][$k]*0.1 > $rows[$sensor_id]['t_max']) ){				//	температура выше критической для данного продукта
 						$query_NACK_Tmax = "1, ";
 						$query_TIME_NACK_Tmax = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
-						$loggingString .= "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". Tmax. Срабатывание сигнала АПС;\n";
+
+						$alarmMessage = "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". Tmax. Срабатывание сигнала АПС;\n";
+
+						$loggingString .= $alarmMessage;
+						$telegramMessage .= $alarmMessage;
+
 				} else {
 						$query_NACK_Tmax = "'".$rows[$sensor_id]['NACK_Tmax']."', ";
 						$query_TIME_NACK_Tmax = is_null($rows[$sensor_id]['TIME_NACK_Tmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_NACK_Tmax']."', ";
@@ -206,7 +218,12 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 					($arrayOfTempSpeeds[$i][$j][$k] > $rows[$sensor_id]['v_max']) ){					//	скорость изменения температуры выше критической
 						$query_NACK_Vmax = "1, ";
 						$query_TIME_NACK_Vmax = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
-						$loggingString .= "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". Vmax. Срабатывание сигнала АПС;\n";
+
+						$alarmMessage = "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". Vmax. Срабатывание сигнала АПС;\n";
+
+						$loggingString .= $alarmMessage;
+						$telegramMessage .= $alarmMessage;
+
 				} else {
 						$query_NACK_Vmax = "'".$rows[$sensor_id]['NACK_Vmax']."', ";
 						$query_TIME_NACK_Vmax = is_null($rows[$sensor_id]['TIME_NACK_Vmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_NACK_Vmax']."', ";
@@ -376,6 +393,30 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 
 	writeToLog($logFile, $loggingString);
 
+	//	Отправляем уведомления пользователям в Телеграм
+	if(strlen($telegramMessage)>0){
+		require_once("telegram/index.php");
+		$telegramMessageArr = explode("\n",$telegramMessage);
+		$messageToSend = "";
+		$messageToSendArr = [];
+
+		for($i=0; $i<count($telegramMessageArr); $i++){
+
+			$messageToSend .= $telegramMessageArr[$i]."%0A";
+			if( ($i>0 && $i%10==0) || ($i==count($telegramMessageArr)-1) ){
+				array_push($messageToSendArr, $messageToSend);
+			}
+
+		}
+		//	Извлекаем из БД всех пользователей, которые включили уведомления
+		$query = "SELECT user_id FROM ".DBNAME.".telegram_users WHERE notifications_on=1;";
+		$sth = $dbh->query($query);
+		$telegram_users = $sth->fetchAll();
+		foreach($telegram_users as $telegram_user){
+			sendMessage($telegram_user["user_id"], $messageToSendArr);
+		}
+	}
+
 	return;
 }
 //	Квитирование алармов
@@ -394,7 +435,7 @@ function alarms_ack($dbh, $serverDate, $logFile){
 	$sth = $dbh->query($query);
 	$rows = $sth->fetchAll();
 
-	$query = "	INSERT INTO zernoib.sensors
+	$query = "	INSERT INTO ".DBNAME.".sensors
 					(sensor_id, silo_id, podv_id, sensor_num, is_enabled, current_temperature, current_speed,
 					curr_t_text, curr_v_text, curr_t_colour, curr_v_colour, server_date,
 					NACK_Tmax, TIME_NACK_Tmax, ACK_Tmax, TIME_ACK_Tmax, NACK_Vmax, TIME_NACK_Vmax, ACK_Vmax, TIME_ACK_Vmax,
@@ -543,7 +584,7 @@ function alarms_ack($dbh, $serverDate, $logFile){
 }
 //	Функция определения того, есть ли неквитированные алармы
 function alarms_get_nack_number($dbh){
-	$sql = "SELECT count(sensor_id) FROM zernoib.sensors WHERE (NACK_err=1 OR NACK_Tmax=1 OR NACK_Vmax=1)";
+	$sql = "SELECT count(sensor_id) FROM ".DBNAME.".sensors WHERE (NACK_err=1 OR NACK_Tmax=1 OR NACK_Vmax=1)";
 	$sth = $dbh->query($sql);
 	if($sth!=false){
 		return $sth->fetchAll()[0]['count(sensor_id)'];

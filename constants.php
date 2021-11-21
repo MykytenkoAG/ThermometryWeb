@@ -2,6 +2,25 @@
 
 mb_internal_encoding("UTF-8");
 
+//  Выбор режима работы ----------------------------------------------------------------------------------------------------------------
+$simulation_mode = true;
+                   //false;
+$debugPageDisableElements = $simulation_mode ? "" : "disabled";     //  Отключение элементов на странице отладки
+
+//  Работа с Базой Данных --------------------------------------------------------------------------------------------------------------
+const SERVER_NAME = "localhost";
+const USERNAME = "root";
+const password = "";
+const DBNAME = "zernoib";
+
+$pdo_options = [
+    PDO::ATTR_TIMEOUT => 5,
+    PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"//,
+    //PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION//,
+    //PDO::ATTR_CASE => PDO::CASE_NATURAL//,
+    //PDO::ATTR_ORACLE_NULLS => PDO::NULL_EMPTY_STRING
+];
+
 $logFile = 'logs/log.txt';
 
 $CURRENT_WORKING_DIRECTORY = getcwd();
@@ -46,19 +65,19 @@ $POSSIBLE_ERRORS = array(
 );
 
 const SQL_STATEMENT_DROP_ALL_TABLES = 
-       "DROP TABLE IF EXISTS zernoib.measurements;
-        DROP TABLE IF EXISTS zernoib.dates;
-        DROP TABLE IF EXISTS zernoib.sensors;
-        DROP TABLE IF EXISTS zernoib.prodtypesbysilo;
-        DROP TABLE IF EXISTS zernoib.silosesgroups;
-        DROP TABLE IF EXISTS zernoib.prodtypes;
-        DROP TABLE IF EXISTS zernoib.errors;
-        DROP TABLE IF EXISTS zernoib.users;";
+       "DROP TABLE IF EXISTS ".DBNAME.".measurements;
+        DROP TABLE IF EXISTS ".DBNAME.".dates;
+        DROP TABLE IF EXISTS ".DBNAME.".sensors;
+        DROP TABLE IF EXISTS ".DBNAME.".prodtypesbysilo;
+        DROP TABLE IF EXISTS ".DBNAME.".silosesgroups;
+        DROP TABLE IF EXISTS ".DBNAME.".prodtypes;
+        DROP TABLE IF EXISTS ".DBNAME.".errors;
+        DROP TABLE IF EXISTS ".DBNAME.".users;";
 
-const SQL_STATEMENT_DROP_USERS = "DROP TABLE IF EXISTS zernoib.users;";
+const SQL_STATEMENT_DROP_USERS = "DROP TABLE IF EXISTS ".DBNAME.".users;";
 
 const SQL_STATEMENT_CREATE_USERS =
-       "CREATE TABLE IF NOT EXISTS zernoib.users
+       "CREATE TABLE IF NOT EXISTS ".DBNAME.".users
         (user_id INT NOT NULL AUTO_INCREMENT,
         user_name VARCHAR(20) NOT NULL,
         password VARCHAR(32) NOT NULL,
@@ -67,10 +86,10 @@ const SQL_STATEMENT_CREATE_USERS =
         ENGINE = InnoDB
         CHARSET=utf8 COLLATE utf8_general_ci;";
 
-const SQL_STATEMENT_DROP_ERRORS = "DROP TABLE IF EXISTS zernoib.errors;";
+const SQL_STATEMENT_DROP_ERRORS = "DROP TABLE IF EXISTS ".DBNAME.".errors;";
 
 const SQL_STATEMENT_CREATE_ERRORS =
-       "CREATE TABLE IF NOT EXISTS zernoib.errors
+       "CREATE TABLE IF NOT EXISTS ".DBNAME.".errors
         (error_id INT NOT NULL,
         error_description VARCHAR(70) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
         error_desc_short VARCHAR(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
@@ -79,20 +98,20 @@ const SQL_STATEMENT_CREATE_ERRORS =
         ENGINE = InnoDB
         CHARSET=utf8 COLLATE utf8_general_ci;";
 
-const SQL_STATEMENT_DROP_DATES = "DROP TABLE IF EXISTS zernoib.dates;";
+const SQL_STATEMENT_DROP_DATES = "DROP TABLE IF EXISTS ".DBNAME.".dates;";
 
 const SQL_STATEMENT_CREATE_DATES = 
-        "CREATE TABLE IF NOT EXISTS zernoib.dates
+        "CREATE TABLE IF NOT EXISTS ".DBNAME.".dates
         (date_id INT NOT NULL AUTO_INCREMENT,
         date TIMESTAMP NOT NULL,
         PRIMARY KEY (date_id))
         ENGINE = InnoDB
         CHARSET=utf8 COLLATE utf8_general_ci;";
 
-const SQL_STATEMENT_DROP_PRODTYPES = "DROP TABLE IF EXISTS zernoib.prodtypes;";
+const SQL_STATEMENT_DROP_PRODTYPES = "DROP TABLE IF EXISTS ".DBNAME.".prodtypes;";
 
 const SQL_STATEMENT_CREATE_PRODTYPES =
-       "CREATE TABLE IF NOT EXISTS zernoib.prodtypes
+       "CREATE TABLE IF NOT EXISTS ".DBNAME.".prodtypes
         (product_id INT NOT NULL AUTO_INCREMENT,
         product_name VARCHAR(60) NOT NULL,
         t_min FLOAT NOT NULL, t_max FLOAT NOT NULL,
@@ -101,10 +120,10 @@ const SQL_STATEMENT_CREATE_PRODTYPES =
         ENGINE = InnoDB
         CHARSET=utf8 COLLATE utf8_general_ci;";
 
-const SQL_STATEMENT_DROP_SILOSESGROUPS = "DROP TABLE IF EXISTS zernoib.silosesgroups;";
+const SQL_STATEMENT_DROP_SILOSESGROUPS = "DROP TABLE IF EXISTS ".DBNAME.".silosesgroups;";
 
 const SQL_STATEMENT_CREATE_SILOSESGROUPS =
-       "CREATE TABLE IF NOT EXISTS zernoib.silosesgroups
+       "CREATE TABLE IF NOT EXISTS ".DBNAME.".silosesgroups
         (silo_group INT NOT NULL,
         silo_group_name VARCHAR(60) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
         silo_group_col INT NULL DEFAULT NULL,
@@ -114,10 +133,10 @@ const SQL_STATEMENT_CREATE_SILOSESGROUPS =
         ENGINE = InnoDB
         CHARSET=utf8 COLLATE utf8_general_ci;";
 
-const SQL_STATEMENT_DROP_PRODTYPESBYSILO = "DROP TABLE IF EXISTS zernoib.prodtypesbysilo;";
+const SQL_STATEMENT_DROP_PRODTYPESBYSILO = "DROP TABLE IF EXISTS ".DBNAME.".prodtypesbysilo;";
 
 const SQL_STATEMENT_CREATE_PRODTYPESBYSILO =
-       "CREATE TABLE IF NOT EXISTS zernoib.prodtypesbysilo
+       "CREATE TABLE IF NOT EXISTS ".DBNAME.".prodtypesbysilo
         (silo_id INT NOT NULL,
         silo_name VARCHAR(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
         bs_addr INT NOT NULL DEFAULT 1,
@@ -135,10 +154,10 @@ const SQL_STATEMENT_CREATE_PRODTYPESBYSILO =
         ENGINE = InnoDB
         CHARSET=utf8 COLLATE utf8_general_ci;";
 
-const SQL_STATEMENT_DROP_SENSORS = "DROP TABLE IF EXISTS zernoib.sensors;";
+const SQL_STATEMENT_DROP_SENSORS = "DROP TABLE IF EXISTS ".DBNAME.".sensors;";
 
 const SQL_STATEMENT_CREATE_SENSORS =
-       "CREATE TABLE IF NOT EXISTS zernoib.sensors
+       "CREATE TABLE IF NOT EXISTS ".DBNAME.".sensors
         (sensor_id INT NOT NULL,
         silo_id INT NOT NULL, podv_id INT NOT NULL, sensor_num INT NOT NULL,
         is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
@@ -162,12 +181,12 @@ const SQL_STATEMENT_CREATE_SENSORS =
         ENGINE = InnoDB
         CHARSET=utf8 COLLATE utf8_general_ci;";
 
-const SQL_STATEMENT_DROP_MEASUREMENTS = "DROP TABLE IF EXISTS zernoib.measurements;";
+const SQL_STATEMENT_DROP_MEASUREMENTS = "DROP TABLE IF EXISTS ".DBNAME.".measurements;";
 
-const SQL_STATEMENT_TRUNCATE_MEASUREMENTS = "TRUNCATE zernoib.measurements;";
+const SQL_STATEMENT_TRUNCATE_MEASUREMENTS = "TRUNCATE ".DBNAME.".measurements;";
 
 const SQL_STATEMENT_CREATE_MEASUREMENTS =
-       "CREATE TABLE IF NOT EXISTS zernoib.measurements
+       "CREATE TABLE IF NOT EXISTS ".DBNAME.".measurements
         (date_id INT NOT NULL,
         sensor_id INT NOT NULL,
         temperature FLOAT NULL,
@@ -177,20 +196,24 @@ const SQL_STATEMENT_CREATE_MEASUREMENTS =
         ENGINE = InnoDB
         CHARSET=utf8 COLLATE utf8_general_ci;";
 
-const SQL_STATEMENT_DROP_TS_CONN_SETTINGS = "DROP TABLE IF EXISTS zernoib.ts_conn_settings;";
+const SQL_STATEMENT_DROP_TS_CONN_SETTINGS = "DROP TABLE IF EXISTS ".DBNAME.".ts_conn_settings;";
 
 const SQL_STATEMENT_CREATE_TS_CONN_SETTINGS =
-       "CREATE TABLE IF NOT EXISTS zernoib.ts_conn_settings
+       "CREATE TABLE IF NOT EXISTS ".DBNAME.".ts_conn_settings
         ( id INT NOT NULL AUTO_INCREMENT,
         ts_ip VARCHAR(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '127.0.0.1',
         ts_port SMALLINT NOT NULL DEFAULT '200', PRIMARY KEY (id))
         ENGINE = InnoDB;";
 
 const SQL_STATEMENT_SELECT_TS_CONN_SETTINGS =
-       "SELECT id, ts_ip, ts_port FROM zernoib.ts_conn_settings WHERE id=1;";
+       "SELECT id, ts_ip, ts_port FROM ".DBNAME.".ts_conn_settings WHERE id=1;";
        
 const SQL_STATEMENT_INIT_TS_CONN_SETTINGS =
-       "INSERT INTO zernoib.ts_conn_settings (id, ts_ip, ts_port) VALUES (1, '127.0.0.1', '200');";
+       "INSERT INTO ".DBNAME.".ts_conn_settings (id, ts_ip, ts_port) VALUES (1, '127.0.0.1', '200');";
 
+const SQL_STATEMENT_CREATE_TELEGRAM_USERS =
+       "CREATE TABLE ".DBNAME.".`telegram_users`
+       ( `user_id` INT(32) NOT NULL , `notifications_on` TINYINT(1) NOT NULL , PRIMARY KEY (`user_id`))
+       ENGINE = InnoDB;";
 
 ?>

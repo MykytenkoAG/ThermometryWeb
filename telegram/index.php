@@ -1,22 +1,26 @@
 <?php
 /*  Перечень команд:
     siloinfo - краткая информация по текущему состоянию. Формат ответа: Силос, Продукт, Уровень, Ткр, Tmax, Tmin, Vкр, Vmax
-    conf - получение конфигурации системы. Формат ответа: [силос]:НП[номер подвески]/[количество датчиков]
+    alarms - получение текущих неисправностей
+    lvl1 - получение уровня заполнения силоса. Формат команды: /lvl [силос]
     temp1 - получение текущей температуры. Формат команды: /temp [силос].[подвеска].[датчик]
     speed1 - получение текущей скорости изменения температуры. Формат команды: /speed [силос].[подвеска].[датчик]
-    lvl1 - получение уровня заполнения силоса. Формат команды: /lvl [силос]
-    alarms - получение текущих неисправностей
+    conf - получение конфигурации системы. Формат ответа: [силос]:НП[номер подвески]/[количество датчиков]
+    notificationson - включить уведомления о возникновении новых АПС
+    notificationsoff - выключить уведомления о возникновении новых АПС
+
+    set webhook: https://api.telegram.org/bot2123872619:AAENLR1KZVjWBmeOP8vcqHM39KPZOPX9OW4/setWebhook?url=https://nethermometrytest.ddns.net:8443/Thermometry/telegram/
 */
-//  set webhook:
-//  https://api.telegram.org/bot2123872619:AAENLR1KZVjWBmeOP8vcqHM39KPZOPX9OW4/setWebhook?url=https://nethermometrytest.ddns.net:8443/Thermometry/telegram/
-require_once('../currValsFromTS.php');                              //  Получаем всю необходимую информацию
+require_once( substr(__DIR__,0,-8)."currValsFromTS.php" );                              //  Получаем всю необходимую информацию
 
 const BASE_URL = "https://api.telegram.org/bot"; const TOKEN = "2123872619:AAENLR1KZVjWBmeOP8vcqHM39KPZOPX9OW4"; ini_set("allow_url_fopen", true);
 
 $newMessage = json_decode(file_get_contents('php://input'));        //  Получаем сообщение от Телеграм Бота
 //file_put_contents(__DIR__.'/debug.txt', print_r($newMessage,1), FILE_APPEND);
 
-recognizeCmd($dbh, $newMessage);                                    //  Распознаем команду и отправляем ответ
+if(!is_null($newMessage)>0){
+    recognizeCmd($dbh, $newMessage);                                    //  Распознаем команду и отправляем ответ
+}
 
 function recognizeCmd($dbh, $newMessage){
 
@@ -54,6 +58,25 @@ function recognizeCmd($dbh, $newMessage){
 
         $messageToSend = cmdGetConfiguration($dbh);
 
+    }else if (  preg_match('/\/notificationson\s*/ui',$command,$matches) ||
+                preg_match('/уведомления\s*вкл\s*/ui',$command,$matches) ){
+
+        $query="REPLACE INTO telegram_users (user_id, notifications_on) VALUES 
+                ('$sender_id', '1');";
+        $stmt = $dbh->prepare($query);
+        $stmt->execute();
+
+        $messageToSend = array("Уведомления о возникновении АПС включены.");
+    
+    }else if (  preg_match('/\/notificationsoff\s*/ui',$command,$matches) ||
+                preg_match('/уведомления\s*выкл\s*/ui',$command,$matches) ){
+
+        $query="REPLACE INTO telegram_users (user_id, notifications_on) VALUES 
+                ('$sender_id', '0');";
+        $stmt = $dbh->prepare($query);
+        $stmt->execute();
+        $messageToSend = array("Уведомления о возникновении АПС выключены");
+
     } else if (preg_match('/\/start/ui',$command,$matches)) {
 
         $messageToSend = array("Здравствуйте, ".$newMessage->message->from->first_name."!");
@@ -67,6 +90,7 @@ function recognizeCmd($dbh, $newMessage){
 
 function sendMessage($sender_id, $arrayOfMessages){
     foreach($arrayOfMessages as $currMess){
+        //echo BASE_URL.TOKEN."/sendMessage?chat_id=".$sender_id."&text=".$currMess;
         file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$sender_id."&text=".$currMess);
     }
     return;

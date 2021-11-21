@@ -387,7 +387,7 @@ if( isset($_POST['POST_ts_connection_settings_ip']) && isset($_POST['POST_ts_con
 
 function vSConf_ts_connection_settings_save($dbh, $ts_ip, $ts_port){
 
-    $query = "UPDATE zernoib.ts_conn_settings SET ts_ip='$ts_ip', ts_port='$ts_port' WHERE id=1;";
+    $query = "UPDATE ".DBNAME.".ts_conn_settings SET ts_ip='$ts_ip', ts_port='$ts_port' WHERE id=1;";
     $stmt = $dbh->prepare($query);
     $stmt->execute();
 
@@ -398,8 +398,8 @@ function vSConf_ts_connection_settings_save($dbh, $ts_ip, $ts_port){
 //  Резервное копирование БД
 //  Отправка AJAX запроса, который должен вернуть ссылку на файл
 if( isset($_POST['POST_vSConf_db_create_backup']) ) {
-    $sql_backup_file = "dbBackups/". dbname . date("_d.m.Y_H.i.s") . '.sql';
-    $dumpCommand = '/wamp64/bin/mysql/mysql5.7.31/bin/mysqldump.exe --host='.servername.' --user='.username.' --password='.password.' --databases '.dbname.' > '. $sql_backup_file;
+    $sql_backup_file = "dbBackups/". DBNAME . date("_d.m.Y_H.i.s") . '.sql';
+    $dumpCommand = '/wamp64/bin/mysql/mysql5.7.31/bin/mysqldump.exe --host='.SERVER_NAME.' --user='.USERNAME.' --password='.password.' --databases '.DBNAME.' > '. $sql_backup_file;
     system($dumpCommand);
     echo $sql_backup_file;
 }
@@ -468,7 +468,7 @@ function vSConf_db_restore_from_backup($dbh, $dbBackupFile){
     $ts_conn_settings_rows = $sth->fetchAll();
 
     $query_ts_conn_settings=SQL_STATEMENT_DROP_TS_CONN_SETTINGS.SQL_STATEMENT_CREATE_TS_CONN_SETTINGS
-                            ."INSERT INTO zernoib.ts_conn_settings (id, ts_ip, ts_port) VALUES ";
+                            ."INSERT INTO ".DBNAME.".ts_conn_settings (id, ts_ip, ts_port) VALUES ";
     foreach($ts_conn_settings_rows as $ts_conn_settings_row){
         $query_ts_conn_settings .= "(".$ts_conn_settings_row['id'].", '".$ts_conn_settings_row['ts_ip']."', '".$ts_conn_settings_row['ts_port']."'),";
     }

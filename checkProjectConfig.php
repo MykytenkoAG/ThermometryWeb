@@ -123,6 +123,7 @@ function projectUpdate($dbh, $termoClientINI, $termoServerINI){
 	ddl_execute_statement($dbh, SQL_STATEMENT_CREATE_PRODTYPESBYSILO);
 	ddl_execute_statement($dbh, SQL_STATEMENT_CREATE_SENSORS);
 	ddl_execute_statement($dbh, SQL_STATEMENT_CREATE_MEASUREMENTS);
+	ddl_execute_statement($dbh, SQL_STATEMENT_CREATE_TELEGRAM_USERS);
 
 	date_default_timezone_set('Europe/Kiev'); $date = date('d.m.Y H:i:s', time()); $serverDate = $date;
 
@@ -152,7 +153,7 @@ function getConfForVisu_ProjectConfig($dbh){
     $projectConfArr = array();
 
     $sql = "SELECT s.silo_id, pbs.silo_name, s.podv_id, s.sensor_num, s.sensor_id
-				FROM zernoib.sensors AS s INNER JOIN zernoib.prodtypesbysilo AS pbs ON s.silo_id = pbs.silo_id
+				FROM ".DBNAME.".sensors AS s INNER JOIN ".DBNAME.".prodtypesbysilo AS pbs ON s.silo_id = pbs.silo_id
 				ORDER BY silo_id, silo_name, sensor_id, sensor_num;";
     $sth = $dbh->query($sql);
     
@@ -191,7 +192,7 @@ function getConfForVisu_SiloNames($dbh){
 
     $arrayOfSiloNames = array();
 
-    $sql = "SELECT silo_id, silo_name FROM zernoib.prodtypesbysilo ORDER BY silo_id;";
+    $sql = "SELECT silo_id, silo_name FROM ".DBNAME.".prodtypesbysilo ORDER BY silo_id;";
     $sth = $dbh->query($sql);
     
     $rows = $sth->fetchAll();

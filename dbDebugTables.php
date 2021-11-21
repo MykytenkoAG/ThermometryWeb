@@ -3,8 +3,8 @@
 function ddl_debug_drop_all($dbh){
 
 	$query = 
-	   "DROP TABLE IF EXISTS zernoib.debug_sensors;
-		DROP TABLE IF EXISTS zernoib.debug_silo;";
+	   "DROP TABLE IF EXISTS ".DBNAME.".debug_sensors;
+		DROP TABLE IF EXISTS ".DBNAME.".debug_silo;";
 
 	$stmt = $dbh->prepare($query);
 
@@ -15,7 +15,7 @@ function ddl_debug_drop_all($dbh){
 //  silo_id, grain_level
 function ddl_debug_create_Silo($dbh){
 	
-	$sql = "CREATE TABLE IF NOT EXISTS zernoib.debug_silo
+	$sql = "CREATE TABLE IF NOT EXISTS ".DBNAME.".debug_silo
 			 (silo_id INT NOT NULL,
               grain_level INT NOT NULL,
 			  PRIMARY KEY (silo_id))
@@ -50,7 +50,7 @@ function ddl_debug_create_Silo($dbh){
 //  sensor_id, silo_id, podv_id, sensor_num, current_temperature, current_temperature_speed
 function ddl_debug_create_Sensors($dbh){
 
-	$sql = "CREATE TABLE IF NOT EXISTS zernoib.debug_sensors
+	$sql = "CREATE TABLE IF NOT EXISTS ".DBNAME.".debug_sensors
 			 (sensor_id INT NOT NULL,
               silo_id INT NOT NULL,
               podv_id INT NOT NULL,

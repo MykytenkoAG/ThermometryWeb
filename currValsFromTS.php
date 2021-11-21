@@ -14,7 +14,7 @@ $arrayOfTemperatures=array(); $arrayOfTempSpeeds=array(); $arrayOfLevels=array()
 //	ПРОЦЕДУРА ПРОВЕРКИ -------------------------------------------------------------------------------------------------------------------------------------------
 
 //	Проверка существования таблицы sensors в базе данных проекта
-if( isTableExistAndNotEmpty($dbh,"zernoib.sensors") ){
+if( isTableExistAndNotEmpty($dbh,"".DBNAME.".sensors") ){
 	goto tableSensorsOK;
 }
 

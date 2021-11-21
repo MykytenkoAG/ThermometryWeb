@@ -10,7 +10,7 @@ function add_new_measurement($dbh, $arrayOfTemperatures,$serverDate){
 	$stmt = $dbh->prepare($query);
 	$stmt->execute();
 
-    $query = "SELECT date_id FROM zernoib.dates ORDER BY date_id DESC LIMIT 1";
+    $query = "SELECT date_id FROM ".DBNAME.".dates ORDER BY date_id DESC LIMIT 1";
     $sth = $dbh->query($query);
 	$last_date_id=($sth->fetchAll())[0]['date_id'];									//	Выбираем id последней даты
 
