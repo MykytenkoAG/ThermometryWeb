@@ -1,6 +1,6 @@
 <?php
 
-require_once ('currValsFromTS.php');
+require_once (substr(__DIR__,0,-4).'/ts/currValsFromTS.php');
 //  Получение главной отладочной таблицы
 function vDbg_draw_debugParamsTable($dbh){
 

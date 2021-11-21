@@ -13,7 +13,7 @@ function init_index() {
 //  Левый сайтбар ------------------------------------------------------------------------------------------------------------------------------
 function vIndRedrawTableCurrentAlarms() {
     $.ajax({
-        url: '/Thermometry/visu_index.php',
+        url: '/Thermometry/php/visu/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_get_current_alarms': 1 },
@@ -51,13 +51,13 @@ $('#btn-enable-all-auto-lvl-mode').click(function() {
 
 function vIndDisAllDefectiveSensors() {
     $.ajax({
-        url: '/Thermometry/visu_index.php',
+        url: '/Thermometry/php/visu/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_dis_all_defective_sensors': 1 },
         dataType: 'html',
         success: function(fromPHP) {
-            vIndOnClickOnSilo(lastSiloID);                  //  Перерисовываем таблицу с измеренными значениями для того, чтобы сразу увидеть изменения
+            vIndOnClickOnSilo(lastSiloID); //  Перерисовываем таблицу с измеренными значениями для того, чтобы сразу увидеть изменения
         }
     });
     return;
@@ -65,13 +65,13 @@ function vIndDisAllDefectiveSensors() {
 
 function vIndEnAllSensors() {
     $.ajax({
-        url: '/Thermometry/visu_index.php',
+        url: '/Thermometry/php/visu/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_enable_all_sensors': 1 },
         dataType: 'html',
         success: function(fromPHP) {
-            vIndOnClickOnSilo(lastSiloID);                  //  Перерисовываем таблицу с измеренными значениями для того, чтобы сразу увидеть изменения
+            vIndOnClickOnSilo(lastSiloID); //  Перерисовываем таблицу с измеренными значениями для того, чтобы сразу увидеть изменения
         }
     });
     return;
@@ -79,13 +79,13 @@ function vIndEnAllSensors() {
 
 function vIndEnAutoLvlOnAllSilo() {
     $.ajax({
-        url: '/Thermometry/visu_index.php',
+        url: '/Thermometry/php/visu/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_enable_auto_lvl_mode_on_all_silo': 1 },
         dataType: 'html',
         success: function(fromPHP) {
-            vIndOnClickOnSilo(lastSiloID);                  //  Перерисовываем таблицу с измеренными значениями для того, чтобы сразу увидеть изменения
+            vIndOnClickOnSilo(lastSiloID); //  Перерисовываем таблицу с измеренными значениями для того, чтобы сразу увидеть изменения
         }
     });
     return;
@@ -108,21 +108,21 @@ const img_arr_silo_status = [
         ["assets/img/silo_square_OK.png", "assets/img/silo_square_OK.png"]
     ]
 ];
-let arr_silo_status_new = [];                                               //  массив новых состояний силосов, который ми принимаем от PHP
-let arr_silo_status_curr = [];                                              //  массив состояний силосов, полученный на предыдущем шаге
-let curr_NACK_state = 0;                                                    //  переменная для создания мерация. Изменяет свое значение от 0 до 1 на каждом цикле
+let arr_silo_status_new = []; //  массив новых состояний силосов, который ми принимаем от PHP
+let arr_silo_status_curr = []; //  массив состояний силосов, полученный на предыдущем шаге
+let curr_NACK_state = 0; //  переменная для создания мерация. Изменяет свое значение от 0 до 1 на каждом цикле
 
-const silo_blink_period = 1000;                                             //  период мерцания
+const silo_blink_period = 1000; //  период мерцания
 
 const timer_silo_blink = setInterval(() => {
     for (let i = 0; i < arr_silo_status_new.length; i++) {
         //  Перерисовывать картинки следует только при необходимости
-        if( JSON.stringify(arr_silo_status_new[i]) !== JSON.stringify(arr_silo_status_curr[i]) || arr_silo_status_new[i][0]===2 || arr_silo_status_new[i][1]===2 ){
+        if (JSON.stringify(arr_silo_status_new[i]) !== JSON.stringify(arr_silo_status_curr[i]) || arr_silo_status_new[i][0] === 2 || arr_silo_status_new[i][1] === 2) {
 
-            document.getElementById("silo-" + i).setAttribute("src", img_arr_silo_status [arr_silo_status_new[i][0]] [arr_silo_status_new[i][1]] [curr_NACK_state]);
+            document.getElementById("silo-" + i).setAttribute("src", img_arr_silo_status[arr_silo_status_new[i][0]][arr_silo_status_new[i][1]][curr_NACK_state]);
 
         }
-        arr_silo_status_curr[i]=arr_silo_status_new[i];
+        arr_silo_status_curr[i] = arr_silo_status_new[i];
     }
     curr_NACK_state = 1 - curr_NACK_state;
 }, silo_blink_period);
@@ -132,7 +132,7 @@ const timer_silo_blink = setInterval(() => {
 function vIndRedrawSiloStatus() {
 
     $.ajax({
-        url: '/Thermometry/visu_index.php',
+        url: '/Thermometry/php/visu/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_get_curr_silo_status': 1 },
@@ -161,12 +161,12 @@ function vIndOnClickOnSilo(silo_id) {
         vIndredrawTblTemperatureSpeeds(silo_id);
     }
     //  Перерисовка таблицы с параметрами продукта для текущего силоса
-    if(silo_id!==lastSiloID){
+    if (silo_id !== lastSiloID) {
         vIndredrawTblProdParameters(silo_id);
     }
-    
-    vIndRedrawTableCurrentAlarms();         //  Перерисовываем таблицу с текущими алармами
-    vIndRedrawSiloStatus();                 //  Показываем текущий статус каждого силоса
+
+    vIndRedrawTableCurrentAlarms(); //  Перерисовываем таблицу с текущими алармами
+    vIndRedrawSiloStatus(); //  Показываем текущий статус каждого силоса
 
     if (typeof silo_id !== 'undefined') {
         document.getElementById("current-silo-name").innerHTML = "Силос " + silo_names_array[silo_id.split("-").pop()];
@@ -187,7 +187,7 @@ function vIndOnClickOnValsSelectBtn(btn_id) {
 
 function vIndredrawTblProdParameters(silo_id) {
     $.ajax({
-        url: '/Thermometry/visu_index.php',
+        url: '/Thermometry/php/visu/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_silo_id_for_product_parameters': silo_id },
@@ -195,7 +195,7 @@ function vIndredrawTblProdParameters(silo_id) {
         success: function(fromPHP) {
 
             try {
-                
+
                 document.getElementById("ind-prod-tbl-1-prodtype").innerHTML = JSON.parse(fromPHP)[0];
                 document.getElementById("ind-prod-tbl-1-t-max").innerHTML = JSON.parse(fromPHP)[1];
                 document.getElementById("ind-prod-tbl-1-v-max").innerHTML = JSON.parse(fromPHP)[2];
@@ -208,7 +208,7 @@ function vIndredrawTblProdParameters(silo_id) {
                 document.getElementById("ind-prod-tbl-6-rng-t-min").innerHTML = JSON.parse(fromPHP)[9];
                 document.getElementById("ind-prod-tbl-6-rng-t-max").innerHTML = JSON.parse(fromPHP)[10];
                 document.getElementById("ind-prod-tbl-6-v-max").innerHTML = JSON.parse(fromPHP)[11];
-                
+
             } catch (e) {
                 return;
             }
@@ -220,7 +220,7 @@ function vIndredrawTblProdParameters(silo_id) {
 
 function vIndredrawTblTemperatures(silo_id) {
     $.ajax({
-        url: '/Thermometry/visu_index.php',
+        url: '/Thermometry/php/visu/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_temperature_table_silo_id': silo_id },
@@ -234,7 +234,7 @@ function vIndredrawTblTemperatures(silo_id) {
 
 function vIndredrawTblTemperatureSpeeds(silo_id) {
     $.ajax({
-        url: '/Thermometry/visu_index.php',
+        url: '/Thermometry/php/visu/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_speeds_table_silo_id': silo_id },
@@ -249,7 +249,7 @@ function vIndredrawTblTemperatureSpeeds(silo_id) {
 //  Включение/Отключение конкретного датчика/подвески путем нажатия на ячейку с измеренным значением температуры или скорости ее изменения
 function vIndSelectedSensorDisable(silo_id, podv_num, sensor_num) {
     $.ajax({
-        url: '/Thermometry/visu_index.php',
+        url: '/Thermometry/php/visu/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_sensorDisable_silo_id': silo_id, 'POST_vInd_sensorDisable_podv_id': podv_num, 'POST_vInd_sensorDisable_sensor_num': sensor_num },
@@ -263,7 +263,7 @@ function vIndSelectedSensorDisable(silo_id, podv_num, sensor_num) {
 
 function vIndSelectedSensorEnable(silo_id, podv_num, sensor_num) {
     $.ajax({
-        url: '/Thermometry/visu_index.php',
+        url: '/Thermometry/php/visu/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_sensorEnable_silo_id': silo_id, 'POST_vInd_sensorEnable_podv_id': podv_num, 'POST_vInd_sensorEnable_sensor_num': sensor_num },
@@ -277,7 +277,7 @@ function vIndSelectedSensorEnable(silo_id, podv_num, sensor_num) {
 
 function vIndSelectedPodvDisable(silo_id, podv_num) {
     $.ajax({
-        url: '/Thermometry/visu_index.php',
+        url: '/Thermometry/php/visu/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_podvDisable_silo_id': silo_id, 'POST_vInd_podvDisable_podv_id': podv_num },
@@ -291,7 +291,7 @@ function vIndSelectedPodvDisable(silo_id, podv_num) {
 
 function vIndSelectedPodvEnable(silo_id, podv_num) {
     $.ajax({
-        url: '/Thermometry/visu_index.php',
+        url: '/Thermometry/php/visu/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_podvEnable_silo_id': silo_id, 'POST_vInd_podvEnable_podv_id': podv_num },
@@ -306,7 +306,7 @@ function vIndSelectedPodvEnable(silo_id, podv_num) {
 //  Изменение уровня при помощи слайдера
 function vIndChangeSourceOfLvl(silo_id, lvl_mode) {
     $.ajax({
-        url: '/Thermometry/visu_index.php',
+        url: '/Thermometry/php/visu/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_change_source_of_grain_level_silo_id': silo_id, 'POST_vInd_change_source_of_grain_level_source': lvl_mode },
@@ -329,7 +329,7 @@ function vIndWriteGrainLvlFromSlider(silo_id) {
     }
 
     $.ajax({
-        url: '/Thermometry/visu_index.php',
+        url: '/Thermometry/php/visu/visu_index.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vInd_writeLevelFromSliderForCurrSilo_silo_id': silo_id, 'POST_vInd_writeLevelFromSliderForCurrSilo_grainLevel': lvl_slider.value },
@@ -346,8 +346,8 @@ function vIndWriteGrainLvlFromSlider(silo_id) {
 //  В функции происходит запоминание номера датчика в cookie и переход на страницу "Отчет"
 function vIndDrawChartForSelectedSensor(silo_id, podv_num, sensor_num, period) {
     document.cookie = "chart_silo_name=" + silo_names_array[silo_id] + ";";
-    document.cookie = "chart_podv_num=" + (+podv_num+1) + ";";
-    document.cookie = "chart_sensor_num=" + (+sensor_num+1) + ";";
+    document.cookie = "chart_podv_num=" + (+podv_num + 1) + ";";
+    document.cookie = "chart_sensor_num=" + (+sensor_num + 1) + ";";
     document.cookie = "chart_period=" + period + ";";
     document.location.href = "report.php";
     return;

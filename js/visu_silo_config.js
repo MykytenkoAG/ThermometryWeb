@@ -3,7 +3,7 @@
     При наличии активных АПС обе таблицы должны блокироваться
 */
 
-let arrayOfLevels = [];             //  массив уровней для автоматического заполнения уровня в таблице "Загрузка силосов"
+let arrayOfLevels = []; //  массив уровней для автоматического заполнения уровня в таблице "Загрузка силосов"
 let tbl_prodtypes_changed;
 let tbl_prodtypesbysilo_changed;
 
@@ -22,7 +22,7 @@ function init_silo_config() {
 //  Получение массива с текущими уровнями для установки уровня в автоматическом режиме для таблицы "Загрузка силосов"
 function vSConf_getArrayOfLevels() {
     $.ajax({
-        url: '/Thermometry/currValsFromTS.php',
+        url: '/Thermometry/php/ts/currValsFromTS.php',
         type: 'POST',
         cache: false,
         data: { 'POST_currValsFromTS_get_array_of_levels': 1 },
@@ -63,7 +63,7 @@ function vSConf_buttonEnable(button_id) {
 //  Отрисовка таблицы "Типы продукта"
 function vSConf_redrawTableProdtypes() {
     $.ajax({
-        url: 'visu_silo_config.php',
+        url: '/Thermometry/php/visu/visu_silo_config.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vSConf_draw_Prodtypes': 1 },
@@ -74,7 +74,7 @@ function vSConf_redrawTableProdtypes() {
             tbl_prodtypes_changed = 0;
             vSConf_buttonDisable("sconf-table-prodtypes-btn-save-changes");
             vSConf_buttonDisable("sconf-table-prodtypes-btn-discard-changes");
-            if(curr_user==="tehn"){                                             //  Включение кнопки "Добавить", в случае, если пользователь - технолог
+            if (curr_user === "tehn") { //  Включение кнопки "Добавить", в случае, если пользователь - технолог
                 vSConf_buttonEnable("sconf-table-prodtypes-btn-add");
             }
         }
@@ -84,7 +84,7 @@ function vSConf_redrawTableProdtypes() {
 //  Отрисовка таблицы "Загрузка силосов"
 function vSConf_redrawTableProdtypesbysilo() {
     $.ajax({
-        url: 'visu_silo_config.php',
+        url: '/Thermometry/php/visu/visu_silo_config.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vSConf_draw_Prodtypesbysilo': 1 },
@@ -95,7 +95,7 @@ function vSConf_redrawTableProdtypesbysilo() {
             tbl_prodtypesbysilo_changed = 0;
             vSConf_buttonDisable("sconf-table-prodtypesbysilo-btn-save-changes");
             vSConf_buttonDisable("sconf-table-prodtypesbysilo-btn-discard-changes");
-            if(curr_user==="tehn"){
+            if (curr_user === "tehn") {
                 vSConf_buttonEnable("sconf-table-prodtypes-btn-add");
             }
         }
@@ -107,7 +107,7 @@ function vSConf_siloConfigSaveChanges() {
 
     if (tbl_prodtypes_changed == 1) {
         $.ajax({
-            url: 'visu_silo_config.php',
+            url: '/Thermometry/php/visu/visu_silo_config.php',
             type: 'POST',
             cache: false,
             data: { 'POST_vSConf_prodtypes_changes_queue': SConf_prodtypes_changes_queue },
@@ -123,7 +123,7 @@ function vSConf_siloConfigSaveChanges() {
 
     if (tbl_prodtypesbysilo_changed == 1) {
         $.ajax({
-            url: 'visu_silo_config.php',
+            url: '/Thermometry/php/visu/visu_silo_config.php',
             type: 'POST',
             cache: false,
             data: { 'POST_vSConf_prodtypesbysilo_update_list': SConf_prodtypesbysilo_update_list },
@@ -374,7 +374,7 @@ function vSConf_checkProductNames() {
     vSConf_buttonEnable("sconf-table-prodtypes-btn-save-changes");
     vSConf_buttonEnable("sconf-table-prodtypes-btn-discard-changes");
     for (let i = 0; i < inputs.length; i++) {
-        if (!vSConf_isProductNameValid(inputs[i].value) || inputs[i].value==="") {
+        if (!vSConf_isProductNameValid(inputs[i].value) || inputs[i].value === "") {
             checkOK = false;
             inputs[i].setAttribute("style", "width: 300px; color:red");
             vSConf_buttonDisable("sconf-table-prodtypes-btn-save-changes");
@@ -446,7 +446,7 @@ function vSConf_tblProdtypesbysiloUpdate() {
 //  Создать модальное окно с двумя полями ввода: IP и port
 $("#sconf-ts-connection-settings").click(function() {
     $.ajax({
-        url: 'visu_silo_config.php',
+        url: '/Thermometry/php/visu/visu_silo_config.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vSConf_get_ts_connection_settings': 1 },
@@ -486,7 +486,7 @@ $("#sconf-db-operations").click(function() {
 //  Отправка AJAX запроса, который должен вернуть ссылку на файл
 $("#sconf-db-create-backup").click(function() {
     $.ajax({
-        url: 'visu_silo_config.php',
+        url: '/Thermometry/php/visu/visu_silo_config.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vSConf_db_create_backup': 1 },
@@ -508,9 +508,9 @@ $("#sconf-db-truncate-measurements").click(function() {
     $("#modal-are-you-sure").modal('show');
 });
 
-function vSConf_db_truncate_measurements(){
+function vSConf_db_truncate_measurements() {
     $.ajax({
-        url: 'visu_silo_config.php',
+        url: '/Thermometry/php/visu/visu_silo_config.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vSConf_db_truncate_measurements': 1 },
@@ -530,9 +530,9 @@ $("#sconf-db-delete-old-measurements").click(function() {
     $("#modal-are-you-sure").modal('show');
 });
 
-function vSConf_db_delete_old_measurements(){
+function vSConf_db_delete_old_measurements() {
     $.ajax({
-        url: 'visu_silo_config.php',
+        url: '/Thermometry/php/visu/visu_silo_config.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vSConf_db_delete_old_measurements': 1 },
@@ -553,9 +553,9 @@ $('#sconf-silo-config-btn-clear-log').click(function() {
     $("#modal-are-you-sure").modal('show');
 });
 
-function vSConf_clear_log(){
+function vSConf_clear_log() {
     $.ajax({
-        url: 'visu_silo_config.php',
+        url: '/Thermometry/php/visu/visu_silo_config.php',
         type: 'POST',
         cache: false,
         data: { 'POST_vSConf_clear_log': 1 },

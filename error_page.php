@@ -1,4 +1,4 @@
-<?php require_once('auth.php'); ?>
+<?php require_once __DIR__.'/php/auth/auth.php'; ?>
 <!doctype html>
 <html lang="en">
    <head>
@@ -11,9 +11,9 @@
 
       <div class="container-fluid">
          <?php
-            require_once ('header.php');
-            require_once ('modals.php');
-            require_once ('currValsFromTS.php');
+            require_once 'header.php';
+            require_once 'modals.php';
+            require_once __DIR__.'/php/ts/currValsFromTS.php';
             echo draw_errors($POSSIBLE_ERRORS, $errors);
             echo draw_error_images($POSSIBLE_ERRORS, $errors);
          ?>

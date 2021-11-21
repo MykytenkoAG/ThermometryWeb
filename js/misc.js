@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
 //  Получение главного конфигурационного массива [[массив с именами (при этом индекс элемента - это id силоса)],[массив с подвесками],[массив с датчиками]]
 function getConf_ProjectConfArr() {
     $.ajax({
-        url: '/Thermometry/currValsFromTS.php',
+        url: '/Thermometry/php/ts/currValsFromTS.php',
         type: 'POST',
         cache: false,
         data: { 'POST_currValsFromTS_get_project_conf_array': 1 },
@@ -137,7 +137,7 @@ function getConf_ProjectConfArr() {
 //  Получение массива с именами силосов для быстрого отображения названия силоса на главной странице
 function getConf_ArrayOfSiloNames() {
     $.ajax({
-        url: 'currValsFromTS.php',
+        url: '/Thermometry/php/ts/currValsFromTS.php',
         type: 'POST',
         cache: false,
         data: { 'POST_currValsFromTS_get_silo_names_array': 1 },
@@ -153,7 +153,7 @@ function getConf_ArrayOfSiloNames() {
 //  Получение массива с максимальным количеством подвесок. Необходимо для страницы "Отчет" в сайтбаре с печатными формами
 function getConf_SiloNameWithMaxPodvNumber() {
     $.ajax({
-        url: '/Thermometry/currValsFromTS.php',
+        url: '/Thermometry/php/ts/currValsFromTS.php',
         type: 'POST',
         cache: false,
         data: { 'POST_currValsFromTS_get_silo_number_with_max_podv_number': 1 },
@@ -267,7 +267,7 @@ function controlAudio(OnOff) {
 
 function alarmsAck() {
     $.ajax({
-        url: '/Thermometry/currValsFromTS.php',
+        url: '/Thermometry/php/ts/currValsFromTS.php',
         type: 'POST',
         cache: false,
         data: { 'POST_currValsFromTS_acknowledge_alarms': 1 },
@@ -286,7 +286,7 @@ function alarmsAck() {
 function getNewAlarmsNumber() {
 
     $.ajax({
-        url: '/Thermometry/currValsFromTS.php',
+        url: '/Thermometry/php/ts/currValsFromTS.php',
         type: 'POST',
         cache: false,
         data: { 'POST_currValsFromTS_get_number_of_new_alarms': 1 },

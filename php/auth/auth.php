@@ -1,6 +1,6 @@
 <?php
 
-require_once ('configParameters.php');
+require_once (substr(__DIR__,0,-4).'/config/configParameters.php');
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

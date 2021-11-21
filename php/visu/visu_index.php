@@ -1,7 +1,7 @@
 <?php
 
-require_once ('auth.php');
-require_once ('currValsFromTS.php');
+require_once (substr(__DIR__,0,-4).'/auth/auth.php');
+require_once (substr(__DIR__,0,-4).'/ts/currValsFromTS.php');
 
 // Левый сайтбар ------------------------------------------------------------------------------------------------------------------------------------------------------
 //  OUT = html table < NACK, time, silo_name, podv_num, sensor_num, reason >

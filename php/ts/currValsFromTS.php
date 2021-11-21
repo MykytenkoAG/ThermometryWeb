@@ -1,11 +1,11 @@
 <?php
 
-require_once ('configParameters.php');		//	Параметры подключения к БД и связи с Термосервером
-require_once ('checkProjectConfig.php');	//	Функции для проверки текущей конфигурации проекта
-require_once ('dbDebugTables.php');			//	Создание, удаление и изменение отладочных таблиц в БД
-require_once ('dbDDL.php');					//	Создание и инициализация всех таблиц в БД
-require_once ('TermoServer.php');			//	Функции для работы с программой Термосервер
-require_once ('dbCurrVals.php');			//	Запись текущих измеренных значений в БД
+require_once (substr(__DIR__,0,-2).'/config/configParameters.php');		//	Параметры подключения к БД и связи с Термосервером
+require_once (substr(__DIR__,0,-2).'/config/checkProjectConfig.php');	//	Функции для проверки текущей конфигурации проекта
+require_once (substr(__DIR__,0,-2).'/db/dbDebugTables.php');			//	Создание, удаление и изменение отладочных таблиц в БД
+require_once (substr(__DIR__,0,-2).'/db/dbDDL.php');					//	Создание и инициализация всех таблиц в БД
+require_once (substr(__DIR__,0,-2).'/ts/TermoServer.php');			//	Функции для работы с программой Термосервер
+require_once (substr(__DIR__,0,-2).'/db/dbCurrVals.php');			//	Запись текущих измеренных значений в БД
 
 $configOK=true;
 $errors=array();

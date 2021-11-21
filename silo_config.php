@@ -1,11 +1,11 @@
-<?php require_once('auth.php'); ?>
+<?php require_once __DIR__.'/php/auth/auth.php'; ?>
 <!doctype html>
 <html lang="ru">
   <head>
     <?php
       $webSiteTitle="Настройки";
       require_once "head.php";
-      require_once('visu_silo_config.php');
+      require_once __DIR__.'/php/visu/visu_silo_config.php';
     ?>
   </head>
   <body>

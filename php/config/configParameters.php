@@ -1,5 +1,5 @@
 <?php
-require_once ('constants.php');
+require_once 'constants.php';
 //	Подключение к Базе Данных ----------------------------------------------------------------------------------------------------------
 $dbh = new PDO("mysql:host=".SERVER_NAME."; charset=utf8;", USERNAME, password, $pdo_options);
 $dbh->query("CREATE DATABASE IF NOT EXISTS ".DBNAME." CHARACTER SET utf8 COLLATE utf8_general_ci;"); $dbh->query("use ".DBNAME);

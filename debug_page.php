@@ -1,18 +1,18 @@
-<?php require_once('auth.php'); ?>
+<?php require_once __DIR__."/php/auth/auth.php"; ?>
 <!doctype html>
 <html lang="en">
   <head>
     <?php
       $webSiteTitle="DEBUG";
       require_once "head.php";
-      require_once('visu_debug_page.php');
+      require_once __DIR__."/php/visu/visu_debug_page.php";
     ?>
   </head>
   <body>
     <?php
       require_once "header.php";
       require_once "modals.php";
-      require_once ('configParameters.php');
+      require_once __DIR__."/php/config/configParameters.php";
       //phpinfo();
     ?>
     <div class="container-fluid h-100">

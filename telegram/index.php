@@ -11,14 +11,14 @@
 
     set webhook: https://api.telegram.org/bot2123872619:AAENLR1KZVjWBmeOP8vcqHM39KPZOPX9OW4/setWebhook?url=https://nethermometrytest.ddns.net:8443/Thermometry/telegram/
 */
-require_once( substr(__DIR__,0,-8)."currValsFromTS.php" );                              //  Получаем всю необходимую информацию
+require_once( substr(__DIR__,0,-8)."currValsFromTS.php" );              //  Получаем всю необходимую информацию
 
 const BASE_URL = "https://api.telegram.org/bot"; const TOKEN = "2123872619:AAENLR1KZVjWBmeOP8vcqHM39KPZOPX9OW4"; ini_set("allow_url_fopen", true);
 
-$newMessage = json_decode(file_get_contents('php://input'));        //  Получаем сообщение от Телеграм Бота
+$newMessage = json_decode(file_get_contents('php://input'));            //  Получаем сообщение от Телеграм Бота
 //file_put_contents(__DIR__.'/debug.txt', print_r($newMessage,1), FILE_APPEND);
 
-if(!is_null($newMessage)>0){
+if(!is_null($newMessage)>0){                                            //  Если пришло новое сообщение
     recognizeCmd($dbh, $newMessage);                                    //  Распознаем команду и отправляем ответ
 }
 
@@ -61,18 +61,15 @@ function recognizeCmd($dbh, $newMessage){
     }else if (  preg_match('/\/notificationson\s*/ui',$command,$matches) ||
                 preg_match('/уведомления\s*вкл\s*/ui',$command,$matches) ){
 
-        $query="REPLACE INTO telegram_users (user_id, notifications_on) VALUES 
-                ('$sender_id', '1');";
+        $query="REPLACE INTO telegram_users (user_id, notifications_on) VALUES ('$sender_id', '1');";
         $stmt = $dbh->prepare($query);
         $stmt->execute();
-
         $messageToSend = array("Уведомления о возникновении АПС включены.");
     
     }else if (  preg_match('/\/notificationsoff\s*/ui',$command,$matches) ||
                 preg_match('/уведомления\s*выкл\s*/ui',$command,$matches) ){
 
-        $query="REPLACE INTO telegram_users (user_id, notifications_on) VALUES 
-                ('$sender_id', '0');";
+        $query="REPLACE INTO telegram_users (user_id, notifications_on) VALUES ('$sender_id', '0');";
         $stmt = $dbh->prepare($query);
         $stmt->execute();
         $messageToSend = array("Уведомления о возникновении АПС выключены");
@@ -90,7 +87,6 @@ function recognizeCmd($dbh, $newMessage){
 
 function sendMessage($sender_id, $arrayOfMessages){
     foreach($arrayOfMessages as $currMess){
-        //echo BASE_URL.TOKEN."/sendMessage?chat_id=".$sender_id."&text=".$currMess;
         file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$sender_id."&text=".$currMess);
     }
     return;
@@ -98,54 +94,46 @@ function sendMessage($sender_id, $arrayOfMessages){
 
 function cmdGetSiloInfo($dbh){
 
-    /*
-    SELECT s.sensor_id, s.silo_id, s.podv_id, s.sensor_num,
-            pbs.silo_name,
-            p.product_name, p.t_max, p.t_min, p.v_max,
-            max(s.current_temperature),
-            min(s.current_temperature),
-            max(s.current_speed),
-            pbs.grain_level,
-            max(s.sensor_num)
-            FROM sensors AS s
-            INNER JOIN prodtypesbysilo AS pbs ON s.silo_id=pbs.silo_id
-            INNER JOIN prodtypes AS p ON pbs.product_id=p.product_id
-            where s.silo_id=0 and s.sensor_num<pbs.grain_level 
-    */
-
-    $sql = "SELECT s.sensor_id, s.silo_id, s.podv_id, s.sensor_num,
-            pbs.silo_name,
-            p.product_name, p.t_max, p.t_min, p.v_max,
-            max(s.current_temperature),
-            min(s.current_temperature),
-            max(s.current_speed),
-            pbs.grain_level,
-            max(s.sensor_num)
-            FROM sensors AS s
-            INNER JOIN prodtypesbysilo AS pbs ON s.silo_id=pbs.silo_id
-            INNER JOIN prodtypes AS p ON pbs.product_id=p.product_id
-            GROUP BY silo_id
-            ORDER BY silo_id";
+    $sql = "SELECT silo_id FROM prodtypesbysilo;";
     
     $sth = $dbh->query($sql);
 
     if($sth==false){
         return false;
     }
-    $rows = $sth->fetchAll();
+    $silo_id_rows = $sth->fetchAll();
 
     $outArr = array(); $outStr = ""; $currentSilo="";
     
-    for($i=0; $i<count($rows); $i++){
+    for($i=0; $i<count($silo_id_rows); $i++){
 
-        $outStr .= "Силос "         .$rows[$i]["silo_name"]
-                .",%0AПродукт: "    .$rows[$i]["product_name"]
-                .",%0AУровень: "    .round((($rows[$i]["grain_level"]/($rows[$i]["max(s.sensor_num)"]+1))*100),1)." %"
-                .",%0ATкр: "        .round($rows[$i]["t_max"],1)." %C2%B0C"
-                .", Tmax: "         .round($rows[$i]["max(s.current_temperature)"],1)." %C2%B0C"
-                .", Tmin: "         .round($rows[$i]["min(s.current_temperature)"],1)." %C2%B0C"
-                .",%0AVкр: "        .round($rows[$i]["v_max"],1)." %C2%B0C/сут."
-                .", Vmax: "         .round($rows[$i]["max(s.current_speed)"],1)." %C2%B0C/сут."
+        $sql = "SELECT s.sensor_id, s.silo_id, s.podv_id, s.sensor_num,
+                pbs.silo_name,
+                p.product_name, p.t_max, p.t_min, p.v_max,
+                max(s.current_temperature),
+                min(s.current_temperature),
+                max(s.current_speed),
+                pbs.grain_level,
+                max(s.sensor_num)
+                FROM sensors AS s
+                INNER JOIN prodtypesbysilo AS pbs ON s.silo_id=pbs.silo_id
+                INNER JOIN prodtypes AS p ON pbs.product_id=p.product_id
+                where s.silo_id=".$silo_id_rows[$i]["silo_id"]." and s.sensor_num<pbs.grain_level";
+        
+        $sth = $dbh->query($sql);
+        if($sth==false){
+            return false;
+        }
+        $curr_row = $sth->fetchAll();
+
+        $outStr .= "Силос "         .$curr_row[0]["silo_name"]
+                .",%0AПродукт: "    .$curr_row[0]["product_name"]
+                .",%0AУровень: "    .round((($curr_row[0]["grain_level"]/($curr_row[0]["max(s.sensor_num)"]+1))*100),1)." %"
+                .",%0ATкр: "        .round($curr_row[0]["t_max"],1)." %C2%B0C"
+                .", Tmax: "         .round($curr_row[0]["max(s.current_temperature)"],1)." %C2%B0C"
+                .", Tmin: "         .round($curr_row[0]["min(s.current_temperature)"],1)." %C2%B0C"
+                .",%0AVкр: "        .round($curr_row[0]["v_max"],1)." %C2%B0C/сут."
+                .", Vmax: "         .round($curr_row[0]["max(s.current_speed)"],1)." %C2%B0C/сут."
                 .";";
         array_push($outArr, $outStr);
         $outStr = "";
@@ -270,12 +258,9 @@ function cmdGetTemperatures($dbh, $silo_name, $podv_id, $sensor_num){
     $outArr = array();  $outStr = "";
     
     if(count($rows)==0){
-        if($sensor_num!=""){
-            array_push($outArr, "Запрашиваемый датчик отсутствует в текущем проекте;");
-        } else if($podv_id!=""){
-            array_push($outArr, "Запрашиваемая подвеска отсутствует в текущем проекте;");
-        } else if($silo_name!=""){
-            array_push($outArr, "Запрашиваемый силос отсутствует в текущем проекте;");
+        if($sensor_num!=""){            array_push($outArr, "Запрашиваемый датчик отсутствует в текущем проекте;");
+        } else if($podv_id!=""){        array_push($outArr, "Запрашиваемая подвеска отсутствует в текущем проекте;");
+        } else if($silo_name!=""){      array_push($outArr, "Запрашиваемый силос отсутствует в текущем проекте;");
         }
     }
 
@@ -327,12 +312,9 @@ function cmdGetTemperatureSpeeds($dbh, $silo_name, $podv_id, $sensor_num){
     $outArr = array(); $outStr = "";
 
     if(count($rows)==0){
-        if($sensor_num!=""){
-            array_push($outArr, "Запрашиваемый датчик отсутствует в текущем проекте;");
-        } else if($podv_id!=""){
-            array_push($outArr, "Запрашиваемая подвеска отсутствует в текущем проекте;");
-        } else if($silo_name!=""){
-            array_push($outArr, "Запрашиваемый силос отсутствует в текущем проекте;");
+        if($sensor_num!=""){            array_push($outArr, "Запрашиваемый датчик отсутствует в текущем проекте;");
+        } else if($podv_id!=""){        array_push($outArr, "Запрашиваемая подвеска отсутствует в текущем проекте;");
+        } else if($silo_name!=""){      array_push($outArr, "Запрашиваемый силос отсутствует в текущем проекте;");
         }
     }
 

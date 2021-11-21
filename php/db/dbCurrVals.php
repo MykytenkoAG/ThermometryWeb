@@ -106,6 +106,7 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 	$alarmMessage = "";
 	$loggingString = "";
 	$telegramMessage = "";
+	$telegramMessageCount=0;
 	$error_codes_arr = db_get_error_codes($dbh);
 
 	$query = "	SELECT  s.sensor_id, s.silo_id, s.podv_id, s.sensor_num, s.is_enabled, s.current_temperature, s.current_speed,
@@ -145,11 +146,11 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 						$query_TIME_NACK_err = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
 						$query_error_id = "'".($arrayOfTemperatures[$i][$j][$k]*0.1)."'),";
 
-						$alarmMessage = "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". "
-										.$error_codes_arr[ ($arrayOfTemperatures[$i][$j][$k]*0.1) ]['error_description'].". Срабатывание сигнала АПС;\n";
+						$alarmMessage = "Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". "
+										.$error_codes_arr[ ($arrayOfTemperatures[$i][$j][$k]*0.1) ]['error_description'];
 
-						$loggingString .= $alarmMessage;
-						$telegramMessage .= $alarmMessage;
+						$loggingString .= "$serverDate: ".$alarmMessage.". Срабатывание сигнала АПС;\n";
+						$telegramMessage .= $alarmMessage.";%0A"; $telegramMessageCount++;
 
 				} else {
 						$query_NACK_err = "'".$rows[$sensor_id]['NACK_err']."', ";
@@ -183,10 +184,10 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 						$query_NACK_Tmax = "1, ";
 						$query_TIME_NACK_Tmax = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
 
-						$alarmMessage = "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". Tmax. Срабатывание сигнала АПС;\n";
+						$alarmMessage = "Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". Tmax";
 
-						$loggingString .= $alarmMessage;
-						$telegramMessage .= $alarmMessage;
+						$loggingString .= "$serverDate: ".$alarmMessage.". Срабатывание сигнала АПС;\n";
+						$telegramMessage .= $alarmMessage.";%0A"; $telegramMessageCount++;
 
 				} else {
 						$query_NACK_Tmax = "'".$rows[$sensor_id]['NACK_Tmax']."', ";
@@ -219,10 +220,10 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 						$query_NACK_Vmax = "1, ";
 						$query_TIME_NACK_Vmax = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
 
-						$alarmMessage = "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". Vmax. Срабатывание сигнала АПС;\n";
+						$alarmMessage = "Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". Vmax";
 
-						$loggingString .= $alarmMessage;
-						$telegramMessage .= $alarmMessage;
+						$loggingString .= "$serverDate: ".$alarmMessage.". Срабатывание сигнала АПС;\n";
+						$telegramMessage .= $alarmMessage.";%0A"; $telegramMessageCount++;
 
 				} else {
 						$query_NACK_Vmax = "'".$rows[$sensor_id]['NACK_Vmax']."', ";
@@ -243,6 +244,10 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 				} else {
 						$query_ACK_Vmax = "'".$rows[$sensor_id]['ACK_Vmax']."', ";
 						$query_TIME_ACK_Vmax = is_null($rows[$sensor_id]['TIME_ACK_Vmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_ACK_Vmax']."', ";
+				}
+
+				if($telegramMessageCount>0 && ($telegramMessageCount%10==0)){
+					$telegramMessage .= "\n";
 				}
 
 				//	Отображение параметров в таблице
@@ -396,24 +401,12 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 	//	Отправляем уведомления пользователям в Телеграм
 	if(strlen($telegramMessage)>0){
 		require_once("telegram/index.php");
-		$telegramMessageArr = explode("\n",$telegramMessage);
-		$messageToSend = "";
-		$messageToSendArr = [];
-
-		for($i=0; $i<count($telegramMessageArr); $i++){
-
-			$messageToSend .= $telegramMessageArr[$i]."%0A";
-			if( ($i>0 && $i%10==0) || ($i==count($telegramMessageArr)-1) ){
-				array_push($messageToSendArr, $messageToSend);
-			}
-
-		}
 		//	Извлекаем из БД всех пользователей, которые включили уведомления
 		$query = "SELECT user_id FROM ".DBNAME.".telegram_users WHERE notifications_on=1;";
 		$sth = $dbh->query($query);
 		$telegram_users = $sth->fetchAll();
 		foreach($telegram_users as $telegram_user){
-			sendMessage($telegram_user["user_id"], $messageToSendArr);
+			sendMessage($telegram_user["user_id"], explode("\n",$telegramMessage));
 		}
 	}
 
