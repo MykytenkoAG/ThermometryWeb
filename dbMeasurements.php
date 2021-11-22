@@ -1,6 +1,6 @@
 <?php
 //  Данный скрипт вызывается 1 раз в 30 минут в фоне для записи показаний температуры в базу данных
-require_once(__DIR__.'/ts/currValsFromTS.php');
+require_once(__DIR__.'/php/ts/currValsFromTS.php');
 
 add_new_measurement($dbh, $arrayOfTemperatures, $serverDate);
 

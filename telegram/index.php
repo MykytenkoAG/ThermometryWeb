@@ -11,7 +11,7 @@
 
     set webhook: https://api.telegram.org/bot2123872619:AAENLR1KZVjWBmeOP8vcqHM39KPZOPX9OW4/setWebhook?url=https://nethermometrytest.ddns.net:8443/Thermometry/telegram/
 */
-require_once( substr(__DIR__,0,-8)."currValsFromTS.php" );              //  Получаем всю необходимую информацию
+require_once( substr(__DIR__,0,-8)."/php/ts/currValsFromTS.php" );              //  Получаем всю необходимую информацию
 
 const BASE_URL = "https://api.telegram.org/bot"; const TOKEN = "2123872619:AAENLR1KZVjWBmeOP8vcqHM39KPZOPX9OW4"; ini_set("allow_url_fopen", true);
 
@@ -22,59 +22,66 @@ if(!is_null($newMessage)>0){                                            //  Ес
     recognizeCmd($dbh, $newMessage);                                    //  Распознаем команду и отправляем ответ
 }
 
+function sendMessage($sender_id, $arrayOfMessages){
+    foreach($arrayOfMessages as $currMess){
+        file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$sender_id."&text=".$currMess."&parse_mode=HTML");
+    }
+    return;
+}
+
 function recognizeCmd($dbh, $newMessage){
 
     $command = $newMessage->message->text;
     $sender_id = $newMessage->message->from->id;
     $messageToSend = array("Неопознанная команда");
 
-    if( preg_match('/\/siloinfo\s*/ui',$command,$matches) ||
-        preg_match('/инфо\s*/ui',$command,$matches) ){
+    if( preg_match('/\/?silo\s*info\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})?\s*\.?\s*\.?\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})?\s*/ui',$command,$matches) ||
+        preg_match('/\/?инфо\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})?\s*\.?\s*\.?\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})?\s*/ui',$command,$matches) ){
 
-        $messageToSend = cmdGetSiloInfo($dbh);
+        $messageToSend = cmdGetSiloInfo($dbh, $matches[1], $matches[2]);
 
-    } else if ( preg_match('/\/alarms\s*/ui',$command,$matches) ||
-                preg_match('/апс\s*/ui',$command,$matches)){
+    } else if ( preg_match('/\/?alarms\s*/ui',$command,$matches) ||
+                preg_match('/\/?апс\s*/ui',$command,$matches)){
 
         $messageToSend = cmdGetAlarms($dbh);
 
-    } else if ( preg_match('/\/lvl\s*(\d{0,5})?\s*/ui',$command,$matches) ||
-                preg_match('/уровень\s*(\d{0,5})?\s*/ui',$command,$matches)){
+    } else if ( preg_match('/\/?lvl\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})?\s*/ui',$command,$matches) ||
+                preg_match('/\/?уровень\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})?\s*/ui',$command,$matches)){
 
         $messageToSend = cmdGetGrainLevels($dbh, $matches[1]);
         
-    } else if ( preg_match('/\/temp\s*(\d{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/ui',$command,$matches) ||
-                preg_match('/температура\s*(\d{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/ui',$command,$matches) ) {
+    } else if ( preg_match('/\/?temp\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/ui',$command,$matches) ||
+                preg_match('/\/?температура\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/ui',$command,$matches) ) {
 
         $messageToSend = cmdGetTemperatures($dbh, $matches[1], $matches[2], $matches[3]);
 
-    } else if ( preg_match('/\/speed\s*(\d{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/ui',$command,$matches) ||
-                preg_match('/скорость\s*(\d{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/ui',$command,$matches) ) {
+    } else if ( preg_match('/\/?speed\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/ui',$command,$matches) ||
+                preg_match('/\/?скорость\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/ui',$command,$matches) ) {
 
         $messageToSend = cmdGetTemperatureSpeeds($dbh, $matches[1], $matches[2], $matches[3]);
 
-    } else if(  preg_match('/\/conf\s*/ui',$command,$matches) ||
-                preg_match('/конфигурация\s*/ui',$command,$matches) ){
+    } else if(  preg_match('/\/?conf\s*/ui',$command,$matches) ||
+                preg_match('/\/?конфигурация\s*/ui',$command,$matches) ){
 
         $messageToSend = cmdGetConfiguration($dbh);
 
-    }else if (  preg_match('/\/notificationson\s*/ui',$command,$matches) ||
-                preg_match('/уведомления\s*вкл\s*/ui',$command,$matches) ){
+    }else if (  preg_match('/\/?notificationson\s*/ui',$command,$matches) ||
+                preg_match('/\/?уведомления\s*вкл\s*/ui',$command,$matches) ){
 
         $query="REPLACE INTO telegram_users (user_id, notifications_on) VALUES ('$sender_id', '1');";
         $stmt = $dbh->prepare($query);
         $stmt->execute();
         $messageToSend = array("Уведомления о возникновении АПС включены.");
     
-    }else if (  preg_match('/\/notificationsoff\s*/ui',$command,$matches) ||
-                preg_match('/уведомления\s*выкл\s*/ui',$command,$matches) ){
+    }else if (  preg_match('/\/?notificationsoff\s*/ui',$command,$matches) ||
+                preg_match('/\/?уведомления\s*выкл\s*/ui',$command,$matches) ){
 
         $query="REPLACE INTO telegram_users (user_id, notifications_on) VALUES ('$sender_id', '0');";
         $stmt = $dbh->prepare($query);
         $stmt->execute();
         $messageToSend = array("Уведомления о возникновении АПС выключены");
 
-    } else if (preg_match('/\/start/ui',$command,$matches)) {
+    } else if (preg_match('/\/?start/ui',$command,$matches)) {
 
         $messageToSend = array("Здравствуйте, ".$newMessage->message->from->first_name."!");
 
@@ -85,25 +92,23 @@ function recognizeCmd($dbh, $newMessage){
     return;
 }
 
-function sendMessage($sender_id, $arrayOfMessages){
-    foreach($arrayOfMessages as $currMess){
-        file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$sender_id."&text=".$currMess);
+function cmdGetSiloInfo($dbh, $silo_name_1, $silo_name_2){
+
+    $sql = "SELECT silo_id FROM prodtypesbysilo ";
+
+    if( $silo_name_1 != "" && $silo_name_2 != "" ){
+        $sql .= " WHERE silo_name BETWEEN $silo_name_1 AND $silo_name_2 ";
+    } else if ( $silo_name_1 != "" ){
+        $sql .= " WHERE silo_name = $silo_name_1 ";
     }
-    return;
-}
-
-function cmdGetSiloInfo($dbh){
-
-    $sql = "SELECT silo_id FROM prodtypesbysilo;";
     
     $sth = $dbh->query($sql);
-
     if($sth==false){
         return false;
     }
     $silo_id_rows = $sth->fetchAll();
 
-    $outArr = array(); $outStr = ""; $currentSilo="";
+    $outArr = array(); $outStr = "";
     
     for($i=0; $i<count($silo_id_rows); $i++){
 

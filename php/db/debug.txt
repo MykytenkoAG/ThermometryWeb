@@ -1,0 +1,33 @@
+Array
+(
+    [0] => Array
+        (
+            [silo_id] => 0
+            [silo_name] => 1
+            [podv_id] => 
+            [sensor_num] => 
+            [is_enabled] => 
+            [NACK_Tmax] => 
+            [TIME_NACK_Tmax] => 
+            [ACK_Tmax] => 
+            [TIME_ACK_Tmax] => 
+            [RST_Tmax] => 
+            [TIME_RST_Tmax] => 
+            [NACK_Vmax] => 
+            [TIME_NACK_Vmax] => 
+            [ACK_Vmax] => 
+            [TIME_ACK_Vmax] => 
+            [RST_Vmax] => 
+            [TIME_RST_Vmax] => 
+            [NACK_err] => 1
+            [TIME_NACK_err] => 22.11.2021 22:24:14
+            [ACK_err] => 0
+            [TIME_ACK_err] => 
+            [RST_err] => 0
+            [TIME_RST_err] => 
+            [error_id] => 253
+            [error_description] => Неисправность встроенного ПЗУ БС
+            [error_desc_for_visu] => Ошибка ПЗУ БС
+        )
+
+)

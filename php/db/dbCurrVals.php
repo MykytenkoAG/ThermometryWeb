@@ -76,6 +76,327 @@ function db_update_grainLevels($dbh, $arrayOfLevels){
 	
 	return;
 }
+//	Функция для обновления значений ассоциативного массива с текущими сигналами АПС
+function db_update_curr_alarm_state($dbh){
+
+    $outArr = array();
+
+    //  Определяем проблемы, связанные с работой БС
+    $sql = "SELECT	s.silo_id, pbs.silo_name,
+					COUNT(s.sensor_id) AS count_sensor_id,
+					SUM(IF(s.error_id = 253, 1, 0)) AS silo_sum_err_253,
+					SUM(IF(s.error_id = 254, 1, 0)) AS silo_sum_err_254,
+					SUM(IF(s.error_id = 256, 1, 0)) AS silo_sum_err_256,
+					s.NACK_err, DATE_FORMAT(s.TIME_NACK_err,'%d.%m.%Y %H:%i:%s') AS f_TIME_NACK_err,
+					s.ACK_err,  DATE_FORMAT(s.TIME_ACK_err,'%d.%m.%Y %H:%i:%s')  AS f_TIME_ACK_err,
+					s.RST_err,  DATE_FORMAT(s.TIME_RST_err,'%d.%m.%Y %H:%i:%s')  AS f_TIME_RST_err,
+					s.error_id, e.error_description, e.error_desc_for_visu
+            FROM sensors AS s
+            INNER JOIN prodtypesbysilo AS pbs ON s.silo_id = pbs.silo_id 
+            LEFT JOIN errors AS e ON s.error_id = e.error_id
+            GROUP BY silo_id
+            HAVING (count_sensor_id=silo_sum_err_253 OR
+                    count_sensor_id=silo_sum_err_254 OR
+                    count_sensor_id=silo_sum_err_256);";
+
+    $sth = $dbh->query($sql);
+    
+    if($sth==false){
+        return false;
+    }
+    $defected_silo_rows = $sth->fetchAll();
+
+	$defected_silo = array();
+    foreach($defected_silo_rows as $defected_silo_row){
+
+		$outArr[] = array(  'silo_id'				=>	$defected_silo_row["silo_id"],
+							'silo_name'				=>	$defected_silo_row["silo_name"],
+							'podv_id'				=>	"",
+							'sensor_num'			=>	"",
+							'is_enabled'			=>	"",
+
+							'NACK_Tmax'				=>	"",
+							'TIME_NACK_Tmax'		=>	"",
+							'ACK_Tmax'				=>	"",
+							'TIME_ACK_Tmax'			=>	"",
+							'RST_Tmax'				=>	"",
+							'TIME_RST_Tmax'			=>	"",
+
+							'NACK_Vmax'        		=>	"",
+							'TIME_NACK_Vmax'        =>	"",
+							'ACK_Vmax'        		=>	"",
+							'TIME_ACK_Vmax'        	=>	"",
+							'RST_Vmax'        		=>	"",
+							'TIME_RST_Vmax'        	=>	"",
+							
+							'NACK_err'        		=>	$defected_silo_row["NACK_err"],
+							'TIME_NACK_err'        	=>	$defected_silo_row["f_TIME_NACK_err"],
+							'ACK_err'        		=>	$defected_silo_row["ACK_err"],
+							'TIME_ACK_err'        	=>	$defected_silo_row["f_TIME_ACK_err"],
+							'RST_err'        		=>	$defected_silo_row["RST_err"],
+							'TIME_RST_err'        	=>	$defected_silo_row["f_TIME_RST_err"],
+
+							'error_id'				=>	$defected_silo_row["error_id"],
+							'error_description'		=>	$defected_silo_row["error_description"],
+							'error_desc_for_visu'	=>	$defected_silo_row["error_desc_for_visu"]	);
+
+        array_push($defected_silo, $defected_silo_row["silo_name"]);
+        
+    }
+
+    //  Определяем проблемы, связанные с работой ТП
+    $sql = "SELECT	s.silo_id, pbs.silo_name, s.podv_id,
+					COUNT(sensor_id) AS count_sensor_id,
+					SUM(IF(s.error_id = 251, 1, 0)) AS silo_sum_err_251,
+					SUM(IF(s.error_id = 252, 1, 0)) AS silo_sum_err_252,
+					s.NACK_err, DATE_FORMAT(s.TIME_NACK_err,'%d.%m.%Y %H:%i:%s') AS f_TIME_NACK_err,
+					s.ACK_err,  DATE_FORMAT(s.TIME_ACK_err,'%d.%m.%Y %H:%i:%s')  AS f_TIME_ACK_err,
+					s.RST_err,  DATE_FORMAT(s.TIME_RST_err,'%d.%m.%Y %H:%i:%s')  AS f_TIME_RST_err,
+					s.error_id, e.error_description, e.error_desc_for_visu
+            FROM sensors AS s
+            INNER JOIN prodtypesbysilo AS pbs ON s.silo_id=pbs.silo_id
+            LEFT JOIN errors AS e ON s.error_id = e.error_id
+            GROUP BY silo_id, podv_id
+            HAVING (count_sensor_id=silo_sum_err_251 OR
+                    count_sensor_id=silo_sum_err_252);";
+
+    $sth = $dbh->query($sql);
+    
+    if($sth==false){
+        return false;
+    }
+    $defected_podv_rows = $sth->fetchAll();
+
+	$defected_podv = array();
+    foreach($defected_podv_rows as $defected_podv_row){
+
+		$outArr[] = array(  'silo_id'				=>	$defected_podv_row["silo_id"],
+							'silo_name'				=>	$defected_podv_row["silo_name"],
+							'podv_id'				=>	$defected_podv_row["podv_id"]+1,
+							'sensor_num'			=>	"",
+							'is_enabled'			=>	"",
+
+							'NACK_Tmax'				=>	"",
+							'TIME_NACK_Tmax'		=>	"",
+							'ACK_Tmax'				=>	"",
+							'TIME_ACK_Tmax'			=>	"",
+							'RST_Tmax'				=>	"",
+							'TIME_RST_Tmax'			=>	"",
+
+							'NACK_Vmax'        		=>	"",
+							'TIME_NACK_Vmax'        =>	"",
+							'ACK_Vmax'        		=>	"",
+							'TIME_ACK_Vmax'        	=>	"",
+							'RST_Vmax'        		=>	"",
+							'TIME_RST_Vmax'        	=>	"",
+							
+							'NACK_err'        		=>	$defected_podv_row["NACK_err"],
+							'TIME_NACK_err'        	=>	$defected_podv_row["f_TIME_NACK_err"],
+							'ACK_err'        		=>	$defected_podv_row["ACK_err"],
+							'TIME_ACK_err'        	=>	$defected_podv_row["f_TIME_ACK_err"],
+							'RST_err'        		=>	$defected_podv_row["RST_err"],
+							'TIME_RST_err'        	=>	$defected_podv_row["f_TIME_RST_err"],
+
+							'error_id'				=>	$defected_podv_row["error_id"],
+							'error_description'		=>	$defected_podv_row["error_description"],
+							'error_desc_for_visu'	=>	$defected_podv_row["error_desc_for_visu"]	);
+
+        array_push($defected_podv, strval($defected_podv_row["silo_name"]).",".strval($defected_podv_row["podv_id"]));
+    }
+
+    //  Определяем алармы датчиков
+    $sql = "SELECT  s.sensor_id, s.silo_id, pbs.silo_name, s.podv_id, s.sensor_num, s.is_enabled,
+                    s.NACK_Tmax, DATE_FORMAT(s.TIME_NACK_Tmax,'%d.%m.%Y %H:%i:%s') AS f_TIME_NACK_Tmax,
+					s.ACK_Tmax,  DATE_FORMAT(s.TIME_ACK_Tmax,'%d.%m.%Y %H:%i:%s')  AS f_TIME_ACK_Tmax,
+					s.RST_Tmax,  DATE_FORMAT(s.TIME_RST_Tmax,'%d.%m.%Y %H:%i:%s')  AS f_TIME_RST_Tmax,
+                    s.NACK_Vmax, DATE_FORMAT(s.TIME_NACK_Vmax,'%d.%m.%Y %H:%i:%s') AS f_TIME_NACK_Vmax,
+					s.ACK_Vmax,  DATE_FORMAT(s.TIME_ACK_Vmax,'%d.%m.%Y %H:%i:%s')  AS f_TIME_ACK_Vmax,
+					s.RST_Vmax,  DATE_FORMAT(s.TIME_RST_Vmax,'%d.%m.%Y %H:%i:%s')  AS f_TIME_RST_Vmax,
+                    s.NACK_err,  DATE_FORMAT(s.TIME_NACK_err,'%d.%m.%Y %H:%i:%s')  AS f_TIME_NACK_err,
+					s.ACK_err,   DATE_FORMAT(s.TIME_ACK_err,'%d.%m.%Y %H:%i:%s')   AS f_TIME_ACK_err,
+					s.RST_err,   DATE_FORMAT(s.TIME_RST_err,'%d.%m.%Y %H:%i:%s')   AS f_TIME_RST_err,
+                    s.error_id, e.error_description, e.error_desc_for_visu
+			FROM sensors AS s
+				LEFT JOIN errors AS e ON s.error_id=e.error_id
+				INNER JOIN prodtypesbysilo AS pbs ON s.silo_id=pbs.silo_id
+			WHERE s.NACK_Tmax=1 OR s.ACK_Tmax=1 OR s.RST_Tmax=1 OR s.NACK_Vmax=1 OR s.ACK_Vmax=1 OR s.RST_Vmax=1 OR s.NACK_err=1 OR s.ACK_err=1 OR s.RST_err=1;";
+    $sth = $dbh->query($sql);
+    
+    if($sth==false){
+        return false;
+    }
+    $sensor_alarm_rows = $sth->fetchAll();
+
+    foreach($sensor_alarm_rows as $sensor_alarm_row){
+
+        if( in_array($sensor_alarm_row["silo_name"], $defected_silo) ){
+            continue;
+        }
+
+        if( in_array($sensor_alarm_row["silo_name"].",".$sensor_alarm_row["podv_id"], $defected_podv) ){
+            continue;
+        }
+
+		$outArr[] = array(  'silo_id'				=>	$sensor_alarm_row["silo_id"],
+							'silo_name'				=>	$sensor_alarm_row["silo_name"],
+							'podv_id'				=>	$sensor_alarm_row["podv_id"]+1,
+							'sensor_num'			=>	$sensor_alarm_row["sensor_num"]+1,
+							'is_enabled'			=>	$sensor_alarm_row["is_enabled"],
+
+							'NACK_Tmax'				=>	$sensor_alarm_row["NACK_Tmax"],
+							'TIME_NACK_Tmax'		=>	$sensor_alarm_row["f_TIME_NACK_Tmax"],
+							'ACK_Tmax'				=>	$sensor_alarm_row["ACK_Tmax"],
+							'TIME_ACK_Tmax'			=>	$sensor_alarm_row["f_TIME_ACK_Tmax"],
+							'RST_Tmax'				=>	$sensor_alarm_row["RST_Tmax"],
+							'TIME_RST_Tmax'			=>	$sensor_alarm_row["f_TIME_RST_Tmax"],
+
+							'NACK_Vmax'        		=>	$sensor_alarm_row["NACK_Vmax"],
+							'TIME_NACK_Vmax'        =>	$sensor_alarm_row["f_TIME_NACK_Vmax"],
+							'ACK_Vmax'        		=>	$sensor_alarm_row["ACK_Vmax"],
+							'TIME_ACK_Vmax'        	=>	$sensor_alarm_row["f_TIME_ACK_Vmax"],
+							'RST_Vmax'        		=>	$sensor_alarm_row["RST_Vmax"],
+							'TIME_RST_Vmax'        	=>	$sensor_alarm_row["f_TIME_RST_Vmax"],
+							
+							'NACK_err'        		=>	$sensor_alarm_row["NACK_err"],
+							'TIME_NACK_err'        	=>	$sensor_alarm_row["f_TIME_NACK_err"],
+							'ACK_err'        		=>	$sensor_alarm_row["ACK_err"],
+							'TIME_ACK_err'        	=>	$sensor_alarm_row["f_TIME_ACK_err"],
+							'RST_err'        		=>	$sensor_alarm_row["RST_err"],
+							'TIME_RST_err'        	=>	$sensor_alarm_row["f_TIME_RST_err"],
+
+							'error_id'				=>	$sensor_alarm_row["error_id"],
+							'error_description'		=>	$sensor_alarm_row["error_description"],
+							'error_desc_for_visu'	=>	$sensor_alarm_row["error_desc_for_visu"]	);
+
+    }
+
+    //  Сортируем выходной ассоциативный массив по времени появления сигнала АПС
+	$c_TIME_NACK_err = array_column($outArr, "TIME_NACK_err");
+	$c_TIME_NACK_Tmax = array_column($outArr, "TIME_NACK_Tmax");
+	$c_TIME_NACK_Vmax = array_column($outArr, "TIME_NACK_Vmax");
+
+    array_multisort($c_TIME_NACK_err, SORT_ASC, $c_TIME_NACK_Tmax, SORT_ASC, $c_TIME_NACK_Vmax, SORT_ASC, $outArr);
+
+	return $outArr;
+
+}
+//	Отправка Телеграм уведомлений
+function send_Telegram_notifications($dbh, $alarmStateArray, $serverDate){
+
+	$notificationMessage="";
+	$notificationMessageCount = 0;
+
+	foreach($alarmStateArray as $alarmState){
+
+		if($alarmState["TIME_NACK_err"]===$serverDate){
+
+			$notificationMessage .= "Силос ".$alarmState["silo_name"].". ";
+			$notificationMessage .= $alarmState["podv_id"]==="" ? "" : "НП ".$alarmState["podv_id"].". ";
+			$notificationMessage .= $alarmState["sensor_num"]==="" ? "" : "НД ".$alarmState["sensor_num"].". ";
+			$notificationMessage .= $alarmState["error_description"].";%0A";
+			$notificationMessageCount++;
+
+		}
+
+		if($alarmState["TIME_NACK_Tmax"]===$serverDate){
+
+			$notificationMessage .= "Силос ".$alarmState["silo_name"].". ";
+			$notificationMessage .= "НП ".$alarmState["podv_id"].". ";
+			$notificationMessage .= "НД ".$alarmState["sensor_num"].". ";
+			$notificationMessage .= "Tmax;%0A";
+			$notificationMessageCount++;
+
+		}
+
+		if($alarmState["TIME_NACK_Vmax"]===$serverDate){
+
+			$notificationMessage .= "Силос ".$alarmState["silo_name"].". ";
+			$notificationMessage .= "НП ".$alarmState["podv_id"].". ";
+			$notificationMessage .= "НД ".$alarmState["sensor_num"].". ";
+			$notificationMessage .= "Vmax;%0A";
+			$notificationMessageCount++;
+
+		}
+
+		if($notificationMessageCount>0 && $notificationMessageCount%10==0){
+			$notificationMessage .= "\n";
+		}
+
+	}
+
+	if(strlen($notificationMessage)>0){
+		require_once(substr(__DIR__,0,-6)."/telegram/index.php");
+
+		$query = "SELECT user_id FROM ".DBNAME.".telegram_users WHERE notifications_on=1;";
+		$sth = $dbh->query($query);
+
+		if($sth==false){
+			return false;
+		}
+
+		$telegram_users = $sth->fetchAll();
+		foreach($telegram_users as $telegram_user){
+			sendMessage($telegram_user["user_id"], explode("\n",$notificationMessage));
+		}
+	}
+
+	return;
+}
+//	
+function log_events($logFile, $alarmStateArray, $serverDate){
+
+	$loggingString="";
+	
+	foreach($alarmStateArray as $alarmState){
+
+		if( in_array( $serverDate, array($alarmState["TIME_NACK_err"], $alarmState["TIME_ACK_err"], $alarmState["TIME_RST_err"]) ) ){
+
+			$loggingString .= "Силос ".$alarmState["silo_name"].". ";
+			$loggingString .= $alarmState["podv_id"]==="" ? "" : "НП ".$alarmState["podv_id"].". ";
+			$loggingString .= $alarmState["sensor_num"]==="" ? "" : "НД ".$alarmState["sensor_num"].". ";
+			$loggingString .= $alarmState["error_description"].". ";
+
+			$loggingString .= $alarmState["NACK_err"]==='1' ? "Возникновение сигнала АПС" : "";
+			$loggingString .= $alarmState["ACK_err"]==='1'  ? "Подтверждение сигнала АПС" : "";
+			$loggingString .= $alarmState["RST_err"]==='1'  ? "Исчезновение сигнала АПС"  : "";
+			$loggingString .= ";\n";
+		}
+
+		if( in_array( $serverDate, array($alarmState["TIME_NACK_Tmax"], $alarmState["TIME_ACK_Tmax"], $alarmState["TIME_RST_Tmax"]) ) ){
+
+			$loggingString .= "Силос ".$alarmState["silo_name"].". ";
+			$loggingString .= "НП ".$alarmState["podv_id"].". ";
+			$loggingString .= "НД ".$alarmState["sensor_num"].". ";
+			$loggingString .= "Tmax. ";
+
+			$loggingString .= $alarmState["NACK_Tmax"]==='1' ? "Возникновение сигнала АПС" : "";
+			$loggingString .= $alarmState["ACK_Tmax"]==='1'  ? "Подтверждение сигнала АПС" : "";
+			$loggingString .= $alarmState["RST_Tmax"]==='1'  ? "Исчезновение сигнала АПС"  : "";
+			$loggingString .= ";\n";
+
+		}
+
+		if( in_array( $serverDate, array($alarmState["TIME_NACK_Vmax"], $alarmState["TIME_ACK_Vmax"], $alarmState["TIME_RST_Vmax"]) ) ){
+
+			$loggingString .= "Силос ".$alarmState["silo_name"].". ";
+			$loggingString .= "НП ".$alarmState["podv_id"].". ";
+			$loggingString .= "НД ".$alarmState["sensor_num"].". ";
+			$loggingString .= "Vmax. ";
+
+			$loggingString .= $alarmState["NACK_Vmax"]==='1' ? "Возникновение сигнала АПС" : "";
+			$loggingString .= $alarmState["ACK_Vmax"]==='1'  ? "Подтверждение сигнала АПС" : "";
+			$loggingString .= $alarmState["RST_Vmax"]==='1'  ? "Исчезновение сигнала АПС"  : "";
+			$loggingString .= ";\n";
+
+		}
+
+	}
+
+	writeToLog($logFile, $loggingString);
+
+	return;
+}
+
 //	Функция получения массива кодов ошибок
 function db_get_error_codes($dbh){
 
@@ -103,16 +424,17 @@ function db_get_error_codes($dbh){
 //	Функция для записи значений из массивов $arrayOfTemperatures и $arrayOfTempSpeeds в Базу Данных от времени $serverDate
 function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate, $logFile){
 
+	$loggingArray = array();
 	$alarmMessage = "";
 	$loggingString = "";
-	$telegramMessage = "";
-	$telegramMessageCount=0;
 	$error_codes_arr = db_get_error_codes($dbh);
 
 	$query = "	SELECT  s.sensor_id, s.silo_id, s.podv_id, s.sensor_num, s.is_enabled, s.current_temperature, s.current_speed,
 						s.curr_t_text, s.curr_v_text, s.curr_t_colour, s.curr_v_colour, s.server_date,
-						s.NACK_Tmax, s.TIME_NACK_Tmax, s.ACK_Tmax, s.TIME_ACK_Tmax, s.NACK_Vmax, s.TIME_NACK_Vmax, s.ACK_Vmax, s.TIME_ACK_Vmax,
-						s.NACK_err, s.TIME_NACK_err, s.ACK_err, s.TIME_ACK_err, s.error_id,
+						s.NACK_Tmax, s.TIME_NACK_Tmax, s.ACK_Tmax, s.TIME_ACK_Tmax, s.RST_Tmax, s.TIME_RST_Tmax,
+						s.NACK_Vmax, s.TIME_NACK_Vmax, s.ACK_Vmax, s.TIME_ACK_Vmax, s.RST_Vmax, s.TIME_RST_Vmax,
+						s.NACK_err, s.TIME_NACK_err, s.ACK_err, s.TIME_ACK_err, s.RST_err, s.TIME_RST_err,
+						s.error_id,
 						pbs.grain_level, pbs.silo_name, pr.t_min, pr.t_max, pr.v_min, pr.v_max, e.error_desc_short
 					FROM sensors AS s
 					JOIN prodtypesbysilo AS pbs
@@ -129,8 +451,10 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 	$query = "INSERT INTO ".DBNAME.".sensors
 			   (sensor_id, silo_id, podv_id, sensor_num, is_enabled, current_temperature, current_speed,
 				curr_t_text, curr_v_text, curr_t_colour, curr_v_colour, server_date,
-				NACK_Tmax, TIME_NACK_Tmax, ACK_Tmax, TIME_ACK_Tmax, NACK_Vmax, TIME_NACK_Vmax, ACK_Vmax, TIME_ACK_Vmax,
-				NACK_err, TIME_NACK_err, ACK_err, TIME_ACK_err, error_id)
+				NACK_Tmax, TIME_NACK_Tmax, ACK_Tmax, TIME_ACK_Tmax, RST_Tmax, TIME_RST_Tmax,
+				NACK_Vmax, TIME_NACK_Vmax, ACK_Vmax, TIME_ACK_Vmax, RST_Vmax, TIME_RST_Vmax,
+				NACK_err, TIME_NACK_err, ACK_err, TIME_ACK_err, RST_err, TIME_RST_err,
+				error_id)
 			  VALUES ";
 
 	$sensor_id = 0;
@@ -138,19 +462,32 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 		for($j = 0; $j < count($arrayOfTemperatures[$i]); $j++){
 			for($k = 0; $k < count($arrayOfTemperatures[$i][$j]); $k++){
 
+				$query_RST_err = "'".$rows[$sensor_id]['RST_err']."', ";
+				$query_TIME_RST_err = is_null($rows[$sensor_id]['TIME_RST_err']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_RST_err']."', ";
 
 				//	error NACK
 				if( $rows[$sensor_id]['is_enabled']==1 && is_null($rows[$sensor_id]['error_id']) &&
 					$arrayOfTemperatures[$i][$j][$k]>=850 ){
 						$query_NACK_err = "1, ";
 						$query_TIME_NACK_err = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
+						$query_RST_err = "0, ";
+						$query_TIME_RST_err = "NULL, ";
 						$query_error_id = "'".($arrayOfTemperatures[$i][$j][$k]*0.1)."'),";
+
+						$loggingArray[] = array(	"date_time"=>$serverDate,
+													"silo_id"=>$i,
+													"silo_name"=>$rows[$sensor_id]['silo_name'],
+													"podv_num"=>($j+1),
+													"sensor_num"=>($k+1),
+													"event_type"=>"NACK_error",
+													"error_code"=>$arrayOfTemperatures[$i][$j][$k]*0.1,
+													"alarm_type"=>$error_codes_arr[ ($arrayOfTemperatures[$i][$j][$k]*0.1) ]['error_description'],
+													"message"=>"Срабатывание сигнала АПС;"	);
 
 						$alarmMessage = "Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". "
 										.$error_codes_arr[ ($arrayOfTemperatures[$i][$j][$k]*0.1) ]['error_description'];
 
 						$loggingString .= "$serverDate: ".$alarmMessage.". Срабатывание сигнала АПС;\n";
-						$telegramMessage .= $alarmMessage.";%0A"; $telegramMessageCount++;
 
 				} else {
 						$query_NACK_err = "'".$rows[$sensor_id]['NACK_err']."', ";
@@ -165,7 +502,21 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 						$query_TIME_NACK_err = "NULL, ";
 						$query_ACK_err = "0, ";
 						$query_TIME_ACK_err = "NULL, ";
+						$query_RST_err = "1, ";
+						$query_TIME_RST_err = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
+
 						$query_error_id = "NULL),";
+
+						$loggingArray[] = array(	"date_time"=>$serverDate,
+													"silo_id"=>$i,
+													"silo_name"=>$rows[$sensor_id]['silo_name'],
+													"podv_num"=>($j+1),
+													"sensor_num"=>($k+1),
+													"event_type"=>"RST_error",
+													"error_code"=>$rows[$sensor_id]['error_id'],
+													"alarm_type"=>$error_codes_arr[ $rows[$sensor_id]['error_id'] ]['error_description'],
+													"message"=>"Исчезновение сигнала АПС;"		);
+
 						$loggingString .= "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". ".$error_codes_arr[ $rows[$sensor_id]['error_id'] ]['error_description'].". Исчезновение сигнала АПС;\n";
 				} else {
 						$query_ACK_err = "'".$rows[$sensor_id]['ACK_err']."', ";
@@ -175,6 +526,10 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 						}
 				}
 
+
+				$query_RST_Tmax = "'".$rows[$sensor_id]['RST_Tmax']."', ";
+				$query_TIME_RST_Tmax = is_null($rows[$sensor_id]['TIME_RST_Tmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_RST_Tmax']."', ";
+
 				//	Tmax NACK
 				if( is_null($rows[$sensor_id]['error_id']) && $rows[$sensor_id]['is_enabled']==1 &&		//	датчик исправен и включен
 					$rows[$sensor_id]['NACK_Tmax']==0 && $rows[$sensor_id]['ACK_Tmax']==0 &&			//	нет текущего аларма
@@ -183,11 +538,22 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 					($arrayOfTemperatures[$i][$j][$k]*0.1 > $rows[$sensor_id]['t_max']) ){				//	температура выше критической для данного продукта
 						$query_NACK_Tmax = "1, ";
 						$query_TIME_NACK_Tmax = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
+						$query_RST_Tmax = "0, ";
+						$query_TIME_RST_Tmax = "NULL, ";
+
+						$loggingArray[] = array(	"date_time"=>$serverDate,
+													"silo_id"=>$i,
+													"silo_name"=>$rows[$sensor_id]['silo_name'],
+													"podv_num"=>($j+1),
+													"sensor_num"=>($k+1),
+													"event_type"=>"NACK_Tmax",
+													"error_code"=>null,
+													"alarm_type"=>null,
+													"message"=>"Срабатывание сигнала АПС;"		);
 
 						$alarmMessage = "Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". Tmax";
 
 						$loggingString .= "$serverDate: ".$alarmMessage.". Срабатывание сигнала АПС;\n";
-						$telegramMessage .= $alarmMessage.";%0A"; $telegramMessageCount++;
 
 				} else {
 						$query_NACK_Tmax = "'".$rows[$sensor_id]['NACK_Tmax']."', ";
@@ -204,12 +570,28 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 						$query_TIME_NACK_Tmax = "NULL, ";
 						$query_ACK_Tmax = "0, ";
 						$query_TIME_ACK_Tmax = "NULL, ";
+						$query_RST_Tmax = "1, ";
+						$query_TIME_RST_Tmax = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
+
+						$loggingArray[] = array(	"date_time"=>$serverDate,
+													"silo_id"=>$i,
+													"silo_name"=>$rows[$sensor_id]['silo_name'],
+													"podv_num"=>($j+1),
+													"sensor_num"=>($k+1),
+													"event_type"=>"RST_Tmax",
+													"error_code"=>null,
+													"alarm_type"=>null,
+													"message"=>"Исчезновение сигнала АПС;"		);
+
 						$loggingString .= "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". Tmax. Исчезновение сигнала АПС;\n";
 				} else {
 						$query_ACK_Tmax = "'".$rows[$sensor_id]['ACK_Tmax']."', ";
 						$query_TIME_ACK_Tmax = is_null($rows[$sensor_id]['TIME_ACK_Tmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_ACK_Tmax']."', ";
 				}
 
+
+				$query_RST_Vmax = "'".$rows[$sensor_id]['RST_Vmax']."', ";
+				$query_TIME_RST_Vmax = is_null($rows[$sensor_id]['TIME_RST_Vmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_RST_Vmax']."', ";
 
 				//	Vmax NACK
 				if(  is_null($rows[$sensor_id]['error_id']) && $rows[$sensor_id]['is_enabled']==1 &&	//	датчик исправен и включен
@@ -219,11 +601,22 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 					($arrayOfTempSpeeds[$i][$j][$k] > $rows[$sensor_id]['v_max']) ){					//	скорость изменения температуры выше критической
 						$query_NACK_Vmax = "1, ";
 						$query_TIME_NACK_Vmax = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
+						$query_RST_Vmax = "0, ";
+						$query_TIME_RST_Vmax = "NULL, ";
+
+						$loggingArray[] = array(	"date_time"=>$serverDate,
+													"silo_id"=>$i,
+													"silo_name"=>$rows[$sensor_id]['silo_name'],
+													"podv_num"=>($j+1),
+													"sensor_num"=>($k+1),
+													"event_type"=>"NACK_Vmax",
+													"error_code"=>null,
+													"alarm_type"=>null,
+													"message"=>"Срабатывание сигнала АПС;"		);
 
 						$alarmMessage = "Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". Vmax";
 
 						$loggingString .= "$serverDate: ".$alarmMessage.". Срабатывание сигнала АПС;\n";
-						$telegramMessage .= $alarmMessage.";%0A"; $telegramMessageCount++;
 
 				} else {
 						$query_NACK_Vmax = "'".$rows[$sensor_id]['NACK_Vmax']."', ";
@@ -240,22 +633,42 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 						$query_TIME_NACK_Vmax = "NULL, ";
 						$query_ACK_Vmax = "0, ";
 						$query_TIME_ACK_Vmax = "NULL, ";
+						$query_RST_Vmax = "1, ";
+						$query_TIME_RST_Vmax = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
+
+						$loggingArray[] = array(	"date_time"=>$serverDate,
+													"silo_id"=>$i,
+													"silo_name"=>$rows[$sensor_id]['silo_name'],
+													"podv_num"=>($j+1),
+													"sensor_num"=>($k+1),
+													"event_type"=>"RST_Vmax",
+													"error_code"=>null,
+													"alarm_type"=>null,
+													"message"=>"Исчезновение сигнала АПС;"		);
+
 						$loggingString .= "$serverDate: Силос ".$rows[$sensor_id]['silo_name'].". НП".($j+1).". НД".($k+1).". Vmax. Исчезновение сигнала АПС;\n";
 				} else {
 						$query_ACK_Vmax = "'".$rows[$sensor_id]['ACK_Vmax']."', ";
 						$query_TIME_ACK_Vmax = is_null($rows[$sensor_id]['TIME_ACK_Vmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_ACK_Vmax']."', ";
 				}
 
-				if($telegramMessageCount>0 && ($telegramMessageCount%10==0)){
-					$telegramMessage .= "\n";
-				}
-
 				//	Отображение параметров в таблице
 
 				//	Текст
 				if($query_error_id!="NULL),"){
-					$query_curr_t_text = "'".$error_codes_arr[($arrayOfTemperatures[$i][$j][$k]*0.1)]['error_desc_short']."', ";
-					$query_curr_v_text = "'".$error_codes_arr[($arrayOfTemperatures[$i][$j][$k]*0.1)]['error_desc_short']."', ";
+
+					if(isset( $error_codes_arr [ $rows[$sensor_id]['error_id'] ] ['error_desc_short'] ) ) {
+
+						$query_curr_t_text = "'".$error_codes_arr[$rows[$sensor_id]['error_id']]['error_desc_short']."', ";
+						$query_curr_v_text = "'".$error_codes_arr[$rows[$sensor_id]['error_id']]['error_desc_short']."', ";
+
+					} else if (isset($error_codes_arr[$arrayOfTemperatures[$i][$j][$k] * 0.1]['error_desc_short'])) {
+						
+						$query_curr_t_text = "'".$error_codes_arr[ $arrayOfTemperatures[$i][$j][$k] * 0.1 ]['error_desc_short']."', ";
+						$query_curr_v_text = "'".$error_codes_arr[ $arrayOfTemperatures[$i][$j][$k] * 0.1 ]['error_desc_short']."', ";
+
+					}
+
 				} else if ($rows[$sensor_id]['is_enabled']==0) {
 					$query_curr_t_text = "'откл.', ";
 					$query_curr_v_text = "'откл.', ";
@@ -341,6 +754,10 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 				$query .= $query_ACK_Tmax;
 				//	TIME_ACK_Tmax
 				$query .= $query_TIME_ACK_Tmax;
+				//	RST_Tmax
+				$query .= $query_RST_Tmax;
+				//	TIME_RST_Tmax
+				$query .= $query_TIME_RST_Tmax;
 
 				//	NACK_Vmax
 				$query .= $query_NACK_Vmax;
@@ -350,6 +767,10 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 				$query .= $query_ACK_Vmax;
 				//	TIME_ACK_Vmax
 				$query .= $query_TIME_ACK_Vmax;
+				//	RST_Vmax
+				$query .= $query_RST_Vmax;
+				//	TIME_RST_Vmax
+				$query .= $query_TIME_RST_Vmax;
 
 				//	NACK_err
 				$query .= $query_NACK_err;
@@ -359,6 +780,11 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 				$query .= $query_ACK_err;
 				//	TIME_ACK_err
 				$query .= $query_TIME_ACK_err;
+				//	RST_err
+				$query .= $query_RST_err;
+				//	TIME_RST_err
+				$query .= $query_TIME_RST_err;
+
 				//	error_id
 				$query .= $query_error_id;
 
@@ -384,23 +810,43 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 										TIME_NACK_Tmax=VALUES(TIME_NACK_Tmax),
 										ACK_Tmax=VALUES(ACK_Tmax),
 										TIME_ACK_Tmax=VALUES(TIME_ACK_Tmax),
+										RST_Tmax=VALUES(RST_Tmax),
+										TIME_RST_Tmax=VALUES(TIME_RST_Tmax),
 										NACK_Vmax=VALUES(NACK_Vmax),
 										TIME_NACK_Vmax=VALUES(TIME_NACK_Vmax),
 										ACK_Vmax=VALUES(ACK_Vmax),
 										TIME_ACK_Vmax=VALUES(TIME_ACK_Vmax),
+										RST_Vmax=VALUES(RST_Vmax),
+										TIME_RST_Vmax=VALUES(TIME_RST_Vmax),
 										NACK_err=VALUES(NACK_err),
 										TIME_NACK_err=VALUES(TIME_NACK_err),
 										ACK_err=VALUES(ACK_err),
 										TIME_ACK_err=VALUES(TIME_ACK_err),
+										RST_err=VALUES(RST_err),
+										TIME_RST_err=VALUES(TIME_RST_err),
 										error_id=VALUES(error_id);";
 	$stmt = $dbh->prepare($query);
 	$stmt->execute();
 
-	writeToLog($logFile, $loggingString);
+	//writeToLog($logFile, $loggingString);
+
+	//print_r($query);
+	file_put_contents(__DIR__.'/debug.txt', "");
+	file_put_contents(__DIR__.'/debug.txt', print_r(db_update_curr_alarm_state($dbh),1), FILE_APPEND);
+
+	$alarmStateArray = db_update_curr_alarm_state($dbh);
+
+	send_Telegram_notifications($dbh, $alarmStateArray,$serverDate);
+	log_events($logFile, $alarmStateArray, $serverDate);
+
+	
 
 	//	Отправляем уведомления пользователям в Телеграм
-	if(strlen($telegramMessage)>0){
-		require_once("telegram/index.php");
+	/*if(strlen($telegramMessage)>0){
+
+		//writeAlarmsToLog($loggingArray);
+
+		require_once(substr(__DIR__,0,-6)."/telegram/index.php");
 		//	Извлекаем из БД всех пользователей, которые включили уведомления
 		$query = "SELECT user_id FROM ".DBNAME.".telegram_users WHERE notifications_on=1;";
 		$sth = $dbh->query($query);
@@ -408,7 +854,7 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 		foreach($telegram_users as $telegram_user){
 			sendMessage($telegram_user["user_id"], explode("\n",$telegramMessage));
 		}
-	}
+	}*/
 
 	return;
 }
