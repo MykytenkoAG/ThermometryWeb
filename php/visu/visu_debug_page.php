@@ -4,8 +4,10 @@ require_once (substr(__DIR__,0,-4).'/ts/currValsFromTS.php');
 //  Получение главной отладочной таблицы
 function vDbg_draw_debugParamsTable($dbh){
 
-    $sql = "SELECT s.sensor_id, pbs.silo_name, s.podv_id, s.sensor_num, s.current_temperature, s.current_speed, pbs.grain_level 
-            FROM ".DBNAME.".sensors s INNER JOIN prodtypesbysilo pbs ON s.silo_id = pbs.silo_id";
+    $sql = "SELECT s.sensor_id, pbs.silo_name, s.podv_id, s.sensor_num, s.current_temperature, s.current_speed, pbs.grain_level, e.error_desc_short
+            FROM ".DBNAME.".sensors AS s
+            INNER JOIN prodtypesbysilo AS pbs ON s.silo_id = pbs.silo_id
+            LEFT JOIN errors AS e ON s.error_id = e.error_id;";
 
     $sth = $dbh->query($sql);
 
@@ -35,8 +37,18 @@ function vDbg_draw_debugParamsTable($dbh){
         $outStr .= "<td style=\"text-align: center; padding-right: 10px;\">". $row['silo_name']."</td>";
         $outStr .= "<td style=\"text-align: center; padding-right: 10px;\">".($row['podv_id']+1)."</td>";
         $outStr .= "<td style=\"text-align: center; padding-right: 10px;\">".($row['sensor_num']+1)."</td>";
-        $outStr .= "<td style=\"text-align: center; padding-right: 10px;\">". $row['current_temperature']."</td>";
-        $outStr .= "<td style=\"text-align: center; padding-right: 10px;\">". $row['current_speed']."</td>";
+
+        if( ! is_null($row['current_temperature']) ){
+            $outStr .= "<td style=\"text-align: center; padding-right: 10px;\">". $row['current_temperature']."</td>";
+            $outStr .= "<td style=\"text-align: center; padding-right: 10px;\">". $row['current_speed']."</td>";
+        } else if ( ! is_null($row['error_desc_short']) ){
+            $outStr .= "<td style=\"text-align: center; padding-right: 10px;\">". $row['error_desc_short']."</td>";
+            $outStr .= "<td style=\"text-align: center; padding-right: 10px;\"></td>";
+        } else {
+            $outStr .= "<td style=\"text-align: center; padding-right: 10px;\">?</td>";
+            $outStr .= "<td style=\"text-align: center; padding-right: 10px;\"></td>";
+        }
+
         $outStr .= "<td style=\"text-align: center; padding-right: 10px;\">". $row['grain_level']."</td>";
 
         $outStr .= "</tr>";

@@ -527,6 +527,21 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 		for($j = 0; $j < count($arrayOfTemperatures[$i]); $j++){
 			for($k = 0; $k < count($arrayOfTemperatures[$i][$j]); $k++){
 
+				if( $arrayOfTemperatures[$i][$j][$k] == 2560 ){							//	Силос отключен на сервере
+					$query_is_enabled = "'0', ";
+				} else {
+					$query_is_enabled = "'".$rows[$sensor_id]['is_enabled']."', ";
+				}
+				
+				//	Проверяем значения температуры на наличие ошибок
+				if( $arrayOfTemperatures[$i][$j][$k] < 850 ){
+					$query_current_temperature = "'". ($arrayOfTemperatures[$i][$j][$k] * 0.1) ."', ";
+					$query_current_speed = "'". str_replace(",", ".", $arrayOfTempSpeeds[$i][$j][$k]) ."', ";
+				} else {
+					$query_current_temperature = "NULL, ";
+					$query_current_speed = "NULL, ";
+				}
+
 				//	error NACK --------------------------------------------------------------------------------------------------------------------------------
 				$query_RST_err = "'".$rows[$sensor_id]['RST_err']."', ";
 				$query_TIME_RST_err = is_null($rows[$sensor_id]['TIME_RST_err']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_RST_err']."', ";
@@ -545,7 +560,8 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 						if( isset( $error_codes_arr[$arrayOfTemperatures[$i][$j][$k]*0.1]["error_id"] ) ){
 							$query_error_id = "'".($arrayOfTemperatures[$i][$j][$k]*0.1)."'),";
 						} else {
-							$query_error_id = "NULL),";
+							//	257 - неизвестная ошибка
+							$query_error_id = "257),";
 						}
 						
 				} else {
@@ -655,8 +671,8 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 					$query_curr_t_text = "'откл.', ";
 					$query_curr_v_text = "'откл.', ";
 				} else {
-					$query_curr_t_text = sprintf('\'%01.1f\'', $arrayOfTemperatures[$i][$j][$k] * 0.1).", ";
-					$query_curr_v_text = sprintf('\'%01.1f\'', $arrayOfTempSpeeds[$i][$j][$k]).", ";
+					$query_curr_t_text = $arrayOfTemperatures[$i][$j][$k]<850 ? sprintf('\'%01.1f\'', $arrayOfTemperatures[$i][$j][$k] * 0.1).", " : "'?', ";
+					$query_curr_v_text = $arrayOfTemperatures[$i][$j][$k]<850 ? sprintf('\'%01.1f\'', $arrayOfTempSpeeds[$i][$j][$k]).", " : "'?', ";
 				}
 
 				//	Цвет ----------------------------------------------------------------------------------------------------------------
@@ -719,11 +735,11 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 				//	sensor_num
 				$query .= "'".$rows[$sensor_id]['sensor_num']."', ";
 				//	is_enabled
-				$query .= "'".$rows[$sensor_id]['is_enabled']."', ";
+				$query .= $query_is_enabled;
 				//	current_temperature
-				$query .= "'". ($arrayOfTemperatures[$i][$j][$k] * 0.1) ."', ";
+				$query .= $query_current_temperature;
 				//	current_speed
-				$query .= "'". str_replace(",", ".", $arrayOfTempSpeeds[$i][$j][$k]) ."', ";
+				$query .= $query_current_speed;
 				//	curr_t_text
 				$query .= $query_curr_t_text;
 				//	curr_v_text
@@ -823,7 +839,7 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 	log_events($dbh, $logFile, $serverDate, $alarmStateArray);
 
 	file_put_contents(__DIR__.'/debug.txt', "");
-	file_put_contents(__DIR__.'/debug.txt', print_r($alarmStateArray,1), FILE_APPEND);
+	file_put_contents(__DIR__.'/debug.txt', print_r($query,1), FILE_APPEND);
 
 	return;
 }
