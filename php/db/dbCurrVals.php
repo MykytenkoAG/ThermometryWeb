@@ -534,7 +534,7 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 				}
 				
 				//	Проверяем значения температуры на наличие ошибок
-				if( $arrayOfTemperatures[$i][$j][$k] < 850 ){
+				if( ($arrayOfTemperatures[$i][$j][$k] < 850) && ($query_is_enabled != "'0', ") ){
 					$query_current_temperature = "'". ($arrayOfTemperatures[$i][$j][$k] * 0.1) ."', ";
 					$query_current_speed = "'". str_replace(",", ".", $arrayOfTempSpeeds[$i][$j][$k]) ."', ";
 				} else {
