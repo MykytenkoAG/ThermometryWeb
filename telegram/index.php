@@ -177,48 +177,35 @@ function cmdGetSiloInfo($dbh, $silo_name_1, $silo_name_2){
 }
 
 function cmdGetAlarms($dbh){
-    
-    $sql = "SELECT s.sensor_id, s.silo_id, s.podv_id, s.sensor_num, pbs.silo_name,
-                   s.NACK_Tmax, s.ACK_Tmax,
-                   s.NACK_Vmax, s.ACK_Vmax,
-                   s.NACK_err, s.ACK_err, s.error_id, e.error_desc_for_visu 
-            FROM sensors AS s
-            INNER JOIN prodtypesbysilo AS pbs ON s.silo_id = pbs.silo_id
-            LEFT JOIN errors AS e ON s.error_id = e.error_id
-            WHERE s.NACK_Tmax=1 OR s.ACK_Tmax=1 OR s.NACK_Vmax=1 OR s.ACK_Vmax=1 OR s.NACK_err=1 OR s.ACK_err=1 ";
 
-    $sth = $dbh->query($sql);
-
-    if($sth==false){
-        return false;
-    }
-    $rows = $sth->fetchAll();
+    $alarmStateArray = db_update_curr_alarm_state($dbh);
 
     $outArr = array();  $outStr = "";
 
-    if(count($rows)==0){
+    if(count($alarmStateArray)==0){
         array_push($outArr, "На данный момент в системе отсутствуют неисправности.");
     }
 
-    $i=0;
-    foreach($rows as $row){
+    for($i=0; $i<count($alarmStateArray); $i++){
 
-        $outStr .= "Силос ".$row["silo_name"].". НП".($row["podv_id"]+1).". НД".($row["sensor_num"]+1).". ";
-        if(!is_null($row["error_desc_for_visu"])){
-            $outStr .= $row["error_desc_for_visu"];
-        } else if ( $row["NACK_Tmax"] || $row["ACK_Tmax"] ){
-            $outStr .= "Tmax";
-        } else if ( $row["NACK_Vmax"] || $row["ACK_Vmax"] ){
-            $outStr .= "Vmax";
+        $outStr .= "Силос ".$alarmStateArray[$i]["silo_name"].". ";
+        $outStr .= is_null($alarmStateArray[$i]["podv_id"]) ? "" : "НП".$alarmStateArray[$i]["podv_id"].". ";
+        $outStr .= is_null($alarmStateArray[$i]["sensor_num"]) ? "" : "НД".$alarmStateArray[$i]["sensor_num"].". ";
+
+        if(!is_null($alarmStateArray[$i]["error_desc_for_visu"])){
+            $outStr .=  $alarmStateArray[$i]["error_desc_for_visu"];
+        } else if ( $alarmStateArray[$i]["NACK_Tmax"]==1 || $alarmStateArray[$i]["ACK_Tmax"]==1 ){
+            $outStr .=  "Tmax";
+        } else if ( $alarmStateArray[$i]["NACK_Vmax"]==1 || $alarmStateArray[$i]["ACK_Vmax"]==1  ){
+            $outStr .=  "Vmax";
         }
         
         $outStr .= ";%0A";
-        
-        if( ($i>0 && $i%10==0) || $i==(count($rows)-1) ){
+
+        if( ($i>0 && $i%10==0) || $i==(count($alarmStateArray)-1) ){
             array_push($outArr, $outStr);
             $outStr = "";
         }
-        $i++;
     }
 
     return $outArr;

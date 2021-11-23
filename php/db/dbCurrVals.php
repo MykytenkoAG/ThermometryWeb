@@ -227,7 +227,7 @@ function db_update_curr_alarm_state($dbh){
 	$defected_podv = array();
     foreach($defected_podv_rows as $defected_podv_row){
 
-		$outArr[] = array(	'time_of_alarm'			=>  $defected_silo_row["f_TIME_NACK_err"],
+		$outArr[] = array(	'time_of_alarm'			=>  $defected_podv_row["f_TIME_NACK_err"],
 			
 							'silo_id'				=>	$defected_podv_row["silo_id"],
 							'silo_name'				=>	$defected_podv_row["silo_name"],
