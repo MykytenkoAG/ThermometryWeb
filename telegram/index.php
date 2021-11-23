@@ -24,7 +24,9 @@ if(!is_null($newMessage)>0){                                            //  Ес
 
 function sendMessage($sender_id, $arrayOfMessages){
     foreach($arrayOfMessages as $currMess){
-        file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$sender_id."&text=".$currMess."&parse_mode=HTML");
+        if(strlen($currMess)>0){
+            file_get_contents(BASE_URL.TOKEN."/sendMessage?chat_id=".$sender_id."&text=".$currMess);
+        }
     }
     return;
 }

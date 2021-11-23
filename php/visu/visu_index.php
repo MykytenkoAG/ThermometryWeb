@@ -9,9 +9,7 @@ function vInd_getCurrAlarms($dbh){
 
     $alarmStateArray = db_update_curr_alarm_state($dbh);
 
-    //  Формируем выходную таблицу
     $outStr = "<table class=\"table table-striped\">";
-    //$outStr .= "<tr><th>Время</th><th>Силос</th><th>ТП</th><th>Датчик</th><th>Тип АПС</th></tr>";
 
     foreach($alarmStateArray as $alarmState){
 
@@ -33,9 +31,9 @@ function vInd_getCurrAlarms($dbh){
 
         if(!is_null($alarmState["error_desc_for_visu"])){
             $td_description = $alarmState["error_desc_for_visu"];
-        } else if (!is_null($alarmState["TIME_NACK_Tmax"])){
+        } else if ( $alarmState["NACK_Tmax"]==1 || $alarmState["ACK_Tmax"]==1 ){
             $td_description= "Tmax";
-        } else if (!is_null($alarmState["TIME_NACK_Vmax"])){
+        } else if ( $alarmState["NACK_Vmax"]==1 || $alarmState["ACK_Vmax"]==1  ){
             $td_description = "Vmax";
         }
 
@@ -212,11 +210,22 @@ function vInd_drawSiloPlan($dbh){
 function vInd_getSiloCurrStatus($dbh){
 
     $outArr = array();    
-    
-    $sql = "SELECT  sensor_id, s.silo_id,
-                    NACK_Tmax, ACK_Tmax, NACK_Vmax, ACK_Vmax, NACK_err, ACK_err,
-                    error_id, pbs.is_square
-            FROM sensors AS s inner join prodtypesbysilo AS pbs ON s.silo_id=pbs.silo_id;";
+        
+    $sql = "SELECT	s.silo_id, pbs.silo_name, pbs.is_square,
+                COUNT(sensor_id) as num_of_sesors,
+                SUM(IF(s.is_enabled = 1, 1, 0)) AS num_of_enabled_sensors,
+                SUM(IF(s.is_enabled = 1 AND s.error_id = 253, 1, 0)) AS num_of_err_253,
+                SUM(IF(s.is_enabled = 1 AND s.error_id = 254, 1, 0)) AS num_of_err_254,
+                SUM(IF(s.NACK_err =  1, 1, 0)) AS num_of_NACK_err,
+                SUM(IF(s.NACK_Tmax = 1, 1, 0)) AS num_of_NACK_Tmax,
+                SUM(IF(s.NACK_Vmax = 1, 1, 0)) AS num_of_NACK_Vmax,
+                SUM(IF(s.ACK_err =  1, 1, 0))  AS num_of_ACK_err,
+                SUM(IF(s.ACK_Tmax = 1, 1, 0))  AS num_of_ACK_Tmax,
+                SUM(IF(s.ACK_Vmax = 1, 1, 0))  AS num_of_ACK_Vmax
+            FROM sensors AS s
+            INNER JOIN prodtypesbysilo AS pbs ON s.silo_id = pbs.silo_id
+            GROUP BY silo_id
+            ORDER BY silo_id;";
 
     $sth = $dbh->query($sql);
 
@@ -225,53 +234,38 @@ function vInd_getSiloCurrStatus($dbh){
     }
     $rows = $sth->fetchAll();
 
-    $curr_silo_id=""; $curr_silo_status=""; $curr_silo_type="";
-
     foreach($rows as $row){
 
-        if($curr_silo_id!=$row['silo_id']){
-            $curr_silo_id = $row['silo_id'];
-            if($curr_silo_status!=""){
-                array_push($outArr, array($curr_silo_type, $curr_silo_status) );
-            }
-            $curr_silo_status=5;
-        }
+        $curr_silo_type = $row['is_square'];
 
-        $curr_silo_type = $row['is_square'];                                                                        //  0: round, 1: square
+        if( $row["num_of_err_253"] === $row["num_of_enabled_sensors"] ||
+            $row["num_of_err_254"] === $row["num_of_enabled_sensors"] ){
 
+            array_push($outArr, array($curr_silo_type, 1) );
 
-        if( in_array($row['error_id'],array(255,256))){
-            $curr_silo_status = 0;                                                                                  //  OFF
-            continue;
-        }
+        } else if ( $row["num_of_NACK_err"]  > 0  ||
+                    $row["num_of_NACK_Tmax"] > 0 ||
+                    $row["num_of_NACK_Vmax"] > 0 ){
 
-        if( in_array($row['error_id'],array(253,254))){
-            $curr_silo_status = 1;                                                                                  //  CRC
-            continue;
-        }
+            array_push($outArr, array($curr_silo_type, 2) );
 
-        if( $row['NACK_Tmax']==1 or $row['NACK_Vmax']==1 or $row['NACK_err']==1){
-            $curr_silo_status = 2;                                                                                  //  NACK
-            continue;
-        }
+        } else if ( $row["num_of_ACK_err"]  > 0  ||
+                    $row["num_of_ACK_Tmax"] > 0 ||
+                    $row["num_of_ACK_Vmax"] > 0 ){
 
-        if( $curr_silo_status!=3 and
-            ($row['ACK_Tmax']==1 or $row['ACK_Vmax']==1 or $row['ACK_err']==1)){
-            $curr_silo_status = 3;                                                                                  //  ACK
-            continue;
-        }
+            array_push($outArr, array($curr_silo_type, 3) );
 
-        if( !in_array($curr_silo_status,array(0,1,2,3)) and
-            ($row['NACK_Tmax']==0 and $row['NACK_Vmax']==0 and $row['NACK_err']==0 and
-             $row['ACK_Tmax']==0 and $row['ACK_Vmax']==0 and $row['ACK_err']==0)){
-            $curr_silo_status = 4;                                                                                  //  OK
-            continue;
+        } else if ( $row["num_of_enabled_sensors"]==0 ){
+
+            array_push($outArr, array($curr_silo_type, 0) );
+
+        } else {
+
+            array_push($outArr, array($curr_silo_type, 4) );
+
         }
 
     }
-
-    //array_push($outArr, $curr_silo_type.$curr_silo_status);
-    array_push($outArr, array($curr_silo_type, $curr_silo_status) );
 
     return $outArr;
 }

@@ -2,7 +2,7 @@
 
 //	Запись строки в журнал
 function writeToLog($logFile, $loggingString){
-    // Write the contents to the file, 
+    // Write the contents to the file,
     // using the FILE_APPEND flag to append the content to the end of the file
     // and the LOCK_EX flag to prevent anyone else writing to the file at the same time
     @file_put_contents($logFile, $loggingString, FILE_APPEND | LOCK_EX);
@@ -83,21 +83,22 @@ function db_update_curr_alarm_state($dbh){
 
     //  Определяем проблемы, связанные с работой БС
     $sql = "SELECT	s.silo_id, pbs.silo_name,
-					COUNT(s.sensor_id) AS count_sensor_id,
-					SUM(IF(s.error_id = 253, 1, 0)) AS silo_sum_err_253,
-					SUM(IF(s.error_id = 254, 1, 0)) AS silo_sum_err_254,
-					SUM(IF(s.error_id = 256, 1, 0)) AS silo_sum_err_256,
+					SUM(IF(s.is_enabled = 1, 1, 0)) AS count_sensor_id,
+					SUM(IF(s.is_enabled = 1 AND s.error_id = 253, 1, 0)) AS silo_sum_err_253,
+					SUM(IF(s.is_enabled = 1 AND s.error_id = 254, 1, 0)) AS silo_sum_err_254,
+					SUM(IF(s.is_enabled = 1 AND s.error_id = 256, 1, 0)) AS silo_sum_err_256,
 					s.NACK_err, DATE_FORMAT(s.TIME_NACK_err,'%d.%m.%Y %H:%i:%s') AS f_TIME_NACK_err,
-					s.ACK_err,  DATE_FORMAT(s.TIME_ACK_err,'%d.%m.%Y %H:%i:%s')  AS f_TIME_ACK_err,
-					s.RST_err,  DATE_FORMAT(s.TIME_RST_err,'%d.%m.%Y %H:%i:%s')  AS f_TIME_RST_err,
+					s.ACK_err,  DATE_FORMAT(s.TIME_ACK_err, '%d.%m.%Y %H:%i:%s') AS f_TIME_ACK_err,
+					s.RST_err,  DATE_FORMAT(s.TIME_RST_err, '%d.%m.%Y %H:%i:%s') AS f_TIME_RST_err,
 					s.error_id, e.error_description, e.error_desc_for_visu
             FROM sensors AS s
             INNER JOIN prodtypesbysilo AS pbs ON s.silo_id = pbs.silo_id 
             LEFT JOIN errors AS e ON s.error_id = e.error_id
             GROUP BY silo_id
-            HAVING (count_sensor_id=silo_sum_err_253 OR
-                    count_sensor_id=silo_sum_err_254 OR
-                    count_sensor_id=silo_sum_err_256);";
+            HAVING ( count_sensor_id>0 AND
+				    (count_sensor_id=silo_sum_err_253 OR
+                     count_sensor_id=silo_sum_err_254 OR
+                     count_sensor_id=silo_sum_err_256) );";
 
     $sth = $dbh->query($sql);
     
@@ -109,7 +110,9 @@ function db_update_curr_alarm_state($dbh){
 	$defected_silo = array();
     foreach($defected_silo_rows as $defected_silo_row){
 
-		$outArr[] = array(  'silo_id'				=>	$defected_silo_row["silo_id"],
+		$outArr[] = array(	'time_of_alarm'			=>  $defected_silo_row["f_TIME_NACK_err"],
+
+							'silo_id'				=>	$defected_silo_row["silo_id"],
 							'silo_name'				=>	$defected_silo_row["silo_name"],
 							'podv_id'				=>	"",
 							'sensor_num'			=>	"",
@@ -146,9 +149,9 @@ function db_update_curr_alarm_state($dbh){
 
     //  Определяем проблемы, связанные с работой ТП
     $sql = "SELECT	s.silo_id, pbs.silo_name, s.podv_id,
-					COUNT(sensor_id) AS count_sensor_id,
-					SUM(IF(s.error_id = 251, 1, 0)) AS silo_sum_err_251,
-					SUM(IF(s.error_id = 252, 1, 0)) AS silo_sum_err_252,
+					SUM(IF(s.is_enabled = 1, 1, 0)) AS count_sensor_id,
+					SUM(IF(s.is_enabled = 1 AND s.error_id = 251, 1, 0)) AS silo_sum_err_251,
+					SUM(IF(s.is_enabled = 1 AND s.error_id = 252, 1, 0)) AS silo_sum_err_252,
 					s.NACK_err, DATE_FORMAT(s.TIME_NACK_err,'%d.%m.%Y %H:%i:%s') AS f_TIME_NACK_err,
 					s.ACK_err,  DATE_FORMAT(s.TIME_ACK_err,'%d.%m.%Y %H:%i:%s')  AS f_TIME_ACK_err,
 					s.RST_err,  DATE_FORMAT(s.TIME_RST_err,'%d.%m.%Y %H:%i:%s')  AS f_TIME_RST_err,
@@ -157,8 +160,9 @@ function db_update_curr_alarm_state($dbh){
             INNER JOIN prodtypesbysilo AS pbs ON s.silo_id=pbs.silo_id
             LEFT JOIN errors AS e ON s.error_id = e.error_id
             GROUP BY silo_id, podv_id
-            HAVING (count_sensor_id=silo_sum_err_251 OR
-                    count_sensor_id=silo_sum_err_252);";
+            HAVING ( count_sensor_id>0 and
+            		(count_sensor_id=silo_sum_err_251 OR
+                     count_sensor_id=silo_sum_err_252) );";
 
     $sth = $dbh->query($sql);
     
@@ -170,7 +174,9 @@ function db_update_curr_alarm_state($dbh){
 	$defected_podv = array();
     foreach($defected_podv_rows as $defected_podv_row){
 
-		$outArr[] = array(  'silo_id'				=>	$defected_podv_row["silo_id"],
+		$outArr[] = array(	'time_of_alarm'			=>  $defected_silo_row["f_TIME_NACK_err"],
+			
+							'silo_id'				=>	$defected_podv_row["silo_id"],
 							'silo_name'				=>	$defected_podv_row["silo_name"],
 							'podv_id'				=>	$defected_podv_row["podv_id"]+1,
 							'sensor_num'			=>	"",
@@ -219,7 +225,9 @@ function db_update_curr_alarm_state($dbh){
 			FROM sensors AS s
 				LEFT JOIN errors AS e ON s.error_id=e.error_id
 				INNER JOIN prodtypesbysilo AS pbs ON s.silo_id=pbs.silo_id
-			WHERE s.NACK_Tmax=1 OR s.ACK_Tmax=1 OR s.RST_Tmax=1 OR s.NACK_Vmax=1 OR s.ACK_Vmax=1 OR s.RST_Vmax=1 OR s.NACK_err=1 OR s.ACK_err=1 OR s.RST_err=1;";
+			WHERE	s.NACK_Tmax=1 OR s.ACK_Tmax=1 OR s.RST_Tmax=1 OR
+					s.NACK_Vmax=1 OR s.ACK_Vmax=1 OR s.RST_Vmax=1 OR
+					s.NACK_err=1  OR s.ACK_err=1  OR s.RST_err=1;";
     $sth = $dbh->query($sql);
     
     if($sth==false){
@@ -237,7 +245,27 @@ function db_update_curr_alarm_state($dbh){
             continue;
         }
 
-		$outArr[] = array(  'silo_id'				=>	$sensor_alarm_row["silo_id"],
+		$time_of_alarm_arr = array();
+
+		if( 		!is_null($sensor_alarm_row["f_TIME_NACK_err"])	){
+			array_push($time_of_alarm_arr, $sensor_alarm_row["f_TIME_NACK_err"]);
+		}
+		
+		if (	!is_null($sensor_alarm_row["f_TIME_NACK_Tmax"])	){
+			array_push($time_of_alarm_arr, $sensor_alarm_row["f_TIME_NACK_Tmax"]);
+		}
+
+		if (	!is_null($sensor_alarm_row["f_TIME_NACK_Vmax"])	){
+			array_push($time_of_alarm_arr, $sensor_alarm_row["f_TIME_NACK_Vmax"]);
+		}
+
+		sort($time_of_alarm_arr);
+
+		$time_of_alarm = $time_of_alarm_arr[0];
+
+		$outArr[] = array(	'time_of_alarm'			=>  $time_of_alarm,
+
+							'silo_id'				=>	$sensor_alarm_row["silo_id"],
 							'silo_name'				=>	$sensor_alarm_row["silo_name"],
 							'podv_id'				=>	$sensor_alarm_row["podv_id"]+1,
 							'sensor_num'			=>	$sensor_alarm_row["sensor_num"]+1,
@@ -271,11 +299,9 @@ function db_update_curr_alarm_state($dbh){
     }
 
     //  Сортируем выходной ассоциативный массив по времени появления сигнала АПС
-	$c_TIME_NACK_err = array_column($outArr, "TIME_NACK_err");
-	$c_TIME_NACK_Tmax = array_column($outArr, "TIME_NACK_Tmax");
-	$c_TIME_NACK_Vmax = array_column($outArr, "TIME_NACK_Vmax");
+	$c_time_of_alarm = array_column($outArr, "time_of_alarm");
 
-    array_multisort($c_TIME_NACK_err, SORT_ASC, $c_TIME_NACK_Tmax, SORT_ASC, $c_TIME_NACK_Vmax, SORT_ASC, $outArr);
+    array_multisort($c_time_of_alarm, SORT_DESC, $outArr);
 
 	return $outArr;
 
@@ -441,6 +467,8 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 
 	$error_codes_arr = db_get_error_codes($dbh);
 
+	//print_r($error_codes_arr);
+
 	$query = "	SELECT  s.sensor_id, s.silo_id, s.podv_id, s.sensor_num, s.is_enabled, s.current_temperature, s.current_speed,
 						s.curr_t_text, s.curr_v_text, s.curr_t_colour, s.curr_v_colour, s.server_date,
 						s.NACK_Tmax, s.TIME_NACK_Tmax, s.ACK_Tmax, s.TIME_ACK_Tmax, s.RST_Tmax, s.TIME_RST_Tmax,
@@ -484,7 +512,13 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 						$query_TIME_NACK_err = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
 						$query_RST_err = "0, ";
 						$query_TIME_RST_err = "NULL, ";
-						$query_error_id = "'".($arrayOfTemperatures[$i][$j][$k]*0.1)."'),";
+
+						if( isset( $error_codes_arr[$arrayOfTemperatures[$i][$j][$k]*0.1]["error_id"] ) ){
+							$query_error_id = "'".($arrayOfTemperatures[$i][$j][$k]*0.1)."'),";
+						} else {
+							$query_error_id = "NULL),";
+						}
+						
 				} else {
 						$query_NACK_err = "'".$rows[$sensor_id]['NACK_err']."', ";
 						$query_TIME_NACK_err = is_null($rows[$sensor_id]['TIME_NACK_err']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_NACK_err']."', ";
@@ -776,15 +810,13 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 //	Квитирование алармов
 function alarms_ack($dbh, $serverDate, $logFile){
 
-	$query = "	UPDATE ".DBNAME.".sensors
+	$query =   "UPDATE ".DBNAME.".sensors
 					SET NACK_err=0, ACK_err=1, TIME_ACK_err=STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s')
-					WHERE NACK_err=1;
-
-				UPDATE ".DBNAME.".sensors
+					WHERE NACK_err=1;"
+			  ."UPDATE ".DBNAME.".sensors
 					SET NACK_Tmax=0, ACK_Tmax=1, TIME_ACK_Tmax=STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s')
-					WHERE NACK_Tmax=1;
-
-				UPDATE ".DBNAME.".sensors
+					WHERE NACK_Tmax=1;"
+			  ."UPDATE ".DBNAME.".sensors
 					SET NACK_Vmax=0, ACK_Vmax=1, TIME_ACK_Vmax=STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s')
 					WHERE NACK_Vmax=1;";
 
