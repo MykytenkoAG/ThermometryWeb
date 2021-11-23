@@ -7,167 +7,51 @@ require_once (substr(__DIR__,0,-4).'/ts/currValsFromTS.php');
 //  OUT = html table < NACK, time, silo_name, podv_num, sensor_num, reason >
 function vInd_getCurrAlarms($dbh){
 
-    $outArr = array();
-    $NACK = 0; $timeOfAlarm=""; $silo_name=""; $podv_num=0; $sensor_num=0; $reason="";
-
-    //  Определяем проблемы, связанные с работой БС
-    $defected_silo = array();
-
-    $sql = "SELECT	s.silo_id, pbs.silo_name,
-                COUNT(s.sensor_id) AS count_sensor_id,
-                SUM(IF(s.error_id = 253, 1, 0)) AS silo_sum_err_253,
-                SUM(IF(s.error_id = 254, 1, 0)) AS silo_sum_err_254,
-                SUM(IF(s.error_id = 256, 1, 0)) AS silo_sum_err_256,
-		        s.NACK_err, s.TIME_NACK_err,
-                e.error_description, e.error_desc_for_visu
-            FROM sensors AS s
-            INNER JOIN prodtypesbysilo AS pbs ON s.silo_id = pbs.silo_id 
-            LEFT JOIN errors AS e ON s.error_id = e.error_id
-            GROUP BY silo_id
-            HAVING (count_sensor_id=silo_sum_err_253 OR
-                    count_sensor_id=silo_sum_err_254 OR
-                    count_sensor_id=silo_sum_err_256);";
-
-    $sth = $dbh->query($sql);
-    
-    if($sth==false){
-        return false;
-    }
-    $defected_silo_rows = $sth->fetchAll();
-
-    foreach($defected_silo_rows as $defected_silo_row){
-
-        $outArr[] = array(  'NACK'          => $defected_silo_row["NACK_err"],
-                            'timeOfAlarm'   => $defected_silo_row["TIME_NACK_err"],
-                            'silo_name'     => $defected_silo_row["silo_name"],
-                            'podv_num'      => "",
-                            'sensor_num'    => "",
-                            'reason'        => $defected_silo_row["error_desc_for_visu"]);
-
-        array_push($defected_silo, $defected_silo_row["silo_name"]);
-        
-    }
-
-    //  Определяем проблемы, связанные с работой ТП
-    $defected_podv = array();
-
-    $sql = "SELECT	s.silo_id, pbs.silo_name, s.podv_id,
-                COUNT(sensor_id) AS count_sensor_id,
-                SUM(IF(s.error_id = 251, 1, 0)) AS silo_sum_err_251,
-                SUM(IF(s.error_id = 252, 1, 0)) AS silo_sum_err_252,
-		        s.NACK_err, s.TIME_NACK_err,
-                e.error_description, e.error_desc_for_visu
-            FROM sensors AS s
-            INNER JOIN prodtypesbysilo AS pbs ON s.silo_id=pbs.silo_id
-            LEFT JOIN errors AS e ON s.error_id = e.error_id
-            GROUP BY silo_id, podv_id
-            HAVING (count_sensor_id=silo_sum_err_251 OR
-                    count_sensor_id=silo_sum_err_252);";
-
-    $sth = $dbh->query($sql);
-    
-    if($sth==false){
-        return false;
-    }
-    $defected_podv_rows = $sth->fetchAll();
-
-    foreach($defected_podv_rows as $defected_podv_row){
-
-        $outArr[] = array(  'NACK'          => $defected_podv_row["NACK_err"],
-                            'timeOfAlarm'   => $defected_podv_row["TIME_NACK_err"],
-                            'silo_name'     => $defected_podv_row["silo_name"],
-                            'podv_num'      => ($defected_podv_row["podv_id"]+1),
-                            'sensor_num'    => "",
-                            'reason'        => $defected_podv_row["error_desc_for_visu"]);
-
-        array_push($defected_podv, strval($defected_podv_row["silo_name"]).",".strval($defected_podv_row["podv_id"]));
-    }
-
-    //  Определяем алармы датчиков
-    $sql = "SELECT  s.sensor_id, s.silo_id, pbs.silo_name, s.podv_id, s.sensor_num,
-                    s.NACK_Tmax, s.TIME_NACK_Tmax, s.ACK_Tmax, s.TIME_ACK_Tmax,
-                    s.NACK_Vmax, s.TIME_NACK_Vmax, s.ACK_Vmax, s.TIME_ACK_Vmax,
-                    s.NACK_err, s.TIME_NACK_err, s.ACK_err, s.TIME_ACK_err,
-                    s.error_id, e.error_description, e.error_desc_for_visu
-                    FROM sensors AS s LEFT JOIN errors AS e ON s.error_id=e.error_id INNER JOIN prodtypesbysilo AS pbs ON s.silo_id=pbs.silo_id
-                    WHERE s.NACK_Tmax=1 OR s.ACK_Tmax=1 OR s.NACK_Vmax=1 OR s.ACK_Vmax=1 OR s.NACK_err=1 OR s.ACK_err=1;";
-    $sth = $dbh->query($sql);
-    
-    if($sth==false){
-        return false;
-    }
-    $sensor_alarm_rows = $sth->fetchAll();
-
-    foreach($sensor_alarm_rows as $sensor_alarm_row){
-
-        if( in_array($sensor_alarm_row["silo_name"], $defected_silo) ){
-            continue;
-        }
-
-        if( in_array($sensor_alarm_row["silo_name"].",".$sensor_alarm_row["podv_id"], $defected_podv) ){
-            continue;
-        }
-
-        if($sensor_alarm_row['NACK_Tmax']==1 or $sensor_alarm_row['NACK_Vmax']==1 or $sensor_alarm_row['NACK_err']==1){
-            $NACK = 1;
-        } else {
-            $NACK = 0;
-        }
-
-        if($sensor_alarm_row['TIME_NACK_Tmax']!=null){
-            $timeOfAlarm = $sensor_alarm_row['TIME_NACK_Tmax'];
-            $reason = "T крит.";
-        } else  if ($sensor_alarm_row['TIME_NACK_Vmax']!=null){
-            $timeOfAlarm = $sensor_alarm_row['TIME_NACK_Vmax'];
-            $reason = "V крит.";
-        } else  if ($sensor_alarm_row['TIME_NACK_err']!=null){
-            $timeOfAlarm = $sensor_alarm_row['TIME_NACK_err'];
-            $reason = $sensor_alarm_row['error_desc_for_visu'];
-        }
-
-        $silo_name = $sensor_alarm_row['silo_name'];
-        $podv_num = $sensor_alarm_row['podv_id'] + 1;
-        $sensor_num = $sensor_alarm_row['sensor_num'] + 1;
-
-        $outArr[] = array(  'NACK'          => $NACK,
-                            'timeOfAlarm'   => $timeOfAlarm,
-                            'silo_name'     => $silo_name,
-                            'podv_num'      => $podv_num,
-                            'sensor_num'    => $sensor_num,
-                            'reason'        => $reason);
-
-    }
-
-    //  Сортируем выходной ассоциативный массив по времени появления сигнала АПС
-    $c_NACK  = array_column($outArr, 'NACK');
-    $c_timeOfAlarm  = array_column($outArr, 'timeOfAlarm');
-    $c_silo_name  = array_column($outArr, 'silo_name');
-    $c_podv_num  = array_column($outArr, 'podv_num');
-    $c_sensor_num  = array_column($outArr, 'sensor_num');
-    $c_reason  = array_column($outArr, 'reason');
-
-    array_multisort($c_timeOfAlarm, SORT_ASC, $c_silo_name, SORT_ASC, $c_podv_num, SORT_ASC, $c_sensor_num, SORT_ASC, $c_NACK, SORT_ASC, $outArr);
+    $alarmStateArray = db_update_curr_alarm_state($dbh);
 
     //  Формируем выходную таблицу
     $outStr = "<table class=\"table table-striped\">";
     //$outStr .= "<tr><th>Время</th><th>Силос</th><th>ТП</th><th>Датчик</th><th>Тип АПС</th></tr>";
 
-    foreach($outArr as $val){
+    foreach($alarmStateArray as $alarmState){
+
+        $td_time = "";
+
+        if(!is_null($alarmState["TIME_NACK_err"])){
+            $td_time = $alarmState["TIME_NACK_err"];
+        } else if (!is_null($alarmState["TIME_NACK_Tmax"])){
+            $td_time = $alarmState["TIME_NACK_Tmax"];
+        } else if (!is_null($alarmState["TIME_NACK_Vmax"])){
+            $td_time = $alarmState["TIME_NACK_Vmax"];
+        }
+        
+        $td_silo_name=$alarmState["silo_name"];
+        $td_podv_id=$alarmState["podv_id"];
+        $td_sensor_num=$alarmState["sensor_num"];
+
+        $td_description = "";
+
+        if(!is_null($alarmState["error_desc_for_visu"])){
+            $td_description = $alarmState["error_desc_for_visu"];
+        } else if (!is_null($alarmState["TIME_NACK_Tmax"])){
+            $td_description= "Tmax";
+        } else if (!is_null($alarmState["TIME_NACK_Vmax"])){
+            $td_description = "Vmax";
+        }
+
         $outStr .= "<tr ";
 
-        if($val['NACK']){
+        if( $alarmState['NACK_err']==1 || $alarmState['NACK_Tmax']==1 || $alarmState['NACK_Vmax']==1 ){
             $outStr .= "style=\"font-weight: bold;\"";
         }
 
-        $outStr .= "><td style=\"width: 140px; margin:0px; padding: 0px;\">";
+        $outStr .= "><td style=\"width: 140px; margin:0px; padding: 0px;\">".$td_time
+                ."</td><td style=\"width: 60px; margin:0px; padding: 0px; text-align:center\">".$td_silo_name
+                ."</td><td style=\"width: 30px; margin:0px; padding: 0px;\">".$td_podv_id
+                ."</td><td style=\"width: 40px; margin:0px; padding: 0px;\">".$td_sensor_num
+                ."</td><td style=\"width: 140px; margin:0px; padding: 0px;\">".$td_description;
 
-        $outStr .= (new \DateTime($val['timeOfAlarm']))->format("d.m.Y H:i")
-                ."</td><td style=\"width: 60px; margin:0px; padding: 0px; text-align:center\">".$val['silo_name']
-                ."</td><td style=\"width: 30px; margin:0px; padding: 0px;\">".$val['podv_num']
-                ."</td><td style=\"width: 40px; margin:0px; padding: 0px;\">".$val['sensor_num']
-                ."</td><td style=\"width: 140px; margin:0px; padding: 0px;\">".$val['reason'];
-
-                $outStr .= "</td></tr>";
+        $outStr .= "</td></tr>";
     }
 
     $outStr .= "</tr></table>";
