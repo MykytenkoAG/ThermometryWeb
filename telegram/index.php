@@ -37,46 +37,46 @@ function recognizeCmd($dbh, $newMessage){
     $sender_id = $newMessage->message->from->id;
     $messageToSend = array("Неопознанная команда");
 
-    if( preg_match('/\/?i\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})?\s*\.?\s*\.?\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})?\s*/ui',$command,$matches) ||
-        preg_match('/\/?и\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})?\s*\.?\s*\.?\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})?\s*/ui',$command,$matches) ){
+    if( preg_match('/^\/?i\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})?\s*\.?\s*\.?\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})?\s*/ui',$command,$matches) ||
+        preg_match('/^\/?и\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})?\s*\.?\s*\.?\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})?\s*/ui',$command,$matches) ){
 
         $messageToSend = cmdGetSiloInfo($dbh, $matches[1], $matches[2]);
 
-    } else if ( preg_match('/\/?a\s*/ui',$command,$matches) ||
-                preg_match('/\/?а\s*/ui',$command,$matches)){
+    } else if ( preg_match('/^\/?a\s*/ui',$command,$matches) ||
+                preg_match('/^\/?а\s*/ui',$command,$matches)){
 
         $messageToSend = cmdGetAlarms($dbh);
 
-    } else if ( preg_match('/\/?l\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})?\s*/ui',$command,$matches) ||
-                preg_match('/\/?у\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})?\s*/ui',$command,$matches)){
+    } else if ( preg_match('/^\/?l\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})?\s*/ui',$command,$matches) ||
+                preg_match('/^\/?у\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})?\s*/ui',$command,$matches)){
 
         $messageToSend = cmdGetGrainLevels($dbh, $matches[1]);
         
-    } else if ( preg_match('/\/?t\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/ui',$command,$matches) ||
-                preg_match('/\/?т\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/ui',$command,$matches) ) {
+    } else if ( preg_match('/^\/?t\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/ui',$command,$matches) ||
+                preg_match('/^\/?т\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/ui',$command,$matches) ) {
 
         $messageToSend = cmdGetTemperatures($dbh, $matches[1], $matches[2], $matches[3]);
 
-    } else if ( preg_match('/\/?v\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/ui',$command,$matches) ||
-                preg_match('/\/?с\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/ui',$command,$matches) ) {
+    } else if ( preg_match('/^\/?v\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/ui',$command,$matches) ||
+                preg_match('/^\/?с\s*([A-Za-z0-9\x{0400}-\x{04FF}]{0,5})\s*\.?\s*(\d{0,2})?\s*\.?\s*(\d{0,2})?\s*/ui',$command,$matches) ) {
 
         $messageToSend = cmdGetTemperatureSpeeds($dbh, $matches[1], $matches[2], $matches[3]);
 
-    } else if(  preg_match('/\/?conf\s*/ui',$command,$matches) ||
-                preg_match('/\/?конф\s*/ui',$command,$matches) ){
+    } else if(  preg_match('/^\/?conf\s*/ui',$command,$matches) ||
+                preg_match('/^\/?конф\s*/ui',$command,$matches) ){
 
         $messageToSend = cmdGetConfiguration($dbh);
 
-    }else if (  preg_match('/\/?notificationson\s*/ui',$command,$matches) ||
-                preg_match('/\/?увед\s*вкл\s*/ui',$command,$matches) ){
+    }else if (  preg_match('/^\/?notificationson\s*/ui',$command,$matches) ||
+                preg_match('/^\/?увед\s*вкл\s*/ui',$command,$matches) ){
 
         $query="REPLACE INTO telegram_users (user_id, notifications_on) VALUES ('$sender_id', '1');";
         $stmt = $dbh->prepare($query);
         $stmt->execute();
         $messageToSend = array("Уведомления о возникновении АПС включены.");
     
-    }else if (  preg_match('/\/?notificationsoff\s*/ui',$command,$matches) ||
-                preg_match('/\/?увед\s*выкл\s*/ui',$command,$matches) ){
+    }else if (  preg_match('/^\/?notificationsoff\s*/ui',$command,$matches) ||
+                preg_match('/^\/?увед\s*выкл\s*/ui',$command,$matches) ){
 
         $query="REPLACE INTO telegram_users (user_id, notifications_on) VALUES ('$sender_id', '0');";
         $stmt = $dbh->prepare($query);
