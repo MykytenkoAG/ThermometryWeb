@@ -1,5 +1,10 @@
 <?php
 
+//	Очистка журнала
+function logClear($logFile){
+    file_put_contents($logFile, "");
+    return;
+}
 //	Запись строки в журнал
 function writeToLog($logFile, $loggingString){
     // Write the contents to the file,
@@ -8,10 +13,34 @@ function writeToLog($logFile, $loggingString){
     @file_put_contents($logFile, $loggingString, FILE_APPEND | LOCK_EX);
     return;
 }
-//	Очистка журнала
-function logClear($logFile){
-    file_put_contents($logFile, "");
-    return;
+//	Функция определения того, есть ли неквитированные алармы
+function alarms_get_nack_number($dbh){
+	$sql = "SELECT count(sensor_id) FROM ".DBNAME.".sensors WHERE (NACK_err=1 OR NACK_Tmax=1 OR NACK_Vmax=1)";
+	$sth = $dbh->query($sql);
+	if($sth!=false){
+		return $sth->fetchAll()[0]['count(sensor_id)'];
+	}
+}
+//	Квитирование алармов
+function alarms_ack($dbh, $serverDate, $logFile){
+
+	$query =   "UPDATE ".DBNAME.".sensors
+					SET NACK_err=0, ACK_err=1, TIME_ACK_err=STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s')
+					WHERE NACK_err=1;"
+			  ."UPDATE ".DBNAME.".sensors
+					SET NACK_Tmax=0, ACK_Tmax=1, TIME_ACK_Tmax=STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s')
+					WHERE NACK_Tmax=1;"
+			  ."UPDATE ".DBNAME.".sensors
+					SET NACK_Vmax=0, ACK_Vmax=1, TIME_ACK_Vmax=STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s')
+					WHERE NACK_Vmax=1;";
+
+	$stmt = $dbh->prepare($query);
+	$stmt->execute();
+
+	log_events($dbh, $logFile, $serverDate, db_update_curr_alarm_state($dbh));
+
+	return $query;
+
 }
 //	Функция для записи значений из массива $arrayOfLevels в Базу Данных
 function db_update_grainLevels($dbh, $arrayOfLevels){
@@ -75,6 +104,30 @@ function db_update_grainLevels($dbh, $arrayOfLevels){
 	$stmt->execute();
 	
 	return;
+}
+//	Функция получения массива кодов ошибок
+function db_get_error_codes($dbh){
+
+	$query = "SELECT error_id, error_description, error_desc_short, error_desc_for_visu
+				FROM errors
+				ORDER BY error_id;";
+
+	$sth = $dbh->query($query);
+	$error_codes = $sth->fetchAll();
+	//	Создание двумерного ассоциативного массива из БД для удобства и скорости доступа к таблице "errors"
+	$error_codes_arr = array();
+	$j=0;
+	for($i=0; $i<$error_codes[count($error_codes)-1]['error_id'];$i++){
+		if($i==$error_codes[$j]['error_id']){
+			array_push($error_codes_arr, $error_codes[$j]);
+			$j++;
+		} else {
+			array_push($error_codes_arr, array());
+		}
+	}
+
+	return $error_codes_arr;
+
 }
 //	Функция для обновления значений ассоциативного массива с текущими сигналами АПС
 function db_update_curr_alarm_state($dbh){
@@ -250,18 +303,17 @@ function db_update_curr_alarm_state($dbh){
 		if( 		!is_null($sensor_alarm_row["f_TIME_NACK_err"])	){
 			array_push($time_of_alarm_arr, $sensor_alarm_row["f_TIME_NACK_err"]);
 		}
-		
 		if (	!is_null($sensor_alarm_row["f_TIME_NACK_Tmax"])	){
 			array_push($time_of_alarm_arr, $sensor_alarm_row["f_TIME_NACK_Tmax"]);
 		}
-
 		if (	!is_null($sensor_alarm_row["f_TIME_NACK_Vmax"])	){
 			array_push($time_of_alarm_arr, $sensor_alarm_row["f_TIME_NACK_Vmax"]);
 		}
 
 		sort($time_of_alarm_arr);
-
-		$time_of_alarm = $time_of_alarm_arr[0];
+		if(isset($time_of_alarm_arr[0])){
+			$time_of_alarm = $time_of_alarm_arr[0];
+		}
 
 		$outArr[] = array(	'time_of_alarm'			=>  $time_of_alarm,
 
@@ -368,7 +420,7 @@ function send_Telegram_notifications($dbh, $alarmStateArray, $serverDate){
 
 	return;
 }
-//	
+//	Логирование событий
 function log_events($dbh, $logFile, $serverDate, $alarmStateArray){
 
 	$loggingString="";
@@ -437,38 +489,11 @@ function log_events($dbh, $logFile, $serverDate, $alarmStateArray){
 
 	return;
 }
-
-//	Функция получения массива кодов ошибок
-function db_get_error_codes($dbh){
-
-	$query = "SELECT error_id, error_description, error_desc_short, error_desc_for_visu
-				FROM errors
-				ORDER BY error_id;";
-
-	$sth = $dbh->query($query);
-	$error_codes = $sth->fetchAll();
-	//	Создание двумерного ассоциативного массива из БД для удобства и скорости доступа к таблице "errors"
-	$error_codes_arr = array();
-	$j=0;
-	for($i=0; $i<$error_codes[count($error_codes)-1]['error_id'];$i++){
-		if($i==$error_codes[$j]['error_id']){
-			array_push($error_codes_arr, $error_codes[$j]);
-			$j++;
-		} else {
-			array_push($error_codes_arr, array());
-		}
-	}
-
-	return $error_codes_arr;
-
-}
 //	Функция для записи значений из массивов $arrayOfTemperatures и $arrayOfTempSpeeds в Базу Данных от времени $serverDate
 function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate, $logFile){
-
+	//	Получаем коды ошибок для ускорения работы
 	$error_codes_arr = db_get_error_codes($dbh);
-
-	//print_r($error_codes_arr);
-
+	//	Извлекаем текущее состояние из БД
 	$query = "	SELECT  s.sensor_id, s.silo_id, s.podv_id, s.sensor_num, s.is_enabled, s.current_temperature, s.current_speed,
 						s.curr_t_text, s.curr_v_text, s.curr_t_colour, s.curr_v_colour, s.server_date,
 						s.NACK_Tmax, s.TIME_NACK_Tmax, s.ACK_Tmax, s.TIME_ACK_Tmax, s.RST_Tmax, s.TIME_RST_Tmax,
@@ -487,7 +512,7 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 
 	$sth = $dbh->query($query);
 	$rows = $sth->fetchAll();
-
+	//	Формируем запрос на запись
 	$query = "INSERT INTO ".DBNAME.".sensors
 			   (sensor_id, silo_id, podv_id, sensor_num, is_enabled, current_temperature, current_speed,
 				curr_t_text, curr_v_text, curr_t_colour, curr_v_colour, server_date,
@@ -496,23 +521,27 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 				NACK_err, TIME_NACK_err, ACK_err, TIME_ACK_err, RST_err, TIME_RST_err,
 				error_id)
 			  VALUES ";
-
+	
 	$sensor_id = 0;
 	for($i = 0; $i < count($arrayOfTemperatures); $i++){
 		for($j = 0; $j < count($arrayOfTemperatures[$i]); $j++){
 			for($k = 0; $k < count($arrayOfTemperatures[$i][$j]); $k++){
 
+				//	error NACK --------------------------------------------------------------------------------------------------------------------------------
 				$query_RST_err = "'".$rows[$sensor_id]['RST_err']."', ";
 				$query_TIME_RST_err = is_null($rows[$sensor_id]['TIME_RST_err']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_RST_err']."', ";
-
-				//	error NACK
+				
 				if( $rows[$sensor_id]['is_enabled']==1 && is_null($rows[$sensor_id]['error_id']) &&
 					$arrayOfTemperatures[$i][$j][$k]>=850 ){
+
+						//	Фиксируем появление ошибки в Базе Данных
 						$query_NACK_err = "1, ";
 						$query_TIME_NACK_err = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
+						
 						$query_RST_err = "0, ";
 						$query_TIME_RST_err = "NULL, ";
 
+						//	error_id записываем только в случае, если он есть в таблице errors
 						if( isset( $error_codes_arr[$arrayOfTemperatures[$i][$j][$k]*0.1]["error_id"] ) ){
 							$query_error_id = "'".($arrayOfTemperatures[$i][$j][$k]*0.1)."'),";
 						} else {
@@ -528,28 +557,23 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 				//	error reset
 				if( $rows[$sensor_id]['ACK_err']==1 &&
 					($rows[$sensor_id]['is_enabled']==0 || $arrayOfTemperatures[$i][$j][$k]<850) ){
-						$query_NACK_err = "0, ";
-						$query_TIME_NACK_err = "NULL, ";
+
 						$query_ACK_err = "0, ";
 						$query_TIME_ACK_err = "NULL, ";
 						$query_RST_err = "1, ";
 						$query_TIME_RST_err = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
 
-						//$query_error_id = "NULL),";
+						//	error_id сбрасываем в другой функции, после того как все будет зафиксировано в логе
 
 				} else {
 						$query_ACK_err = "'".$rows[$sensor_id]['ACK_err']."', ";
 						$query_TIME_ACK_err = is_null($rows[$sensor_id]['TIME_ACK_err']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_ACK_err']."', ";
-						if($query_NACK_err!="1, "){
-							//$query_error_id = is_null($rows[$sensor_id]['error_id']) ? "NULL)," : "'".$rows[$sensor_id]['error_id']."'),";
-						}
 				}
 
-
+				//	Tmax NACK --------------------------------------------------------------------------------------------------------------------------------
 				$query_RST_Tmax = "'".$rows[$sensor_id]['RST_Tmax']."', ";
 				$query_TIME_RST_Tmax = is_null($rows[$sensor_id]['TIME_RST_Tmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_RST_Tmax']."', ";
 
-				//	Tmax NACK
 				if( is_null($rows[$sensor_id]['error_id']) && $rows[$sensor_id]['is_enabled']==1 &&		//	датчик исправен и включен
 					$rows[$sensor_id]['NACK_Tmax']==0 && $rows[$sensor_id]['ACK_Tmax']==0 &&			//	нет текущего аларма
 					($rows[$sensor_id]['sensor_num'] < $rows[$sensor_id]['grain_level']) &&				//	датчик находится в зерне
@@ -559,7 +583,6 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 						$query_TIME_NACK_Tmax = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
 						$query_RST_Tmax = "0, ";
 						$query_TIME_RST_Tmax = "NULL, ";
-
 				} else {
 						$query_NACK_Tmax = "'".$rows[$sensor_id]['NACK_Tmax']."', ";
 						$query_TIME_NACK_Tmax = is_null($rows[$sensor_id]['TIME_NACK_Tmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_NACK_Tmax']."', ";
@@ -577,17 +600,15 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 						$query_TIME_ACK_Tmax = "NULL, ";
 						$query_RST_Tmax = "1, ";
 						$query_TIME_RST_Tmax = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
-
 				} else {
 						$query_ACK_Tmax = "'".$rows[$sensor_id]['ACK_Tmax']."', ";
 						$query_TIME_ACK_Tmax = is_null($rows[$sensor_id]['TIME_ACK_Tmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_ACK_Tmax']."', ";
 				}
 
-
+				//	Vmax NACK ---------------------------------------------------------------------------------------------------------------------------------
 				$query_RST_Vmax = "'".$rows[$sensor_id]['RST_Vmax']."', ";
 				$query_TIME_RST_Vmax = is_null($rows[$sensor_id]['TIME_RST_Vmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_RST_Vmax']."', ";
-
-				//	Vmax NACK
+				
 				if(  is_null($rows[$sensor_id]['error_id']) && $rows[$sensor_id]['is_enabled']==1 &&	//	датчик исправен и включен
 					 $rows[$sensor_id]['NACK_Vmax']==0 && $rows[$sensor_id]['ACK_Vmax']==0 &&			//	нет текущего аларма
 					($rows[$sensor_id]['sensor_num'] < $rows[$sensor_id]['grain_level']) &&				//	датчик находится в зерне
@@ -597,7 +618,6 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 						$query_TIME_NACK_Vmax = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
 						$query_RST_Vmax = "0, ";
 						$query_TIME_RST_Vmax = "NULL, ";
-
 				} else {
 						$query_NACK_Vmax = "'".$rows[$sensor_id]['NACK_Vmax']."', ";
 						$query_TIME_NACK_Vmax = is_null($rows[$sensor_id]['TIME_NACK_Vmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_NACK_Vmax']."', ";
@@ -615,29 +635,22 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 						$query_TIME_ACK_Vmax = "NULL, ";
 						$query_RST_Vmax = "1, ";
 						$query_TIME_RST_Vmax = "STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s'), ";
-
 				} else {
 						$query_ACK_Vmax = "'".$rows[$sensor_id]['ACK_Vmax']."', ";
 						$query_TIME_ACK_Vmax = is_null($rows[$sensor_id]['TIME_ACK_Vmax']) ? "NULL, " : "'".$rows[$sensor_id]['TIME_ACK_Vmax']."', ";
 				}
 
-				//	Отображение параметров в таблице
+				//	Отображение параметров в таблице -------------------------------------------------------------------------------------------------------------
 
-				//	Текст
-				if($query_error_id!="NULL),"){
-
-					if(isset( $error_codes_arr [ $rows[$sensor_id]['error_id'] ] ['error_desc_short'] ) ) {
-
-						$query_curr_t_text = "'".$error_codes_arr[$rows[$sensor_id]['error_id']]['error_desc_short']."', ";
-						$query_curr_v_text = "'".$error_codes_arr[$rows[$sensor_id]['error_id']]['error_desc_short']."', ";
-
-					} else if (isset($error_codes_arr[$arrayOfTemperatures[$i][$j][$k] * 0.1]['error_desc_short'])) {
-						
+				//	Текст -------------------------------------------------------------------------------------------------------------
+				if( $query_error_id!="NULL)," ){
+					if( isset( $error_codes_arr [ $arrayOfTemperatures[$i][$j][$k] * 0.1 ] ['error_desc_short'] ) ){
 						$query_curr_t_text = "'".$error_codes_arr[ $arrayOfTemperatures[$i][$j][$k] * 0.1 ]['error_desc_short']."', ";
 						$query_curr_v_text = "'".$error_codes_arr[ $arrayOfTemperatures[$i][$j][$k] * 0.1 ]['error_desc_short']."', ";
-
+					} else {
+						$query_curr_t_text = "'".$rows[$sensor_id]['error_desc_short']."', ";
+						$query_curr_v_text = "'".$rows[$sensor_id]['error_desc_short']."', ";
 					}
-
 				} else if ($rows[$sensor_id]['is_enabled']==0) {
 					$query_curr_t_text = "'откл.', ";
 					$query_curr_v_text = "'откл.', ";
@@ -646,25 +659,28 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 					$query_curr_v_text = sprintf('\'%01.1f\'', $arrayOfTempSpeeds[$i][$j][$k]).", ";
 				}
 
-				//	Цвет
-				if($query_error_id!="NULL),"){
+				//	Цвет ----------------------------------------------------------------------------------------------------------------
+				if($query_error_id!="NULL),"){							//	АПС
 					$query_curr_t_colour="'#FF0000', ";
 					$query_curr_v_colour="'#FF0000', ";
-				} else if ($rows[$sensor_id]['is_enabled']==0) {
+				} else if ($rows[$sensor_id]['is_enabled']==0) {		//	Датчик отключен
 					$query_curr_t_colour="'#616161', ";
 					$query_curr_v_colour="'#616161', ";
-				} else if ($k>=$rows[$sensor_id]['grain_level']) {
+				} else if ($k>=$rows[$sensor_id]['grain_level']) {		//	Датчик выше уровня заполнения
 					$query_curr_t_colour="'#E5E5E5', ";
 					$query_curr_v_colour="'#E5E5E5', ";
 				} else {
-					$green = ($rows[$sensor_id]['t_max'] - $arrayOfTemperatures[$i][$j][$k] * 0.1) / ($rows[$sensor_id]['t_max'] - $rows[$sensor_id]['t_min']) * 255;
+
+					$range_t = $rows[$sensor_id]['t_max'] - $rows[$sensor_id]['t_min'];
+
+					$green = ($rows[$sensor_id]['t_max'] - $arrayOfTemperatures[$i][$j][$k] * 0.1) / $range_t * 255;
 					if($green>255){
 						$green=255;
 					} else if ($green < 0) {
 						$green = 0;
 					}
 
-					$red = (1 - ($rows[$sensor_id]['t_max'] - $arrayOfTemperatures[$i][$j][$k] * 0.1) / ($rows[$sensor_id]['t_max'] - $rows[$sensor_id]['t_min'])) * 255;
+					$red = (1 - ($rows[$sensor_id]['t_max'] - $arrayOfTemperatures[$i][$j][$k] * 0.1) / $range_t) * 255;
 					if($red > 255){
 						$red = 255;
 					} else if ($red < 0) {
@@ -673,14 +689,17 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 
 					$query_curr_t_colour=sprintf('\'#%02X%02X00\'',$red, $green).", ";
 
-					$green = ($rows[$sensor_id]['v_max'] - str_replace(",", ".", $arrayOfTempSpeeds[$i][$j][$k])) / ($rows[$sensor_id]['v_max'] - $rows[$sensor_id]['v_min']) * 255;
+
+					$range_v = $rows[$sensor_id]['v_max'] - $rows[$sensor_id]['v_min'];
+
+					$green = ($rows[$sensor_id]['v_max'] - str_replace(",", ".", $arrayOfTempSpeeds[$i][$j][$k])) / $range_v * 255;
 					if($green>255){
 						$green=255;
 					} else if ($green < 0) {
 						$green = 0;
 					}
 
-					$red = (1 - ($rows[$sensor_id]['v_max'] - str_replace(",", ".", $arrayOfTempSpeeds[$i][$j][$k])) / ($rows[$sensor_id]['v_max'] - $rows[$sensor_id]['v_min'])) * 255;
+					$red = (1 - ($rows[$sensor_id]['v_max'] - str_replace(",", ".", $arrayOfTempSpeeds[$i][$j][$k])) / $range_v) * 255;
 					if($red > 255){
 						$red = 255;
 					} else if ($red < 0) {
@@ -688,6 +707,7 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 					}
 
 					$query_curr_v_colour=sprintf('\'#%02X%02X00\'',$red, $green).", ";
+
 				}
 
 				//	sensor_id
@@ -797,44 +817,15 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 	$stmt = $dbh->prepare($query);
 	$stmt->execute();
 
-	file_put_contents(__DIR__.'/debug.txt', "");
-	file_put_contents(__DIR__.'/debug.txt', print_r(db_update_curr_alarm_state($dbh),1), FILE_APPEND);
-
 	$alarmStateArray = db_update_curr_alarm_state($dbh);
 
 	send_Telegram_notifications($dbh, $alarmStateArray,$serverDate);
 	log_events($dbh, $logFile, $serverDate, $alarmStateArray);
 
+	file_put_contents(__DIR__.'/debug.txt', "");
+	file_put_contents(__DIR__.'/debug.txt', print_r($alarmStateArray,1), FILE_APPEND);
+
 	return;
-}
-//	Квитирование алармов
-function alarms_ack($dbh, $serverDate, $logFile){
-
-	$query =   "UPDATE ".DBNAME.".sensors
-					SET NACK_err=0, ACK_err=1, TIME_ACK_err=STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s')
-					WHERE NACK_err=1;"
-			  ."UPDATE ".DBNAME.".sensors
-					SET NACK_Tmax=0, ACK_Tmax=1, TIME_ACK_Tmax=STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s')
-					WHERE NACK_Tmax=1;"
-			  ."UPDATE ".DBNAME.".sensors
-					SET NACK_Vmax=0, ACK_Vmax=1, TIME_ACK_Vmax=STR_TO_DATE('$serverDate','%d.%m.%Y %H:%i:%s')
-					WHERE NACK_Vmax=1;";
-
-	$stmt = $dbh->prepare($query);
-	$stmt->execute();
-
-	log_events($dbh, $logFile, $serverDate, db_update_curr_alarm_state($dbh));
-
-	return $query;
-
-}
-//	Функция определения того, есть ли неквитированные алармы
-function alarms_get_nack_number($dbh){
-	$sql = "SELECT count(sensor_id) FROM ".DBNAME.".sensors WHERE (NACK_err=1 OR NACK_Tmax=1 OR NACK_Vmax=1)";
-	$sth = $dbh->query($sql);
-	if($sth!=false){
-		return $sth->fetchAll()[0]['count(sensor_id)'];
-	}
 }
 
 ?>
