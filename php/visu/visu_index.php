@@ -7,7 +7,7 @@ require_once (substr(__DIR__,0,-4).'/ts/currValsFromTS.php');
 //  OUT = html table < NACK, time, silo_name, podv_num, sensor_num, reason >
 function vInd_getCurrAlarms($dbh){
 
-    $alarmStateArray = db_update_curr_alarm_state($dbh);
+    global $alarmStateArray;
 
     $outStr = "<table class=\"table table-striped\">";
 

@@ -833,14 +833,6 @@ function db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTem
 	$stmt = $dbh->prepare($query);
 	$stmt->execute();
 
-	$alarmStateArray = db_update_curr_alarm_state($dbh);
-
-	send_Telegram_notifications($dbh, $alarmStateArray,$serverDate);
-	log_events($dbh, $logFile, $serverDate, $alarmStateArray);
-
-	file_put_contents(__DIR__.'/debug.txt', "");
-	file_put_contents(__DIR__.'/debug.txt', print_r($query,1), FILE_APPEND);
-
 	return;
 }
 

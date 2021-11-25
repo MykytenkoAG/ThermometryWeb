@@ -11,12 +11,9 @@
 
     set webhook: https://api.telegram.org/bot2123872619:AAENLR1KZVjWBmeOP8vcqHM39KPZOPX9OW4/setWebhook?url=https://nethermometrytest.ddns.net:8443/Thermometry/telegram/
 */
-require_once( substr(__DIR__,0,-8)."/php/ts/currValsFromTS.php" );              //  Получаем всю необходимую информацию
-
+require_once( substr(__DIR__,0,-8)."/php/ts/currValsFromTS.php" );      //  Получаем всю необходимую информацию
 const BASE_URL = "https://api.telegram.org/bot"; const TOKEN = "2123872619:AAENLR1KZVjWBmeOP8vcqHM39KPZOPX9OW4"; ini_set("allow_url_fopen", true);
-
 $newMessage = json_decode(file_get_contents('php://input'));            //  Получаем сообщение от Телеграм Бота
-//file_put_contents(__DIR__.'/debug.txt', print_r($newMessage,1), FILE_APPEND);
 
 if(!is_null($newMessage)>0){                                            //  Если пришло новое сообщение
     recognizeCmd($dbh, $newMessage);                                    //  Распознаем команду и отправляем ответ
@@ -159,9 +156,9 @@ function cmdGetSiloInfo($dbh, $silo_name_1, $silo_name_2){
                     $outStr .=  "%0AНеисправность: ПЗУ;";
                 } else if ( $rows[$i]["num_of_errors"]>0 || $rows[$i]["num_of_Tmax"]>0 || $rows[$i]["num_of_Vmax"]>0 ){
                     $outStr .=  "%0AАПС: ";
-                    $outStr .=  $rows[$i]["num_of_errors"]." неиспр., ";
-                    $outStr .=  $rows[$i]["num_of_Tmax"]." Tmax, ";
-                    $outStr .=  $rows[$i]["num_of_Vmax"]." Vmax;";
+                    $outStr .=  $rows[$i]["num_of_errors"]>0 ? $rows[$i]["num_of_errors"]." неиспр.  " : "";
+                    $outStr .=  $rows[$i]["num_of_Tmax"]>0 ?   $rows[$i]["num_of_Tmax"]." Tmax  " : "";
+                    $outStr .=  $rows[$i]["num_of_Vmax"]>0 ?   $rows[$i]["num_of_Vmax"]." Vmax " : "";
                 }
             }
 
@@ -243,7 +240,7 @@ function cmdGetGrainLevels($dbh, $silo_name){
     $i=0;
     foreach($rows as $row){
         $outStr .= "Силос ".$row["silo_name"].". ";
-        $outStr .= "Уровень заполнения: ".(($row["grain_level"]/$row["max_sensor_num"])*100)." %";
+        $outStr .= "Уровень заполнения: ".( round( ($row["grain_level"]/$row["max_sensor_num"])*100, 1) )." %";
         $outStr .= ";%0A";
 
         if( ($i>0 && $i%10==0) || $i==(count($rows)-1) ){

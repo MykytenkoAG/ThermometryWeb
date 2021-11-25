@@ -113,6 +113,14 @@ if(!checkReadValsToDBSensors($dbh, $arrayOfTemperatures)){
 if($configOK){
 	db_update_grainLevels($dbh, $arrayOfLevels);
 	db_update_temperaturesAndSpeeds($dbh, $arrayOfTemperatures, $arrayOfTempSpeeds, $serverDate, $logFile);
+
+	$alarmStateArray = db_update_curr_alarm_state($dbh);
+
+	send_Telegram_notifications($dbh, $alarmStateArray,$serverDate);
+	log_events($dbh, $logFile, $serverDate, $alarmStateArray);
+
+	file_put_contents(__DIR__.'/debug.txt', "");
+	file_put_contents(__DIR__.'/debug.txt', print_r($alarmStateArray,1), FILE_APPEND);
 }
 
 exit_from_script:
