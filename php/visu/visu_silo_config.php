@@ -245,10 +245,8 @@ function vSConf_prodtypes_remove($dbh, $product_id){
 
 function vSConf_prodtypes_insert($dbh, $product_id, $product_name, $t_min, $t_max, $v_min, $v_max){
 
-    //$query="INSERT INTO prodtypes (product_id, product_name, t_min, t_max, v_min, v_max) VALUES ($product_id, \"$product_name\", $t_min, $t_max, $v_min, $v_max);";
     $query="INSERT INTO prodtypes (product_id, product_name, t_min, t_max, v_min, v_max) VALUES (?, ?, ?, ?, ?, ?);";
     $stmt = $dbh->prepare($query);
-    //$stmt->execute();
     $stmt->execute(array($product_id, $product_name, $t_min, $t_max, $v_min, $v_max));
 
     return $query;
@@ -256,10 +254,8 @@ function vSConf_prodtypes_insert($dbh, $product_id, $product_name, $t_min, $t_ma
 
 function vSConf_prodtypes_update($dbh, $product_id, $product_name, $t_min, $t_max, $v_min, $v_max){
 
-    //$sql = "UPDATE prodtypes SET product_name='$product_name', t_min='$t_min', t_max='$t_max', v_min ='$v_min', v_max='$v_max' WHERE product_id=$product_id";
     $sql = "UPDATE prodtypes SET product_name=?, t_min=?, t_max=?, v_min =?, v_max=? WHERE product_id=?";
     $stmt = $dbh->prepare($sql);
-    //$stmt->execute();
     $stmt->execute(array($product_name,$t_min, $t_max, $v_min, $v_max,$product_id));
 
     return $sql;
@@ -299,10 +295,8 @@ if( isset($_POST['POST_vSConf_prodtypes_changes_queue']) ) {
 //  Формирование массива с перечнем изменений для таблицы "Загрузка силосов"
 function vSConf_prodtypesbysilo_update($dbh, $silo_id, $grainLevelFromTS, $grain_level, $product_id){
 
-    //  $sql = "UPDATE prodtypesbysilo SET grain_level_FromTS='$grainLevelFromTS', grain_level='$grain_level', product_id='$product_id' WHERE silo_id=$silo_id";
     $sql = "UPDATE prodtypesbysilo SET grain_level_FromTS=?, grain_level=?, product_id=? WHERE silo_id=?";
     $stmt = $dbh->prepare($sql);
-    //  $stmt->execute();
     $stmt->execute(array($grainLevelFromTS,$grain_level,$product_id,$silo_id));
 
     return $sql;
@@ -393,10 +387,8 @@ if( isset($_POST['POST_ts_connection_settings_ip']) && isset($_POST['POST_ts_con
 
 function vSConf_ts_connection_settings_save($dbh, $ts_ip, $ts_port){
 
-    //$query = "UPDATE ".DBNAME.".ts_conn_settings SET ts_ip='$ts_ip', ts_port='$ts_port' WHERE id=1;";
     $query = "UPDATE ".DBNAME.".ts_conn_settings SET ts_ip=?, ts_port=? WHERE id=1;";
     $stmt = $dbh->prepare($query);
-    //$stmt->execute();
     $stmt->execute(array($ts_ip, $ts_port));
 
     return;
