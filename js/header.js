@@ -75,19 +75,19 @@ $("a").click(
 //  Выбор языка приложения
 $('#hdr-lng-select-ru').click(
     function() {
-        document.cookie = "application_language=RU;";
+        document.cookie = "application_language=RU;Max-Age=2592000;path=/";
         document.location.href = current_page;
     }
 )
 $('#hdr-lng-select-en').click(
     function() {
-        document.cookie = "application_language=EN;";
+        document.cookie = "application_language=EN;Max-Age=2592000;path=/";
         document.location.href = current_page;
     }
 )
 $('#hdr-lng-select-ua').click(
     function() {
-        document.cookie = "application_language=UA;";
+        document.cookie = "application_language=UA;Max-Age=2592000;path=/";
         document.location.href = current_page;
     }
 )

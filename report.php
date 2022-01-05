@@ -30,13 +30,17 @@
               <div class="card-body">
                 
                 <div class="d-flex mb-2 justify-content-center">
-                  <h5 class="card-title justify-content-center" style="font-family: Arial, Helvetica, sans-serif; font-size: 28px;">Печатные формы</h5>
+                  <h5 class="card-title justify-content-center" style="font-family: Arial, Helvetica, sans-serif; font-size: 28px;">
+                    <?php echo TEXTS["REPORT_LEFT_TITLE"][LANG]; ?>
+                  </h5>
                 </div>
 
                 <div class="row">
 
                   <div class="col-4 text-center">
-                    <h5 style="font-family: Arial, Helvetica, sans-serif; font-size: 16px;">Дата и время</h4>
+                    <h5 style="font-family: Arial, Helvetica, sans-serif; font-size: 16px;">
+                      <?php echo TEXTS["REPORT_LEFT_DATE"][LANG]; ?>
+                    </h4>
 
                     <div class="mt-3">
                       <?php
@@ -51,37 +55,43 @@
                     <div class="row row-cols-1 row-cols-lg-2 row-cols-xl-1">
 
                       <div class="col">
-                        <h5 style="font-family: Arial, Helvetica, sans-serif; font-size: 16px;">Печатные данные</h5>
+                        <h5 style="font-family: Arial, Helvetica, sans-serif; font-size: 16px;">
+                          <?php echo TEXTS["REPORT_LEFT_PR_DATA_TITLE"][LANG]; ?>
+                        </h5>
                         
                         <div class="form-check mt-2">
                           <input class="form-check-input" type="radio" name="exampleRadios"
                                   id="prfrb_avg-t-by-layer" onchange="vRep_prfSelectsDisable()" value="avg-t-by-layer" checked>
                           <label class="form-check-label" for="prfrb_avg-t-by-layer">
-                            Средние температуры в слоях
+                            <?php echo TEXTS["REPORT_LEFT_PR_DATA_1"][LANG]; ?>
                           </label>
                         </div>
                         <div class="form-check mt-1">
                           <input class="form-check-input" type="radio" name="exampleRadios"
                                   id="prfrb_t-by-layer" onchange="vRep_prfSelectsDisable()" value="t-by-layer">
                           <label class="form-check-label" for="prfrb_t-by-layer">
-                            Температуры каждого датчика в слоях
+                            <?php echo TEXTS["REPORT_LEFT_PR_DATA_2"][LANG]; ?>
                           </label>
                         </div>
                         <div class="form-check mt-1">
                           <input class="form-check-input" type="radio" name="exampleRadios"
                                   id="prfrb_t-by-sensor" onchange="vRep_prfSelectsDisable()" value="t-by-sensor">
                           <label class="form-check-label" for="prfrb_t-by-sensor">
-                            Температуры датчика в подвеске
+                            <?php echo TEXTS["REPORT_LEFT_PR_DATA_3"][LANG]; ?>
                           </label>
                         </div>
 
                       </div>
 
                       <div class="col mt-3">
-                        <h5 style="font-family: Arial, Helvetica, sans-serif; font-size: 16px;">Входные данные</h5>
+                        <h5 style="font-family: Arial, Helvetica, sans-serif; font-size: 16px;">
+                          <?php echo TEXTS["REPORT_LEFT_IN_DATA_TITLE"][LANG]; ?>
+                        </h5>
 
                         <div class="mt-2">
-                          <label for="rprtprf_silo_1" class="form-label">Силос</label>
+                          <label for="rprtprf_silo_1" class="form-label">
+                            <?php echo TEXTS["REPORT_LEFT_IN_DATA_SILO"][LANG]; ?>
+                          </label>
                           <select class="form-control"
                             id="rprtprf_silo_1"     onchange="redrawRowOfSelects(event.target.id)"
                             style="width: 70px">
@@ -91,7 +101,9 @@
                           <div class="row mt-2">
 
                             <div class="col-4 mr-1">
-                              <label for="rprtprf_podv_1" class="form-label" disabled>Подвеска</label>
+                              <label for="rprtprf_podv_1" class="form-label" disabled>
+                                <?php echo TEXTS["REPORT_LEFT_IN_DATA_PODV"][LANG]; ?>
+                              </label>
                               <select class="form-control"
                                 id="rprtprf_podv_1" onchange="redrawRowOfSelects(event.target.id)"
                                 style="width: 70px">
@@ -100,7 +112,9 @@
                             </div>
 
                             <div class="col-4 mr-1">
-                              <label for="rprtprf_layer_1" class="form-label">Слой</label>
+                              <label for="rprtprf_layer_1" class="form-label">
+                                <?php echo TEXTS["REPORT_LEFT_IN_DATA_LAYER"][LANG]; ?>
+                              </label>
                               <select class="form-control"
                                 id="rprtprf_layer_1"
                                 style="width: 70px">
@@ -109,7 +123,9 @@
                             </div>
 
                             <div class="col-4 mr-1">
-                              <label for="rprtprf_sensor_1" class="form-label" disabled>Датчик</label>
+                              <label for="rprtprf_sensor_1" class="form-label" disabled>
+                                <?php echo TEXTS["REPORT_LEFT_IN_DATA_SENSOR"][LANG]; ?>
+                              </label>
                               <select class="form-control"
                                 id="rprtprf_sensor_1"
                                 style="width: 70px">
@@ -155,7 +171,9 @@
             <div class="card border-light h-100">
               <div class="card-body">
                 <div class="d-flex mb-2 justify-content-center">
-                  <h5 class="card-title justify-content-center" style="font-family: Arial, Helvetica, sans-serif; font-size: 28px;">График температуры</h5>
+                  <h5 class="card-title justify-content-center" style="font-family: Arial, Helvetica, sans-serif; font-size: 28px;">
+                    <?php echo TEXTS["REPORT_CHART_TITLE"][LANG]; ?>
+                  </h5>
                 </div>
                 <canvas id="temperatureGraph"></canvas>
 
@@ -192,7 +210,9 @@
               <div class="card-body">
 
                 <div class="d-flex justify-content-center">
-                  <h5 class="card-title" style="font-family: Arial, Helvetica, sans-serif; font-size: 28px;">Выбор датчика</h5>
+                  <h5 class="card-title" style="font-family: Arial, Helvetica, sans-serif; font-size: 28px;">
+                    <?php echo TEXTS["REPORT_RIGHT_TITLE"][LANG]; ?>
+                  </h5>
                 </div>
 
                 <div class="card-body">
@@ -200,11 +220,11 @@
                   <table class="table table-hover text-center" id="rep-chart-time-temperature">
                     <thead>
                       <tr>
-                        <th scope="col">Силос</th>
-                        <th scope="col">НП</th>
-                        <th scope="col">НД</th>
-                        <th scope="col">Цвет</th>
-                        <th scope="col">Период</th>
+                        <th scope="col"><?php echo TEXTS["REPORT_RIGHT_SILO"][LANG]; ?></th>
+                        <th scope="col"><?php echo TEXTS["REPORT_RIGHT_PODV"][LANG]; ?></th>
+                        <th scope="col"><?php echo TEXTS["REPORT_RIGHT_SENSOR"][LANG]; ?></th>
+                        <th scope="col"><?php echo TEXTS["REPORT_RIGHT_COLOUR"][LANG]; ?></th>
+                        <th scope="col"><?php echo TEXTS["REPORT_RIGHT_PERIOD"][LANG]; ?></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -247,7 +267,7 @@
                     <svg width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16">
                       <path d="M8 0a1 1 0 0 1 1 1v6h6a1 1 0 1 1 0 2H9v6a1 1 0 1 1-2 0V9H1a1 1 0 0 1 0-2h6V1a1 1 0 0 1 1-1z"/>
                     </svg>
-                    Добавить
+                    <?php echo TEXTS["REPORT_RIGHT_BTN_ADD"][LANG]; ?>
                   </button>
 
                   <button type="submit" class="btn btn-primary" onclick="vRep_ChartDownloadPDF();" style="width: 120px; height: 38px;">

@@ -218,6 +218,7 @@ const SQL_STATEMENT_CREATE_TELEGRAM_USERS =
        "CREATE TABLE ".DBNAME.".`telegram_users`
        ( `user_id` INT(64) NOT NULL , `notifications_on` TINYINT(1) NOT NULL , PRIMARY KEY (`user_id`))
        ENGINE = InnoDB;";
+
 //  Выбор языка приложения
 if(!isset($_COOKIE["application_language"])){
     require_once("lang_ru.php");
@@ -228,38 +229,106 @@ if(!isset($_COOKIE["application_language"])){
 } else if ($_COOKIE["application_language"]==="UA"){
     require_once("lang_ua.php");
 }
-
+//  Массив с переводами
 const TEXTS = array(
 
-    "HDR_PAGE_NAME_DEBUG"       => array("RU"=>"Отладка","UA"=>"Відлагодження","EN"=>"Debug"),
-    "HDR_PAGE_NAME_MAIN"        => array("RU"=>"Главная","UA"=>"Головна","EN"=>""),
-    "HDR_PAGE_NAME_REPORT"      => array("RU"=>"Отчет","UA"=>"Звіт","EN"=>""),
-    "HDR_PAGE_NAME_SETTINGS"    => array("RU"=>"Настройки","UA"=>"Налаштування","EN"=>""),
-    "HDR_PAGE_NAME_INSTRUCTION" => array("RU"=>"Инструкция","UA"=>"Інструкція","EN"=>""),
-    "HDR_ACK"                   => array("RU"=>"Квитировать АПС","UA"=>"Квітувати АПС","EN"=>""),
-    "HDR_OPER"                  => array("RU"=>"Оператор","UA"=>"Оператор","EN"=>""),
-    "HDR_TEHN"                  => array("RU"=>"Технолог","UA"=>"Технолог","EN"=>""),
-    "HDR_SIGN_OUT"              => array("RU"=>"Выйти","UA"=>"Вийти","EN"=>"Sign out"),
+    //  header
+    "HDR_PAGE_NAME_DEBUG"           => array("RU"=>"Отладка",           "UA"=>"Відлагодження",  "EN"=>"Debug"),
+    "HDR_PAGE_NAME_MAIN"            => array("RU"=>"Главная",           "UA"=>"Головна",        "EN"=>"Main page"),
+    "HDR_PAGE_NAME_REPORT"          => array("RU"=>"Отчет",             "UA"=>"Звіт",           "EN"=>"Report"),
+    "HDR_PAGE_NAME_SETTINGS"        => array("RU"=>"Настройки",         "UA"=>"Налаштування",   "EN"=>"Settings"),
+    "HDR_PAGE_NAME_INSTRUCTION"     => array("RU"=>"Инструкция",        "UA"=>"Інструкція",     "EN"=>"Instruction"),
+    "HDR_ACK"                       => array("RU"=>"Квитировать АПС",   "UA"=>"Квітувати АПС",  "EN"=>"Acknowledge"),
+    "HDR_OPER"                      => array("RU"=>"Оператор",          "UA"=>"Оператор",       "EN"=>"Operator"),
+    "HDR_TEHN"                      => array("RU"=>"Технолог",          "UA"=>"Технолог",       "EN"=>"Technologist"),
+    "HDR_SIGN_OUT"                  => array("RU"=>"Выйти",             "UA"=>"Вийти",          "EN"=>"Sign out"),
 
-    "INDEX_LEFT_TABLE_TITLE"    => array("RU"=>"АПС","UA"=>"АПС","EN"=>"Warnings"),
-    "INDEX_LEFT_TABLE_COL_1"    => array("RU"=>"Время","UA"=>"Час","EN"=>""),
-    "INDEX_LEFT_TABLE_COL_2"    => array("RU"=>"Силос","UA"=>"Силос","EN"=>""),
-    "INDEX_LEFT_TABLE_COL_3"    => array("RU"=>"ТП","UA"=>"ТП","EN"=>""),
-    "INDEX_LEFT_TABLE_COL_4"    => array("RU"=>"НД","UA"=>"НД","EN"=>""),
-    "INDEX_LEFT_TABLE_COL_5"    => array("RU"=>"АПС","UA"=>"АПС","EN"=>""),
-    "INDEX_LEFT_BTN_1"          => array("RU"=>"Отключить все неисправные датчики","UA"=>"Відключити усі несправні датчики","EN"=>""),
-    "INDEX_LEFT_BTN_2"          => array("RU"=>"Включить все отключенные датчики","UA"=>"Включити всі відключені датчики","EN"=>""),
-    "INDEX_LEFT_BTN_3"          => array("RU"=>"Включить автоопределение уровня на всех силосах","UA"=>"Ввімкнути автовизначення рівня на усіх силосах","EN"=>""),
+    //  Главная страница
+    "INDEX_LEFT_TABLE_TITLE"        => array("RU"=>"АПС",               "UA"=>"АПС",    "EN"=>"Warnings"),
+    "INDEX_LEFT_TABLE_COL_1"        => array("RU"=>"Время",             "UA"=>"Час",    "EN"=>"Time"),
+    "INDEX_LEFT_TABLE_COL_2"        => array("RU"=>"Силос",             "UA"=>"Силос",  "EN"=>"Silo"),
+    "INDEX_LEFT_TABLE_COL_3"        => array("RU"=>"ТП",                "UA"=>"ТП",     "EN"=>"T#"),
+    "INDEX_LEFT_TABLE_COL_4"        => array("RU"=>"НД",                "UA"=>"НД",     "EN"=>"S#"),
+    "INDEX_LEFT_TABLE_COL_5"        => array("RU"=>"АПС",               "UA"=>"АПС",    "EN"=>"Warn"),
+    "INDEX_LEFT_BTN_1"              => array("RU"=>"Отключить все неисправные датчики",
+                                             "UA"=>"Відключити усі несправні датчики",
+                                             "EN"=>"Disable all faulty sensors"),
+    "INDEX_LEFT_BTN_2"              => array("RU"=>"Включить все отключенные датчики",
+                                             "UA"=>"Включити всі відключені датчики",
+                                             "EN"=>"Enable all disabled sensors"),
+    "INDEX_LEFT_BTN_3"              => array("RU"=>"Включить автоопределение уровня на всех силосах",
+                                             "UA"=>"Ввімкнути автовизначення рівня на усіх силосах",
+                                             "EN"=>"Enable automatic level detection on all silos"),
 
-    "INDEX_TITLE_SILO_PLAN"     => array("RU"=>"План расположения силосов","UA"=>"План розташування силосів","EN"=>""),
+    "INDEX_TITLE_SILO_PLAN"         => array("RU"=>"План расположения силосов","UA"=>"План розташування силосів","EN"=>"Silo plan"),
 
-    "INDEX_RIGHT_SILO"          => array("RU"=>"Силос","UA"=>"Силос","EN"=>""),
-    "INDEX_RIGHT_TEMPERATURES"  => array("RU"=>"Температуры, &deg;C","UA"=>"Температури, &deg;C","EN"=>""),
-    "INDEX_RIGHT_T_SPEEDS"      => array("RU"=>"Скорости, &deg;C/сут.","UA"=>"Швидкості, &deg;C/сут.","EN"=>""),
-    "INDEX_RIGHT_PARAMETERS"    => array("RU"=>"Параметры","UA"=>"Параметри","EN"=>""),
+    "INDEX_RIGHT_SILO"              => array("RU"=>"Силос",                 "UA"=>"Силос",                      "EN"=>"Silo"),
+    "INDEX_RIGHT_TEMPERATURES"      => array("RU"=>"Температуры, &deg;C",   "UA"=>"Температури, &deg;C",        "EN"=>"Temperatures, &deg;C"),
+    "INDEX_RIGHT_T_SPEEDS"          => array("RU"=>"Скорости, &deg;C/сут.", "UA"=>"Швидкості, &deg;C/сут.",     "EN"=>"Temperatures speeds, &deg;C/сут."),
+    "INDEX_RIGHT_PARAMETERS"        => array("RU"=>"Параметры",             "UA"=>"Параметри",                  "EN"=>"Parameters"),
 
+    //  Отчет
+    "REPORT_LEFT_TITLE"             => array("RU"=>"Печатные формы","UA"=>"Друковані форми","EN"=>"Printed forms"),
+    "REPORT_LEFT_DATE"              => array("RU"=>"Дата и время","UA"=>"Дата та час","EN"=>"Date and time"),
+    "REPORT_LEFT_PR_DATA_TITLE"     => array("RU"=>"Печатные данные","UA"=>"Друковані дані","EN"=>"Print data"),
+    "REPORT_LEFT_PR_DATA_1"         => array("RU"=>"Средние температуры в слоях",
+                                             "UA"=>"Середні температури у шарах",
+                                             "EN"=>"Average temperatures in layers"),
+    "REPORT_LEFT_PR_DATA_2"         => array("RU"=>"Температуры каждого датчика в слоях",
+                                             "UA"=>"Температура кожного датчика у шарах",
+                                             "EN"=>"Temperatures of each sensor in layers"),
+    "REPORT_LEFT_PR_DATA_3"         => array("RU"=>"Температуры датчика в подвеске",
+                                             "UA"=>"Температури датчика у підвісці",
+                                             "EN"=>"Sensor temperatures in cables"),
+    "REPORT_LEFT_IN_DATA_TITLE"     => array("RU"=>"Входные данные","UA"=>"Вхідні дані","EN"=>"Input data"),
+    "REPORT_LEFT_IN_DATA_SILO"      => array("RU"=>"Силос","UA"=>"Силос","EN"=>"Silo"),
+    "REPORT_LEFT_IN_DATA_PODV"      => array("RU"=>"Подвеска","UA"=>"Підвіска","EN"=>"Temperature cable"),
+    "REPORT_LEFT_IN_DATA_LAYER"     => array("RU"=>"Слой","UA"=>"Шар","EN"=>"Layer"),
+    "REPORT_LEFT_IN_DATA_SENSOR"    => array("RU"=>"Датчик","UA"=>"Датчик","EN"=>"Sensor"),
 
+    "REPORT_CHART_TITLE"            => array("RU"=>"График температуры","UA"=>"Графік температури","EN"=>"Temperature chart"),
+    
+    "REPORT_RIGHT_TITLE"            => array("RU"=>"Выбор датчика","UA"=>"Вибір датчика","EN"=>"Sensor selection"),
+    "REPORT_RIGHT_SILO"             => array("RU"=>"Силос","UA"=>"Силос","EN"=>"Silo"),
+    "REPORT_RIGHT_PODV"             => array("RU"=>"НП","UA"=>"НП","EN"=>"T#"),
+    "REPORT_RIGHT_SENSOR"           => array("RU"=>"НД","UA"=>"НД","EN"=>"S#"),
+    "REPORT_RIGHT_COLOUR"           => array("RU"=>"Цвет","UA"=>"Колір","EN"=>"Colour"),
+    "REPORT_RIGHT_PERIOD"           => array("RU"=>"Период","UA"=>"Період","EN"=>"Period"),
+    "REPORT_RIGHT_BTN_ADD"          => array("RU"=>"Добавить","UA"=>"Додати","EN"=>"Add"),
 
+    //  Настройки
+    "SETTINGS_PRODTYPES_TITLE"      => array("RU"=>"Типы продукта","UA"=>"Типи продукта","EN"=>"Product types"),
+    "SETTINGS_PRODTYPES_COL_1"      => array("RU"=>"Тип продукта","UA"=>"Тип продукта","EN"=>"Product type"),
+    "SETTINGS_PRODTYPES_COL_2"      => array("RU"=>"Т мин.","UA"=>"T мин.","EN"=>"T min."),
+    "SETTINGS_PRODTYPES_COL_3"      => array("RU"=>"Т кр.","UA"=>"Т кр.","EN"=>"T max."),
+    "SETTINGS_PRODTYPES_COL_4"      => array("RU"=>"V мин.","UA"=>"V мин.","EN"=>"V min."),
+    "SETTINGS_PRODTYPES_COL_5"      => array("RU"=>"V кр.","UA"=>"V кр.","EN"=>"V max."),
+
+    "SETTINGS_PRODTYPES_BTN_1"      => array("RU"=>"Добавить","UA"=>"Додати","EN"=>"Add"),
+    "SETTINGS_PRODTYPES_BTN_2"      => array("RU"=>"Сохранить изменения","UA"=>"Зберегти","EN"=>"Save changes"),
+    "SETTINGS_PRODTYPES_BTN_3"      => array("RU"=>"Отменить изменения","UA"=>"Відмінити","EN"=>"Discard changes"),
+
+    "SETTINGS_SILOLOADS_TITLE"      => array("RU"=>"Загрузка силосов","UA"=>"Завантаження силосів","EN"=>"Silo loads"),
+    "SETTINGS_SILOLOADS_COL_1"      => array("RU"=>"Силос","UA"=>"Силос","EN"=>"Silo"),
+    "SETTINGS_SILOLOADS_COL_2"      => array("RU"=>"БС","UA"=>"БС","EN"=>"BS"),
+    "SETTINGS_SILOLOADS_COL_3"      => array("RU"=>"Определение уровня","UA"=>"Визначення рівня","EN"=>"Level measuring"),
+    "SETTINGS_SILOLOADS_COL_4"      => array("RU"=>"Уровень","UA"=>"Рівень","EN"=>"Level"),
+    "SETTINGS_SILOLOADS_COL_5"      => array("RU"=>"Тип продукта","UA"=>"Тип продукта","EN"=>"Product type"),
+
+    "SETTINGS_SILOLOADS_BTN_1"      => array("RU"=>"Сохранить изменения","UA"=>"Зберегти","EN"=>"Save changes"),
+    "SETTINGS_SILOLOADS_BTN_2"      => array("RU"=>"Отменить изменения","UA"=>"Відмінити","EN"=>"Discard changes"),
+
+    "SETTINGS_RIGHT_TITLE"          => array("RU"=>"Опции","UA"=>"Опції","EN"=>"Options"),
+    "SETTINGS_RIGHT_ROW_1"          => array("RU"=>"Работа с ПО Термосервер","UA"=>"Робота з ПЗ Термосервер","EN"=>"Working with TermoServer software"),
+    "SETTINGS_RIGHT_ROW_2"          => array("RU"=>"Работа с БД","UA"=>"Робота з БД","EN"=>"Working with DB"),
+    "SETTINGS_RIGHT_ROW_3"          => array("RU"=>"Протокол работы АПС","UA"=>"Протокол роботи АПС","EN"=>"Log"),
+    "SETTINGS_RIGHT_ROW_4"          => array("RU"=>"Пользователь: ","UA"=>"Користувач: ","EN"=>"User"),
+
+    "SETTINGS_RIGHT_BTN_1"          => array("RU"=>"Настроить","UA"=>"Налаштувати","EN"=>"Configure"),
+    "SETTINGS_RIGHT_BTN_2"          => array("RU"=>"Операции","UA"=>"Операції","EN"=>"Operations"),
+    "SETTINGS_RIGHT_BTN_3"          => array("RU"=>"Скачать","UA"=>"Завантажити","EN"=>"Download"),
+    "SETTINGS_RIGHT_BTN_4"          => array("RU"=>"Очистить","UA"=>"Очистити","EN"=>"Clear"),
+    "SETTINGS_RIGHT_BTN_5"          => array("RU"=>"Изменить пароль","UA"=>"Змінити пароль","EN"=>"Change password"),
 
 );
 
