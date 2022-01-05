@@ -71,3 +71,23 @@ $("a").click(
 
     }
 )
+
+//  Выбор языка приложения
+$('#hdr-lng-select-ru').click(
+    function() {
+        document.cookie = "application_language=RU;";
+        document.location.href = current_page;
+    }
+)
+$('#hdr-lng-select-en').click(
+    function() {
+        document.cookie = "application_language=EN;";
+        document.location.href = current_page;
+    }
+)
+$('#hdr-lng-select-ua').click(
+    function() {
+        document.cookie = "application_language=UA;";
+        document.location.href = current_page;
+    }
+)

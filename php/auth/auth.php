@@ -22,7 +22,7 @@ function auth_signIn($dbh, $userName, $password){
 	if(count($user)==0){
 		return "WRONG";
 	}
-
+    
     return $user[0]['access_level'];
 }
 
