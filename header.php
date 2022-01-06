@@ -183,11 +183,14 @@ title="Квитировать сигналы АПС">
         $tehnTooltip = $accessLevel==2 ? "" : "data-bs-toggle=\"tooltip\" data-bs-placement=\"right\" title=\"Авторизоваться как технолог\"";
         echo "
                 <li>
-                    <a href=\"#\" id=\"hdr-auth-tehn\" class=\"nav-link $textColor\" style=\"width: 100px;\" $tehnTooltip>
-                        <svg width=\"24\" height=\"24\" fill=\"currentColor\" class=\"bi d-block mx-auto mt-1\" viewBox=\"0 0 16 16\">
+                    <a href=\"#\" id=\"hdr-auth-tehn\" class=\"nav-link $textColor\" $tehnTooltip>"
+                        /* <svg width=\"24\" height=\"24\" fill=\"currentColor\" class=\"bi d-block mx-auto mt-1\" viewBox=\"0 0 16 16\">
                             <path d=\"M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H3zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z\"/>                
-                        </svg>"
+                        </svg>" */
+                        ."<img src=\"assets/users/user1.jfif\" width=\"24\" height=\"24\" class=\"bi d-block mx-auto mt-1\" style=\"display: block; margin-top: 0.25rem; margin-left: auto; margin-right: auto;\">"
+                        ."<div style=\"width: 100%; margin-left: auto; margin-right: auto;\">"
                         .TEXTS["HDR_TEHN"][LANG]
+                        ."</div>"
                     ."</a>
                 </li>
         ";

@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <?php
-      $webSiteTitle="DEBUG";
+      $webSiteTitle=TEXTS["TITLE_DEBUG"][LANG];
       require_once "head.php";
       require_once __DIR__."/php/visu/visu_debug_page.php";
     ?>

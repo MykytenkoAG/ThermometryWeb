@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <?php
-      $webSiteTitle="Отчет";
+      $webSiteTitle=TEXTS["TITLE_REPORT"][LANG];
       require_once "head.php";
       require_once __DIR__."/php/visu/visu_report.php";
     ?>

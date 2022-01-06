@@ -3,7 +3,7 @@
 <html lang="ru">
   <head>
     <?php
-      $webSiteTitle="Инструкция";
+      $webSiteTitle=TEXTS["TITLE_INSTRUCTION"][LANG];
       require_once "head.php";
       require_once __DIR__.'/php/visu/visu_index.php';
     ?>

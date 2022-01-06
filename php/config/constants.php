@@ -232,6 +232,25 @@ if(!isset($_COOKIE["application_language"])){
 //  Массив с переводами
 const TEXTS = array(
 
+    //  titles
+    "TITLE_DEBUG"                   => array("RU"=>"Отладка",           "UA"=>"Відлагодження",  "EN"=>"Debug"),
+    "TITLE_INDEX"                   => array("RU"=>"Термометрия",       "UA"=>"Термометрія",    "EN"=>"Thermometry"),
+    "TITLE_REPORT"                  => array("RU"=>"Отчет",             "UA"=>"Звіт",           "EN"=>"Report"),
+    "TITLE_SETTINGS"                => array("RU"=>"Настройки",         "UA"=>"Налаштування",   "EN"=>"Settings"),
+    "TITLE_INSTRUCTION"             => array("RU"=>"Инструкция",        "UA"=>"Інструкція",     "EN"=>"Instruction"),
+    "TITLE_SIGN_IN"                 => array("RU"=>"Вход",              "UA"=>"Вхід",           "EN"=>"Sign in"),
+    "TITLE_SIGN_UP"                 => array("RU"=>"Регистрация",       "UA"=>"Реєстрація",     "EN"=>"Sign up"),
+
+    //  sign in and sign up pages
+    "SIGN_IN_USER"                  => array("RU"=>"Пользователь",      "UA"=>"Користувач",      "EN"=>"User"),
+    "SIGN_IN_PASSWORD"              => array("RU"=>"Пароль",            "UA"=>"Пароль",          "EN"=>"Password"),
+    "SIGN_IN_REMEMBER_ME"           => array("RU"=>"Запомнить меня",    "UA"=>"Запам'ятати мене","EN"=>"Remember me"),
+    "SIGN_IN_SIGN_IN"               => array("RU"=>"Войти",             "UA"=>"Увійти",          "EN"=>"Sign in"),
+    "SIGN_IN_SIGN_UP"               => array("RU"=>"Зарегистрироваться","UA"=>"Зареєструватися", "EN"=>"Sign up"),
+    "SIGN_IN_INDEX"                 => array("RU"=>"На главную",        "UA"=>"На головну",      "EN"=>"Main page"),
+    "SIGN_UP_CONFIRM_PASSWORD"      => array("RU"=>"Повторите пароль",  "UA"=>"Повторіть пароль","EN"=>"Confirm password"),
+    "SIGN_UP_PHOTO"                 => array("RU"=>"Фото",              "UA"=>"Фото",            "EN"=>"Photo"),
+
     //  header
     "HDR_PAGE_NAME_DEBUG"           => array("RU"=>"Отладка",           "UA"=>"Відлагодження",  "EN"=>"Debug"),
     "HDR_PAGE_NAME_MAIN"            => array("RU"=>"Главная",           "UA"=>"Головна",        "EN"=>"Main page"),
@@ -264,7 +283,7 @@ const TEXTS = array(
 
     "INDEX_RIGHT_SILO"              => array("RU"=>"Силос",                 "UA"=>"Силос",                      "EN"=>"Silo"),
     "INDEX_RIGHT_TEMPERATURES"      => array("RU"=>"Температуры, &deg;C",   "UA"=>"Температури, &deg;C",        "EN"=>"Temperatures, &deg;C"),
-    "INDEX_RIGHT_T_SPEEDS"          => array("RU"=>"Скорости, &deg;C/сут.", "UA"=>"Швидкості, &deg;C/сут.",     "EN"=>"Temperatures speeds, &deg;C/сут."),
+    "INDEX_RIGHT_T_SPEEDS"          => array("RU"=>"Скорости, &deg;C/сут.", "UA"=>"Швидкості, &deg;C/сут.",     "EN"=>"T. speeds, &deg;C/сут."),
     "INDEX_RIGHT_PARAMETERS"        => array("RU"=>"Параметры",             "UA"=>"Параметри",                  "EN"=>"Parameters"),
 
     //  Отчет
